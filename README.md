@@ -1,6 +1,6 @@
 # ZF3 Library
 
-Biblioteca com models comuns utilizados nos projetos ZF2.
+Biblioteca com models comuns utilizados nos projetos ZF3.
 
 ## Db\TableAdapter
 
