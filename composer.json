@@ -1,5 +1,5 @@
 {
-  "name" : "realejo/library-zf2",
+  "name" : "realejo/library-zf3",
   "description" : "Biblioteca com models comuns utilizados nos projetos ZF3.",
   "minimum-stability": "dev",
   "prefer-stable": true,
