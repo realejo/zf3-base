@@ -26,13 +26,13 @@ class Base
 
     /**
      *
-     * @var Zend\Db\TableGateway\TableGateway
+     * @var \Zend\Db\TableGateway\TableGateway
      */
     private $_tableGateway;
 
     /**
      *
-     * @var Zend\Db\TableGateway\AdapterInterface
+     * @var \Zend\Db\TableGateway\AdapterInterface
      */
     private $_dbAdapter;
 
@@ -393,7 +393,6 @@ class Base
             $md5 = md5(var_export($where, true) . var_export($order, true) . var_export($count, true) . var_export($offset, true) . var_export($this->getShowDeleted(), true) . var_export($this->getUseDeleted(), true));
         }
 
-        // Verifica se tem no cache
         // o Zend_Paginator precisa do Zend_Paginator_Adapter_DbSelect para acessar o cache
         if ($this->getUseCache() && !$this->getUsePaginator() && $this->getCache()->hasItem($md5)) {
             return $this->getCache()->getItem($md5);
@@ -702,7 +701,7 @@ class Base
     public function getCache()
     {
         if (! isset($this->_cache)) {
-            $this->_cache = new \Realejo\App\Model\Cache();
+            $this->_cache = new \Realejo\Utils\Cache();
         }
         return $this->_cache->getFrontend(get_class($this));
     }

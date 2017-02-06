@@ -18,7 +18,7 @@ use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 
-class AbstractTestCase extends \PHPUnit_Framework_TestCase
+class AbstractTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Zend\Db\Adapter\Adapter
