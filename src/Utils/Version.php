@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
-namespace Realejo\App;
+namespace Realejo\Utils;
 
 class Version
 {
@@ -14,7 +14,7 @@ class Version
      * indentificador de versão
      * @see compareVersion()
      */
-    CONST VERSION = '3.0';
+    CONST VERSION = '0.2';
 
     /**
      * The latest stable version Zend Framework available

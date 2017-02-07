@@ -241,7 +241,9 @@ abstract class MapperAbstract
         $select = $this->getTableSelect();
 
         // Verifica se existe ordem padrão
-        if (empty($order) && isset($this->order)) {
+        if ($order === false) {
+            $select->reset('order');
+        } elseif (empty($order) && isset($this->order)) {
             if (is_string($this->order) && strpos($this->order, '=') !== false) {
                 $this->order = new Expression($this->order);
             }
@@ -249,7 +251,9 @@ abstract class MapperAbstract
         }
 
         // Define a ordem
-        $select->order($order);
+        if (!empty($order)) {
+            $select->order($order);
+        }
 
         // Verifica se há paginação, não confundir com o Zend_Paginator
         if (!is_null($count)) {

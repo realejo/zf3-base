@@ -8,11 +8,12 @@
  *
  * @see http://www.sitepoint.com/print/hierarchical-data-database
  */
-namespace Realejo\App\Model;
+namespace Realejo\Service;
 
-use Realejo\App\Model\Db;
+use Realejo\Service\ServiceAbstract;
+use Zend\Db\Sql\Predicate\Expression;
 
-class Mptt extends Db
+class Mptt extends ServiceAbstract
 {
     /**
      * Traversal tree information for
@@ -38,11 +39,14 @@ class Mptt extends Db
 
     /**
      * Modified to initialize traversal
-     *
+     * @param null $mapper
+     * @param null $key
+     * @param null $dbAdapter
      */
-    public function __construct($table = null, $key = null, $dbAdapter = null)
+    public function __construct($mapper = null, $key = null, $dbAdapter = null)
     {
-        parent::__construct($table, $key, $dbAdapter);
+        $this->setMapper($mapper);
+        $this->getMapper()->setTableKey($key);
         $this->_initTraversal();
     }
 
@@ -76,7 +80,7 @@ class Mptt extends Db
 
         // Check for identifying column
         if (!isset($this->_traversal['column'])) {
-            $this->_traversal['column'] = $this->getKey();
+            $this->_traversal['column'] = $this->getMapper()->getTableKey();
         }
 
         if (!in_array($this->_traversal['column'], $columns)) {
@@ -94,7 +98,7 @@ class Mptt extends Db
 
         // Check the order
         if (!isset($this->_traversal['order'])) {
-            $this->_traversal['order'] = $this->getKey();
+            $this->_traversal['order'] = $this->getMapper()->getTableKey();
         }
 
         if (!in_array($this->_traversal['order'], $columns)) {
@@ -130,13 +134,13 @@ class Mptt extends Db
         $this->_verifyTraversable();
 
         // Do not use getSQLSelect() to avoid defined joins
-        $select = $this->getTableGateway()
+        $select = $this->getMapper()->getTableGateway()
                        ->getSql()->select();
 
         if (!empty($parentId)) {
             $select->where(array($this->_traversal['refColumn'] => $parentId));
         } else {
-            $select->where(new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['refColumn']} IS NULL OR {$this->_traversal['refColumn']} = 0"));
+            $select->where(new Expression("{$this->_traversal['refColumn']} IS NULL OR {$this->_traversal['refColumn']} = 0"));
         }
 
         // Define the order
@@ -144,13 +148,13 @@ class Mptt extends Db
 
         $rightValue = $leftValue + 1;
 
-        $rowset = $this->getTableGateway()->selectWith($select);
+        $rowset = $this->getMapper()->getTableGateway()->selectWith($select);
         foreach ($rowset as $row) {
             $rightValue = $this->_rebuildTreeTraversal($row->{$this->_traversal['column']}, $rightValue);
         }
 
         if (!empty($parentId)) {
-            $this->getTableGateway()
+            $this->getMapper()->getTableGateway()
                  ->update(array(
                      $this->_traversal['left'] => $leftValue,
                      $this->_traversal['right'] => $rightValue
@@ -169,7 +173,7 @@ class Mptt extends Db
      */
     public function insert($set)
     {
-        return $this->isTraversable() ? $this->_insertTraversable($set) : parent::insert($set);
+        return $this->isTraversable() ? $this->_insertTraversable($set) : parent::getMapper()->insert($set);
     }
 
     /**
@@ -178,6 +182,7 @@ class Mptt extends Db
      *
      * @param array $set
      * @return int $id
+     * @throws \Exception
      */
     protected function _insertTraversable($set)
     {
@@ -190,7 +195,7 @@ class Mptt extends Db
         if (array_key_exists($this->_traversal['refColumn'], $set) && $set[$this->_traversal['refColumn']] > 0) {
             // Find parent
             $parent_id = $set[$this->_traversal['refColumn']];
-            $parent = $this->getTableGateway()->select(array($this->getKey()=>$parent_id))->current();
+            $parent = $this->getMapper()->getTableGateway()->select(array($this->getMapper()->getTableKey()=>$parent_id))->current();
             if (null === $parent) {
                 throw new \Exception("Traversable error: Parent id {$parent_id} not found");
             }
@@ -199,10 +204,10 @@ class Mptt extends Db
             $rt = (double) $parent->{$this->_traversal['right']};
 
             // Find siblings
-            $select = $this->getTableGateway()->getSql()->select();
+            $select = $this->getMapper()->getTableGateway()->getSql()->select();
             $select->where(array($this->_traversal['refColumn']=>$parent_id));
 
-            $siblings = $this->getTableGateway()->selectWith($select);
+            $siblings = $this->getMapper()->getTableGateway()->selectWith($select);
 
             // Define the position of the new node
             // Checks if it has any sibling on the left, considering the defined order
@@ -238,27 +243,27 @@ class Mptt extends Db
             }
 
             // Make room for the new node
-            $this->getTableGateway()->update(
+            $this->getMapper()->getTableGateway()->update(
                 array(
-                    $this->_traversal['left'] => new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['left']} + 2"),
-                ), new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['left']} > $pos")
+                    $this->_traversal['left'] => new Expression("{$this->_traversal['left']} + 2"),
+                ), new Expression("{$this->_traversal['left']} > $pos")
             );
 
-            $this->getTableGateway()->update(
+            $this->getMapper()->getTableGateway()->update(
                 array(
-                    $this->_traversal['right'] => new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['right']} + 2"),
-                ), new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['right']} > $pos")
+                    $this->_traversal['right'] => new Expression("{$this->_traversal['right']} + 2"),
+                ), new Expression("{$this->_traversal['right']} > $pos")
             );
         } else {
-            $select = $this->getTableGateway()->getSql()->select();
-            $select->reset('columns')->columns(array('theMax' => new \Zend\Db\Sql\Predicate\Expression("MAX({$this->_traversal['right']})")));
-            $maxRt = (double) $this->getTableGateway()->selectWith($select)->current()->theMax;
+            $select = $this->getMapper()->getTableGateway()->getSql()->select();
+            $select->reset('columns')->columns(array('theMax' => new Expression("MAX({$this->_traversal['right']})")));
+            $maxRt = (double) $this->getMapper()->getTableGateway()->selectWith($select)->current()->theMax;
             $set[$this->_traversal['left']] = $maxRt + 1;
             $set[$this->_traversal['right']] = $maxRt + 2;
         }
 
         // Do insert
-        $id = $this->getTableGateway()->insert($set);
+        $id = $this->getMapper()->getTableGateway()->insert($set);
 
         // Reset isTraversable flag to previous value.
         $this->_isTraversable = $isTraversable;
@@ -270,10 +275,11 @@ class Mptt extends Db
      * Override delete method
      *
      * @param mixed $key
+     * @return bool|int
      */
     public function delete($key)
     {
-        return $this->isTraversable() ? $this->_deleteTraversable($key) : parent::delete($key);
+        return $this->isTraversable() ? $this->_deleteTraversable($key) : parent::getMapper()->delete($key);
     }
 
     /**
@@ -281,6 +287,7 @@ class Mptt extends Db
      * It will delete all child nodes from the row
      *
      * @param array $key
+     * @return int
      */
     protected function _deleteTraversable($key)
     {
@@ -291,22 +298,22 @@ class Mptt extends Db
         $this->_isTraversable = false;
 
         // Get the row to be deleted
-        $row = $this->fetchRow($key);
+        $row = $this->getMapper()->fetchRow($key);
 
         // Delete the node and it's childs
-        $delete = $this->getTableGateway()->delete(new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['left']} >= {$row[$this->_traversal['left']]} and {$this->_traversal['right']} <= {$row[$this->_traversal['right']]}"));
+        $delete = $this->getMapper()->getTableGateway()->delete(new Expression("{$this->_traversal['left']} >= {$row[$this->_traversal['left']]} and {$this->_traversal['right']} <= {$row[$this->_traversal['right']]}"));
 
         // Fixes the left,right for the remaining nodes
         $fix = $row[$this->_traversal['right']] - $row[$this->_traversal['left']] + 1;
-        $this->getTableGateway()->update(
+        $this->getMapper()->getTableGateway()->update(
             array(
-                $this->_traversal['left'] => new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['left']} - $fix"),
-            ), new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['left']} > {$row[$this->_traversal['left']]}")
+                $this->_traversal['left'] => new Expression("{$this->_traversal['left']} - $fix"),
+            ), new Expression("{$this->_traversal['left']} > {$row[$this->_traversal['left']]}")
         );
-        $this->getTableGateway()->update(
+        $this->getMapper()->getTableGateway()->update(
             array(
-                $this->_traversal['right'] => new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['right']} - $fix"),
-            ), new \Zend\Db\Sql\Predicate\Expression("{$this->_traversal['right']} > {$row[$this->_traversal['right']]}")
+                $this->_traversal['right'] => new Expression("{$this->_traversal['right']} - $fix"),
+            ), new Expression("{$this->_traversal['right']} > {$row[$this->_traversal['right']]}")
         );
 
 
@@ -326,8 +333,8 @@ class Mptt extends Db
     public function getColumns()
     {
         if (!isset($this->_columns)) {
-            $metadata = new \Zend\Db\Metadata\Metadata($this->getTableGateway()->getAdapter());
-            $this->_columns = $metadata->getColumnNames($this->getTable());
+            $metadata = new \Zend\Db\Metadata\Metadata($this->getMapper()->getTableGateway()->getAdapter());
+            $this->_columns = $metadata->getColumnNames($this->getMapper()->getTableName());
         }
 
         return $this->_columns;
@@ -374,7 +381,7 @@ class Mptt extends Db
     protected function _verifyTraversable()
     {
         if (!$this->isTraversable()) {
-            throw new \Exception("Table {$this->table} is not traversable");
+            throw new \Exception("Table {$this->getMapper()->getTableName()} is not traversable");
         }
     }
 }

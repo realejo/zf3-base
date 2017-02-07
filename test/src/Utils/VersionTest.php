@@ -5,7 +5,7 @@ namespace RealejoTest\App;
 /**
  * Version test case.
  */
-use Realejo\App\Version;
+use Realejo\Utils\Version;
 
 class VersionTest extends \PHPUnit\Framework\TestCase
 {

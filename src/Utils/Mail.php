@@ -54,6 +54,7 @@ class Mail
      */
     private $_password;
 
+
     public function __construct($isException = false)
     {
         // Verifica se a constante da marca esta definida
