@@ -1,5 +1,5 @@
 <?php
-namespace RealejoTest\App\Model;
+namespace RealejoTest\Utils;
 
 /**
  * CacheTest test case.

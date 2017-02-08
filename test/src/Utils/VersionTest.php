@@ -1,6 +1,6 @@
 <?php
 
-namespace RealejoTest\App;
+namespace RealejoTest\Utils;
 
 /**
  * Version test case.
