@@ -10,7 +10,7 @@ use Realejo\Utils\MailSender;
 class MailSenderTest extends \PHPUnit\Framework\TestCase
 {
     private $defaultConfig = [
-        'name'       => 'Bobs',
+        'name'       => 'Bobs Fa',
         'email'      => '***REMOVED***',
         'host'       => '***REMOVED***',
         'username'   => '***REMOVED***',
@@ -36,30 +36,10 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Ok
-     */
-    public function test__envioEmailHtmlSucesso()
-    {
-        $this->markTestIncomplete(
-            'This test has not been revised yet.'
-        );
-
-        $oMailer = new MailSender($this->defaultConfig);
-        $htmlEmail = '<html><head><title>Ola mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
-
-        $return = $oMailer->sendEmail(null, null, null, 'mario.costa@realejo.com.br', 'Ola', $htmlEmail);
-        $this->assertNull($return, 'Envio com sucesso');
-    }
-
-    /**
      *
      */
-    public function test__envioEmailComAnexoStrings()
+    public function test__setEmailComAnexoStrings()
     {
-        $this->markTestIncomplete(
-            'This test has not been revised yet.'
-        );
-
         $oMailer = new MailSender($this->defaultConfig);
 
         $files = [
@@ -67,9 +47,34 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
             TEST_ROOT . '/assets/sql/album.drop.sql'
         ];
 
-        $return = $oMailer->sendEmail(null, null, null, 'mario.costa@realejo.com.br', 'Ola', 'Ola mundo, teste do anexo com array de strings', ['anexos'=>$files]);
+        $oMailer->setEmailMessage(null, null, 'Mario Costa', 'mario.costa@realejo.com.br', 'Olá', 'Olá mundo, teste do anexo com array de strings', ['anexos'=>$files]);
 
-        $this->assertNull($return, 'Envio com sucesso');
+        //verifica se os remetentes e destinatarios estao ok
+        $this->assertEquals('Bobs Fa (teste local)', $oMailer->getMessage()->getFrom()->current()->getName());
+        $this->assertEquals('sistemas@realejo.com.br', $oMailer->getMessage()->getFrom()->current()->getEmail());
+        $this->assertEquals('Mario Costa', $oMailer->getMessage()->getTo()->current()->getName());
+        $this->assertEquals('mario.costa@realejo.com.br', $oMailer->getMessage()->getTo()->current()->getEmail());
+
+        //define e verifica o reply-to
+        $oMailer->getMessage()->setReplyTo($this->defaultConfig['email'], $this->defaultConfig['name']);
+        $this->assertEquals('Bobs Fa', $oMailer->getMessage()->getReplyTo()->current()->getName());
+        $this->assertEquals('***REMOVED***', $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+
+        //verifica o assunto
+        $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());
+
+        //verifica se existe o mime part html
+        $this->assertNotEmpty($oMailer->getMessage()->getBody());
+        $this->assertNotEmpty(3, count($oMailer->getMessage()->getBody()->getParts()));
+
+        $parts = $oMailer->getMessage()->getBody()->getParts();
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[0]);
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[1]);
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[2]);
+
+        $this->assertEquals('Olá mundo, teste do anexo com array de strings', $parts[0]->getContent());
+        $this->assertEquals('album.create.sql', $parts[1]->getFileName());
+        $this->assertEquals('album.drop.sql', $parts[2]->getFileName());
     }
 
     /**
@@ -77,10 +82,6 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
      */
     public function test__envioEmailComAnexoSource()
     {
-        $this->markTestIncomplete(
-            'This test has not been revised yet.'
-        );
-
         $oMailer = new MailSender($this->defaultConfig);
 
         $file1 = fopen(TEST_ROOT . '/assets/sql/album.create.sql', 'r');
@@ -90,7 +91,69 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
             $file1, $file2,
         ];
 
-        $return = $oMailer->sendEmail(null, null, null, 'mario.costa@realejo.com.br', 'Ola', 'Ola mundo, teste do anexo com array de resources', ['anexos'=>$files]);
-        $this->assertNull($return, 'Envio com sucesso');
+        $oMailer->setEmailMessage(null, null, 'Mario Costa', 'mario.costa@realejo.com.br', 'Olá', 'Olá mundo, teste do anexo com array de strings', ['anexos'=>$files]);
+
+        //verifica se os remetentes e destinatarios estao ok
+        $this->assertEquals('Bobs Fa (teste local)', $oMailer->getMessage()->getFrom()->current()->getName());
+        $this->assertEquals('sistemas@realejo.com.br', $oMailer->getMessage()->getFrom()->current()->getEmail());
+        $this->assertEquals('Mario Costa', $oMailer->getMessage()->getTo()->current()->getName());
+        $this->assertEquals('mario.costa@realejo.com.br', $oMailer->getMessage()->getTo()->current()->getEmail());
+
+        //define e verifica o reply-to
+        $oMailer->getMessage()->setReplyTo($this->defaultConfig['email'], $this->defaultConfig['name']);
+        $this->assertEquals('Bobs Fa', $oMailer->getMessage()->getReplyTo()->current()->getName());
+        $this->assertEquals('***REMOVED***', $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+
+        //verifica o assunto
+        $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());
+
+        //verifica se existe o mime part html
+        $this->assertNotEmpty($oMailer->getMessage()->getBody());
+        $this->assertNotEmpty(3, count($oMailer->getMessage()->getBody()->getParts()));
+
+        $parts = $oMailer->getMessage()->getBody()->getParts();
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[0]);
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[1]);
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[2]);
+
+        $this->assertEquals('Olá mundo, teste do anexo com array de strings', $parts[0]->getContent());
+        $this->assertEquals('application/octet-stream', $parts[1]->getType());
+        $this->assertEquals('application/octet-stream', $parts[2]->getType());
+    }
+
+    /**
+     * Ok
+     */
+    public function test__envioEmailHtmlSucesso()
+    {
+        $oMailer = new MailSender($this->defaultConfig);
+        $htmlEmail = '<html><head><title>Olá mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
+
+        $oMailer->setEmailMessage(null, null, 'Mario Costa', 'mario.costa@realejo.com.br', 'Olá', $htmlEmail);
+
+        //verifica se os remetentes e destinatarios estao ok
+        $this->assertEquals('Bobs Fa (teste local)', $oMailer->getMessage()->getFrom()->current()->getName());
+        $this->assertEquals('sistemas@realejo.com.br', $oMailer->getMessage()->getFrom()->current()->getEmail());
+        $this->assertEquals('Mario Costa', $oMailer->getMessage()->getTo()->current()->getName());
+        $this->assertEquals('mario.costa@realejo.com.br', $oMailer->getMessage()->getTo()->current()->getEmail());
+
+        //define e verifica o reply-to
+        $oMailer->getMessage()->setReplyTo($this->defaultConfig['email'], $this->defaultConfig['name']);
+        $this->assertEquals('Bobs Fa', $oMailer->getMessage()->getReplyTo()->current()->getName());
+        $this->assertEquals('***REMOVED***', $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+
+        //verifica o assunto
+        $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());
+
+        //verifica se existe o mime part html
+        $this->assertNotEmpty($oMailer->getMessage()->getBody());
+        $this->assertNotEmpty(1, count($oMailer->getMessage()->getBody()->getParts()));
+
+        $parts = $oMailer->getMessage()->getBody()->getParts();
+        $this->assertInstanceOf('\Zend\Mime\Part', $parts[0]);
+
+        $this->assertEquals('<html><head><title>Olá mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>', $parts[0]->getContent());
+
+        $this->assertNull($oMailer->send());
     }
 }
