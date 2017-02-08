@@ -9,11 +9,12 @@ namespace RealejoTest;
  * @license   http://unlicense.org
  */
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 
 class BaseTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Zend\Db\Adapter\Adapter
+     * @var \Zend\Db\Adapter\Adapter
      */
     protected $adapter = null;
 
@@ -37,15 +38,7 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
     public function getAdapter()
     {
         if (!isset($this->adapter)) {
-
-            // Receupera as configurações do banco de dados
-            $config = TEST_ROOT . '/configs/db.php';
-            if (!file_exists($config)) {
-                $this->fail("Arquivo de configuração do banco de dados $config não encontrado.");
-            }
-            $this->adapter = new \Zend\Db\Adapter\Adapter(require $config);
-
-            \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter($this->adapter);
+            $this->adapter = GlobalAdapterFeature::getStaticAdapter();
         }
         return $this->adapter;
     }

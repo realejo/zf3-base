@@ -308,7 +308,7 @@ class MailSender
                     $part = new \Zend\Mime\Part(fopen($f, 'r+b'));
                     $part->type = $info->file($f);
 
-                //vefifica se é um resource
+                //verifica se é um resource
                 #todo verificar pois não está enviando certo o anexo no email
                 } elseif (is_resource($f)) {
                     $part = new \Zend\Mime\Part($f);

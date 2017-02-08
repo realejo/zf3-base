@@ -40,18 +40,26 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
      */
     public function test__envioEmailHtmlSucesso()
     {
+        $this->markTestIncomplete(
+            'This test has not been revised yet.'
+        );
+
         $oMailer = new MailSender($this->defaultConfig);
         $htmlEmail = '<html><head><title>Ola mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
 
-        $return = $oMailer->sendEmail(null, null, null, 'mariojr.rcosta@gmail.com', 'Ola', $htmlEmail);
+        $return = $oMailer->sendEmail(null, null, null, 'mario.costa@realejo.com.br', 'Ola', $htmlEmail);
         $this->assertNull($return, 'Envio com sucesso');
     }
 
     /**
-     * OK
+     *
      */
     public function test__envioEmailComAnexoStrings()
     {
+        $this->markTestIncomplete(
+            'This test has not been revised yet.'
+        );
+
         $oMailer = new MailSender($this->defaultConfig);
 
         $files = [
@@ -59,7 +67,7 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
             TEST_ROOT . '/assets/sql/album.drop.sql'
         ];
 
-        $return = $oMailer->sendEmail(null, null, null, 'mariojr.rcosta@gmail.com', 'Ola', 'Ola mundo, teste do anexo com array de strings', ['anexos'=>$files]);
+        $return = $oMailer->sendEmail(null, null, null, 'mario.costa@realejo.com.br', 'Ola', 'Ola mundo, teste do anexo com array de strings', ['anexos'=>$files]);
 
         $this->assertNull($return, 'Envio com sucesso');
     }
@@ -69,6 +77,10 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
      */
     public function test__envioEmailComAnexoSource()
     {
+        $this->markTestIncomplete(
+            'This test has not been revised yet.'
+        );
+        
         $oMailer = new MailSender($this->defaultConfig);
 
         $file1 = fopen(TEST_ROOT . '/assets/sql/album.create.sql', 'r');
@@ -78,7 +90,7 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
             $file1, $file2,
         ];
 
-        $return = $oMailer->sendEmail(null, null, null, 'mariojr.rcosta@gmail.com', 'Ola', 'Ola mundo, teste do anexo com array de resources', ['anexos'=>$files]);
+        $return = $oMailer->sendEmail(null, null, null, 'mario.costa@realejo.com.br', 'Ola', 'Ola mundo, teste do anexo com array de resources', ['anexos'=>$files]);
         $this->assertNull($return, 'Envio com sucesso');
     }
 }
