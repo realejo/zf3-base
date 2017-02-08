@@ -62,6 +62,11 @@ class MailSender
      */
     private $_host;
 
+    /**
+     * @var Message
+     */
+    private $_message;
+
 
     /**
      * Mail constructor.
@@ -128,9 +133,34 @@ class MailSender
      * @param $subject
      * @param $message
      * @param array $opt
+     * @return bool
      * @throws \Exception
      */
     public function sendEmail($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = array() )
+    {
+        $this->setEmailMessage($replyName, $replyEmail, $toName, $toEmail, $subject, $message, $opt);
+        $this->getTransport()->send($this->getMessage());
+        return true;
+    }
+
+    public function send()
+    {
+        return $this->getTransport()->send($this->getMessage());
+    }
+
+
+    /**
+     * @param null|string  $replyName
+     * @param null|string  $replyEmail
+     * @param null|string  $toName
+     * @param string $toEmail
+     * @param string $subject
+     * @param string $message
+     * @param array $opt
+     * @return Message
+     * @throws \Exception
+     */
+    public function setEmailMessage($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = array())
     {
         // Verifica a codificação
         $replyName  = $this->_fixEncoding($replyName);
@@ -142,7 +172,7 @@ class MailSender
 
         // Verifica o email do destinatário
         if ( empty($toEmail) ) {
-            throw new \Exception ( 'Não há email de destino definido em RW_Mail');
+            throw new \Exception ( 'Não há email de destino definido em '.get_class($this).'::setMailMessage()');
         }
 
         // Verifica o nome do destinatário
@@ -152,12 +182,12 @@ class MailSender
 
         // Verifica o nome do remetente
         if ( empty($replyName) ) {
-            $replyName = $this->_name;
+            $replyName = $this->_fixEncoding($this->_name);
         }
 
         // Verifica o email de resposta do remetente
         if ( empty($replyEmail) ) {
-            $replyEmail = $this->_email;
+            $replyEmail = $this->_fixEncoding($this->_email);
         }
 
         // Cria o Zend_Mail
@@ -297,7 +327,7 @@ class MailSender
                     $part = $f;
                     $encodingAndDispositionAreSet = true;
 
-                // Verifica se foi passado o path completo do arquivo e se o arquivo existe
+                    // Verifica se foi passado o path completo do arquivo e se o arquivo existe
                 } elseif (is_string($f) && is_file($f)) {
 
                     //pega as infos do arquivo
@@ -308,12 +338,12 @@ class MailSender
                     $part = new \Zend\Mime\Part(fopen($f, 'r+b'));
                     $part->type = $info->file($f);
 
-                //verifica se é um resource
-                #todo verificar pois não está enviando certo o anexo no email
+                    //verifica se é um resource
+                    #todo verificar pois não está enviando certo o anexo no email
                 } elseif (is_resource($f)) {
                     $part = new \Zend\Mime\Part($f);
 
-                //verifica se veio como array (ex: quando se faz o upload)
+                    //verifica se veio como array (ex: quando se faz o upload)
                 } elseif (is_array($f)) {
                     $part = new \Zend\Mime\Part();
                     $encodingAndDispositionAreSet = true;
@@ -356,8 +386,9 @@ class MailSender
             $oMessage->setBody($body);
         }
 
-        //Envia o email
-        return $this->getTransport()->send($oMessage);
+        $this->_message = $oMessage;
+
+        return $this->_message;
     }
 
     /**
@@ -375,7 +406,7 @@ class MailSender
                 $str[$key] = $value;
             }
         } elseif ( $this->_check_utf8( $str ) ) {
-            $str = utf8_decode( $str );
+            $str = mb_convert_encoding( $str , 'UTF-8');
         }
 
         return $str;
@@ -459,5 +490,13 @@ class MailSender
     public function getTransport()
     {
         return $this->_transport;
+    }
+
+    /**
+     * @return Message
+     */
+    public function getMessage()
+    {
+        return $this->_message;
     }
 }
