@@ -37,16 +37,6 @@ class CacheTest extends BaseTestCase
 
     /**
      * getCachePath sem nome da pasta
-     *
-     * @expectedException \Exception
-     */
-    public function testGetCacheRootSemAPPLICATION_DATA()
-    {
-        Cache::getCacheRoot();
-    }
-
-    /**
-     * getCachePath sem nome da pasta
      */
     public function testGetCacheRoot()
     {

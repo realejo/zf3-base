@@ -49,8 +49,8 @@ class DateFormatter
      *         n - minutos
      *         s - segundos (padrão)
      *
-     * @param Zend_Date $d1
-     * @param Zend_Date $d2
+     * @param \DateTime $d1
+     * @param \DateTime $d2
      * @param string $part
      * @return int
      */

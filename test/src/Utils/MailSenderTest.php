@@ -80,7 +80,7 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
         $this->markTestIncomplete(
             'This test has not been revised yet.'
         );
-        
+
         $oMailer = new MailSender($this->defaultConfig);
 
         $file1 = fopen(TEST_ROOT . '/assets/sql/album.create.sql', 'r');
