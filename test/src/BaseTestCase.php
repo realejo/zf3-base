@@ -23,11 +23,11 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
      *
      * @var array
      */
-    protected $tables = array();
+    protected $tables = [];
 
     public function __construct($tables = null)
     {
-        if (!empty($tables) && is_array($tables)) {
+        if (! empty($tables) && is_array($tables)) {
             $this->tables = $tables;
         }
     }
@@ -37,7 +37,7 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
      */
     public function getAdapter()
     {
-        if (!isset($this->adapter)) {
+        if (! isset($this->adapter)) {
             $this->adapter = GlobalAdapterFeature::getStaticAdapter();
         }
         return $this->adapter;
@@ -61,9 +61,9 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
         }
 
         // Recupera o script para criar as tabelas
-        foreach($tables as $tbl) {
+        foreach ($tables as $tbl) {
             $create = TEST_ROOT  . "/assets/sql/$tbl.create.sql";
-            if (!file_exists($create)) {
+            if (! file_exists($create)) {
                 $this->fail("create não encontrado em $create");
             }
 
@@ -83,11 +83,11 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
             $tables = array_reverse($this->tables);
         }
 
-        if (!empty($tables)) {
+        if (! empty($tables)) {
             // Recupera o script para remover as tabelas
-            foreach($tables as $tbl) {
+            foreach ($tables as $tbl) {
                 $drop = TEST_ROOT . "/assets/sql/$tbl.drop.sql";
-                if (!file_exists($drop)) {
+                if (! file_exists($drop)) {
                     $this->fail("drop não encontrado em $drop");
                 }
 
@@ -99,14 +99,14 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
         return $this;
     }
 
-	public function clearApplicationData()
+    public function clearApplicationData()
     {
         // Verifica se há APPLICATION_DATA
-        if (!defined('APPLICATION_DATA')) {
+        if (! defined('APPLICATION_DATA')) {
             $this->fail('APPLICATION_DATA não definido');
         }
         // Verifica se a pasta existe e tem permissão de escrita
-        if (!is_dir(APPLICATION_DATA) || !is_writeable(APPLICATION_DATA)) {
+        if (! is_dir(APPLICATION_DATA) || ! is_writeable(APPLICATION_DATA)) {
             $this->fail('APPLICATION_DATA não definido');
         }
 
@@ -119,11 +119,11 @@ class BaseTestCase extends \PHPUnit\Framework\TestCase
     public function isApplicationDataEmpty()
     {
         // Verifica se há APPLICATION_DATA
-        if (!defined('APPLICATION_DATA')) {
+        if (! defined('APPLICATION_DATA')) {
             $this->fail('APPLICATION_DATA não definido');
         }
         // Verifica se a pasta existe e tem permissão de escrita
-        if (!is_dir(APPLICATION_DATA) || !is_writeable(APPLICATION_DATA)) {
+        if (! is_dir(APPLICATION_DATA) || ! is_writeable(APPLICATION_DATA)) {
             $this->fail('APPLICATION_DATA não definido');
         }
 

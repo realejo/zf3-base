@@ -9,8 +9,8 @@ namespace RealejoTest\App\Model;
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
-use Realejo\Service\Mptt,
-    RealejoTest\BaseTestCase;
+use Realejo\Service\Mptt;
+use RealejoTest\BaseTestCase;
 
 /**
  * Mptt test case.
@@ -23,20 +23,20 @@ class MpttTest extends BaseTestCase
      *
      * @var array
      */
-    protected $idOrderedTree = array(
-        array(1,  'Food',      null, 1, 24),
-        array(2,  'Fruit',     1, 2, 13),
-        array(3,  'Red',       2, 3, 6),
-        array(4,  'Yellow',    2, 7, 10),
-        array(5,  'Green',     2, 11, 12),
-        array(6,  'Cherry',    3, 4, 5),
-        array(7,  'Banana',    4, 8, 9),
-        array(8,  'Meat',      1, 14, 19),
-        array(9,  'Beef',      8, 15, 16),
-        array(10, 'Pork',      8, 17, 18),
-        array(11, 'Vegetable', 1, 20, 23),
-        array(12, 'Carrot',   11, 21, 22),
-    );
+    protected $idOrderedTree = [
+        [1,  'Food',      null, 1, 24],
+        [2,  'Fruit',     1, 2, 13],
+        [3,  'Red',       2, 3, 6],
+        [4,  'Yellow',    2, 7, 10],
+        [5,  'Green',     2, 11, 12],
+        [6,  'Cherry',    3, 4, 5],
+        [7,  'Banana',    4, 8, 9],
+        [8,  'Meat',      1, 14, 19],
+        [9,  'Beef',      8, 15, 16],
+        [10, 'Pork',      8, 17, 18],
+        [11, 'Vegetable', 1, 20, 23],
+        [12, 'Carrot',   11, 21, 22],
+    ];
 
     /**
      * Árvore mptt completa e *correta*
@@ -44,35 +44,35 @@ class MpttTest extends BaseTestCase
      *
      * @var array
      */
-    protected $nameOrderedTree = array(
-        array(1,  'Food',      null, 1, 24),
-        array(2,  'Fruit',     1, 2, 13),
-        array(3,  'Red',       2, 5, 8),
-        array(4,  'Yellow',    2, 9, 12),
-        array(5,  'Green',     2, 3, 4),
-        array(6,  'Cherry',    3, 6, 7),
-        array(7,  'Banana',    4, 10, 11),
-        array(8,  'Meat',      1, 14, 19),
-        array(9,  'Beef',      8, 15, 16),
-        array(10, 'Pork',      8, 17, 18),
-        array(11, 'Vegetable', 1, 20, 23),
-        array(12, 'Carrot',   11, 21, 22),
-    );
+    protected $nameOrderedTree = [
+        [1,  'Food',      null, 1, 24],
+        [2,  'Fruit',     1, 2, 13],
+        [3,  'Red',       2, 5, 8],
+        [4,  'Yellow',    2, 9, 12],
+        [5,  'Green',     2, 3, 4],
+        [6,  'Cherry',    3, 6, 7],
+        [7,  'Banana',    4, 10, 11],
+        [8,  'Meat',      1, 14, 19],
+        [9,  'Beef',      8, 15, 16],
+        [10, 'Pork',      8, 17, 18],
+        [11, 'Vegetable', 1, 20, 23],
+        [12, 'Carrot',   11, 21, 22],
+    ];
 
     /**
      * Será populada com os valores da arvore completa
      * @var array
      */
-    protected $idOrderedRows = array();
-    protected $nameOrderedRows = array();
+    protected $idOrderedRows = [];
+    protected $nameOrderedRows = [];
 
     /**
      * Será populada com os valores da arvore completa sem as informações left,right
      * @var array
      */
-    protected $defaultRows = array();
+    protected $defaultRows = [];
 
-    protected $tables = array('mptt');
+    protected $tables = ['mptt'];
 
     /**
      * @var Mptt
@@ -81,7 +81,7 @@ class MpttTest extends BaseTestCase
 
     public function __construct()
     {
-        $fields = array('id', 'name', 'parent_id', 'lft', 'rgt');
+        $fields = ['id', 'name', 'parent_id', 'lft', 'rgt'];
         foreach ($this->idOrderedTree as $values) {
             $row = array_combine($fields, $values);
             $this->idOrderedRows[] = $row;
@@ -147,12 +147,12 @@ class MpttTest extends BaseTestCase
         $this->assertInstanceOf('\Realejo\Service\Mptt', $mptt);
         $this->assertInstanceOf('\Realejo\Service\ServiceAbstract', $mptt);
 
-        $mptt = $mptt->setTraversal(array());
+        $mptt = $mptt->setTraversal([]);
 
         $this->assertInstanceOf('\Realejo\Service\Mptt', $mptt);
 
         // The Exception
-        $mptt->setTraversal(array('invalid'=>'invalid'));
+        $mptt->setTraversal(['invalid' => 'invalid']);
     }
 
     /**
@@ -164,7 +164,7 @@ class MpttTest extends BaseTestCase
         $this->assertInternalType('array', $mptt->getColumns());
         $this->assertNotNull($mptt->getColumns());
         $this->assertNotEmpty($mptt->getColumns());
-        $this->assertEquals(array('id', 'name', 'parent_id', 'lft', 'rgt'), $mptt->getColumns());
+        $this->assertEquals(['id', 'name', 'parent_id', 'lft', 'rgt'], $mptt->getColumns());
     }
 
     /**
@@ -186,7 +186,7 @@ class MpttTest extends BaseTestCase
         // Cria a tablea com os valores padrões
         $mptt = new Mptt('RealejoTest\Mapper\MapperMptt', 'id');
         $this->assertNull($mptt->getMapper()->fetchAll());
-        foreach($this->defaultRows as $row) {
+        foreach ($this->defaultRows as $row) {
             $mptt->insert($row);
         }
         $this->assertNotNull($mptt->getMapper()->fetchAll());
@@ -205,7 +205,7 @@ class MpttTest extends BaseTestCase
             $fetchArray[] = $value->toArray();
         }
         $this->assertEquals($this->idOrderedRows, $fetchArray);
-        $mptt->setTraversal(array('refColumn'=>'parent_id', 'order'=>'name'));
+        $mptt->setTraversal(['refColumn' => 'parent_id', 'order' => 'name']);
 
         // Rebuild Tree
         $mptt->rebuildTreeTraversal();
@@ -230,11 +230,11 @@ class MpttTest extends BaseTestCase
 
         // Set traversal
         $this->assertFalse($mptt->isTraversable());
-        $mptt->setTraversal(array('refColumn'=>'parent_id', 'order'=>'name'));
+        $mptt->setTraversal(['refColumn' => 'parent_id', 'order' => 'name']);
         $this->assertTrue($mptt->isTraversable());
 
         // Insert default rows
-        foreach($this->defaultRows as $row) {
+        foreach ($this->defaultRows as $row) {
             $mptt->insert($row);
         }
         $this->assertNotNull($mptt->getMapper()->fetchAll());
@@ -252,11 +252,11 @@ class MpttTest extends BaseTestCase
         $this->assertNull($mptt->getMapper()->fetchAll());
 
         // Set traversal ordered by id
-        $mptt->setTraversal(array('refColumn'=>'parent_id'));
+        $mptt->setTraversal(['refColumn' => 'parent_id']);
         $this->assertTrue($mptt->isTraversable());
 
         // insert default rows
-        foreach($this->defaultRows as $row) {
+        foreach ($this->defaultRows as $row) {
             $mptt->insert($row);
         }
         $this->assertNotNull($mptt->getMapper()->fetchAll());
@@ -282,11 +282,11 @@ class MpttTest extends BaseTestCase
 
         // Set traversal
         $this->assertFalse($mptt->isTraversable());
-        $mptt->setTraversal(array('refColumn'=>'parent_id', 'order'=>'name'));
+        $mptt->setTraversal(['refColumn' => 'parent_id', 'order' => 'name']);
         $this->assertTrue($mptt->isTraversable());
 
         // Insert default rows
-        foreach($this->defaultRows as $row) {
+        foreach ($this->defaultRows as $row) {
             $mptt->insert($row);
         }
         $this->assertNotNull($mptt->getMapper()->fetchAll());
@@ -333,7 +333,7 @@ class MpttTest extends BaseTestCase
         $this->assertEquals(13, $row['rgt']);
 
         // Put it back
-        $mptt->insert($this->defaultRows[9-1]);
+        $mptt->insert($this->defaultRows[9 - 1]);
 
         // Assert if left/right is correct
         $fetchArray = [];
@@ -369,9 +369,9 @@ class MpttTest extends BaseTestCase
         $this->assertEquals(13, $row['rgt']);
 
         // Put them back
-        $mptt->insert($this->defaultRows[8-1]);
-        $mptt->insert($this->defaultRows[10-1]);
-        $mptt->insert($this->defaultRows[9-1]);
+        $mptt->insert($this->defaultRows[8 - 1]);
+        $mptt->insert($this->defaultRows[10 - 1]);
+        $mptt->insert($this->defaultRows[9 - 1]);
 
         // Assert if left/right is correct
         $fetchArray = [];
@@ -381,4 +381,3 @@ class MpttTest extends BaseTestCase
         $this->assertEquals($this->nameOrderedRows, $fetchArray);
     }
 }
-

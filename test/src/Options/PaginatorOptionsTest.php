@@ -30,4 +30,3 @@ class PaginatorOptionsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(30, $paginator->getPageRange());
     }
 }
-

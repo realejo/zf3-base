@@ -68,9 +68,9 @@ abstract class ServiceAbstract
 
         // Verifica o select_option_data
         if (isset($this->htmlSelectOptionData) && is_string($this->htmlSelectOptionData)) {
-            $this->htmlSelectOptionData = array(
+            $this->htmlSelectOptionData = [
                 $this->htmlSelectOptionData
-            );
+            ];
         }
 
         // Verifica se deve mostrar a primeira opção em branco
@@ -79,14 +79,14 @@ abstract class ServiceAbstract
 
         // Define ao placeholder a ser usado
         $placeholder = $selectPlaceholder = (isset($opts['placeholder'])) ? $opts['placeholder'] : '';
-        if (!empty($placeholder)) {
+        if (! empty($placeholder)) {
             $selectPlaceholder = "placeholder=\"$selectPlaceholder\"";
         }
 
         $grouped = (isset($opts['grouped'])) ? $opts['grouped'] : false;
 
         // Define a chave a ser usada
-        if (isset($opts['key']) && !empty($opts['key']) && is_string($opts['key'])) {
+        if (isset($opts['key']) && ! empty($opts['key']) && is_string($opts['key'])) {
             $key = $opts['key'];
         } else {
             $key = $this->getMapper()->getTableKey(true);
@@ -140,7 +140,7 @@ abstract class ServiceAbstract
         }
 
         // Verifica se tem valor padrão
-        if ( !is_null($selecionado) ) {
+        if (! is_null($selecionado)) {
             $temp = str_replace("<option value=\"$selecionado\"", "<option value=\"$selecionado\" selected=\"selected\"", $options);
             if ($temp === $options) {
                 $selecionado = null;
@@ -152,7 +152,7 @@ abstract class ServiceAbstract
         $select = "<select class=\"form-control\" name=\"$nome\" id=\"$nome\" $selectPlaceholder>";
 
         // Verifica se tem valor padrão selecionado
-        if ((empty($selecionado) || $showEmpty) && !$neverShowEmpty) {
+        if ((empty($selecionado) || $showEmpty) && ! $neverShowEmpty) {
             $select .= "<option value=\"\">$placeholder</option>";
         }
 
@@ -210,7 +210,7 @@ abstract class ServiceAbstract
 
     public function getUniqueCacheKey()
     {
-        return str_replace('\\','_',get_class($this));
+        return str_replace('\\', '_', get_class($this));
     }
 
     /**
@@ -294,9 +294,9 @@ abstract class ServiceAbstract
         }
 
         $fetchAll = $this->getMapper()->fetchAll($this->getWhere($where), $order, $count, $offset);
-        $findAssoc = array();
-        if (!empty($fetchAll)) {
-            foreach($fetchAll as $row) {
+        $findAssoc = [];
+        if (! empty($fetchAll)) {
+            foreach ($fetchAll as $row) {
                 $findAssoc[$row[$this->getMapper()->getTableKey(true)]] = $row;
             }
         }
@@ -417,8 +417,8 @@ abstract class ServiceAbstract
      */
     public function getMapper()
     {
-        if (!isset($this->mapper)) {
-            if (!isset($this->mapperClass)) {
+        if (! isset($this->mapper)) {
+            if (! isset($this->mapperClass)) {
                 throw new \Exception('Mapper class not definded at ' . get_class($this));
             }
             $this->mapper = new $this->mapperClass();
@@ -451,8 +451,7 @@ abstract class ServiceAbstract
      */
     public function getPaginatorOptions()
     {
-        if (!isset($this->paginatorOptions))
-        {
+        if (! isset($this->paginatorOptions)) {
             $this->paginatorOptions = new \Realejo\Options\PaginatorOptions();
         }
 
@@ -470,8 +469,8 @@ abstract class ServiceAbstract
      */
     public function getCache()
     {
-        if (!isset($this->cache)) {
-            $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\',DIRECTORY_SEPARATOR, get_class($this)));
+        if (! isset($this->cache)) {
+            $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
         }
 
         return $this->cache;
@@ -521,7 +520,7 @@ abstract class ServiceAbstract
      */
     public function getAutoCleanCache()
     {
-        return $this->getMapper()->autoCleanCache;
+        return $this->getMapper()->autoCleanCache();
     }
 
     /**
@@ -535,5 +534,4 @@ abstract class ServiceAbstract
 
         return $this;
     }
-
 }

@@ -17,13 +17,7 @@ define('APPLICATION_DATA', TEST_ROOT . '/assets/data');
  */
 
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-    $loader = include __DIR__ . '/../vendor/autoload.php';
-} elseif (file_exists(__DIR__ .'/../../../vendor/autoload.php')) {
-    $loader = include __DIR__ .'/../../../vendor/autoload.php';
-} elseif (file_exists(__DIR__ .'/../../../autoload.php')) {
-    $loader = include __DIR__ .'/../../../autoload.php';
-} else {
-    throw new RuntimeException('vendor/autoload.php could not be found. Did you run `php composer.phar install`?');
+    $loader = require __DIR__ . '/../vendor/autoload.php';
 }
 
 // Carrega os namespaces para teste
@@ -32,31 +26,30 @@ $loader->addPsr4("RealejoTest\\", __DIR__ .'/src');
 // Procura pelas configurações do Semaphore
 if (isset($_SERVER['DATABASE_MYSQL_USERNAME'])) {
     // Define o banco de dados de testes
-    \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter(new Zend\Db\Adapter\Adapter(array(
+    \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter(new Zend\Db\Adapter\Adapter([
         'driver' => 'mysqli',
         'host'           => '127.0.0.1',
         'username'       => $_SERVER['DATABASE_MYSQL_USERNAME'],
         'password'       => $_SERVER['DATABASE_MYSQL_PASSWORD'],
         'dbname'         => 'test',
-        'options' => array(
+        'options' => [
             'buffer_results' => true,
-        ),
-    )));
+        ],
+    ]));
 
 // Procura pelas configurações do Codeship
 } elseif (isset($_SERVER['MYSQL_USER'])) {
     // Define o banco de dados de testes
-    \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter(new Zend\Db\Adapter\Adapter(array(
+    \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter(new Zend\Db\Adapter\Adapter([
         'driver' => 'mysqli',
         'host'           => '127.0.0.1',
         'username'       => $_SERVER['MYSQL_USER'],
         'password'       => $_SERVER['MYSQL_PASSWORD'],
         'dbname'         => 'test',
-        'options' => array(
+        'options' => [
             'buffer_results' => true,
-        ),
-    )));
-
+        ],
+    ]));
 } else {
     // Define o banco de dados de testes
     $config = (file_exists(__DIR__. '/configs/db.php')) ? __DIR__.'/configs/db.php' : __DIR__.'/configs/db.php.dist';

@@ -6,7 +6,7 @@ class ArrayObject implements \ArrayAccess
     /**
      * @var array
      */
-    protected $storage = array();
+    protected $storage = [];
 
     /**
      * @var array
@@ -22,7 +22,7 @@ class ArrayObject implements \ArrayAccess
 
     public function __construct($data = null)
     {
-        if (is_array($data) && !empty($data)) {
+        if (is_array($data) && ! empty($data)) {
             $this->populate($data);
         }
     }
@@ -43,8 +43,8 @@ class ArrayObject implements \ArrayAccess
 
     public function populate(array $data)
     {
-        if (!empty($data)) {
-            foreach($data as $key=>$value) {
+        if (! empty($data)) {
+            foreach ($data as $key => $value) {
                 $this->storage[$this->getDeprecatedKey($key)] = $value;
             }
         }
@@ -52,13 +52,13 @@ class ArrayObject implements \ArrayAccess
 
     public function toArray()
     {
-        $toArray = array();
+        $toArray = [];
 
         if (empty($this->storage)) {
             return $toArray;
         }
 
-        foreach($this->storage as $key=>$value) {
+        foreach ($this->storage as $key => $value) {
             if ($value instanceof \Realejo\Stdlib\ArrayObject) {
                 $value = $value->toArray();
             }
@@ -96,7 +96,7 @@ class ArrayObject implements \ArrayAccess
     public function offsetGet($offset)
     {
         $offset = $this->getDeprecatedKey($offset);
-        if (!array_key_exists($offset, $this->storage)) {
+        if (! array_key_exists($offset, $this->storage)) {
             //throw new \Exception("Undefined index: $offset in ". var_export($this->storage, true));
             trigger_error("Undefined index: $offset");
         }
@@ -111,7 +111,7 @@ class ArrayObject implements \ArrayAccess
     public function offsetSet($offset, $value)
     {
         $offset = $this->getDeprecatedKey($offset);
-        if (!$this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
+        if (! $this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
             $this->storage[$offset] = $value;
         } else {
             trigger_error("Undefined index: $offset");
@@ -203,5 +203,4 @@ class ArrayObject implements \ArrayAccess
         $this->lockedKeys = $lockedKeys;
         return $this;
     }
-
 }

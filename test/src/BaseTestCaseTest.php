@@ -21,7 +21,7 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp ()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown ()
+    protected function tearDown()
     {
         // TODO Auto-generated DbAdapterTest::tearDown()
         $this->BaseTestCase = null;
@@ -44,7 +44,7 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Constructs the test case.
      */
-    public function __construct ()
+    public function __construct()
     {
         // TODO Auto-generated constructor
     }
@@ -52,7 +52,7 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests DbAdapter->getAdapter()
      */
-    public function testGetAdapter ()
+    public function testGetAdapter()
     {
         $this->assertInstanceOf('\Zend\Db\Adapter\Adapter', $this->BaseTestCase->getAdapter());
     }
@@ -60,9 +60,9 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests DbAdapter->testSetupMysql()
      */
-    public function testTestSetupMysql ()
+    public function testTestSetupMysql()
     {
-        $tables = array('album');
+        $tables = ['album'];
         $this->assertInstanceOf('\RealejoTest\BaseTestCase', $this->BaseTestCase->setTables($tables));
         $this->assertEquals($tables, $this->BaseTestCase->getTables());
 
@@ -79,16 +79,16 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
     public function testClearApplicationData()
     {
         // Verifica se está tudo ok
-        if (!defined('APPLICATION_DATA')) {
+        if (! defined('APPLICATION_DATA')) {
             $this->fail('APPLICATION_DATA não definido');
         }
-        if (!is_writable(APPLICATION_DATA)) {
+        if (! is_writable(APPLICATION_DATA)) {
             $this->fail('APPLICATION_DATA não tem permissão de escrita');
         }
 
         // Grava umas bobeiras la
         $folder = APPLICATION_DATA . '/teste1';
-        if (!file_exists($folder)) {
+        if (! file_exists($folder)) {
             $oldumask = umask(0);
             mkdir($folder);
             umask($oldumask);
@@ -96,7 +96,7 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
         file_put_contents($folder . '/test1.txt', 'teste');
 
         $folder = APPLICATION_DATA . '/teste2/teste3';
-        if (!file_exists($folder)) {
+        if (! file_exists($folder)) {
             $oldumask = umask(0);
             mkdir($folder, 0777, true);
             umask($oldumask);
@@ -111,7 +111,7 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
         // Verifica se está vazia
         $files = $objects = scandir(APPLICATION_DATA);
         $this->assertCount(3, $files, 'não tem mais nada no APPLICATION_DATA');
-        $this->assertEquals(array('.', '..', 'cache'), $files, 'não tem mais nada no APPLICATION_DATA');
+        $this->assertEquals(['.', '..', 'cache'], $files, 'não tem mais nada no APPLICATION_DATA');
 
         // Verifica se a pasta está vazia
         $this->assertTrue($this->BaseTestCase->isApplicationDataEmpty());
@@ -124,4 +124,3 @@ class BaseTestCaseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->BaseTestCase->clearApplicationData());
     }
 }
-

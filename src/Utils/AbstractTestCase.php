@@ -30,11 +30,11 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
      *
      * @var array
      */
-    protected $tables = array();
+    protected $tables = [];
 
     public function __construct($tables = null)
     {
-        if (!empty($tables) && is_array($tables)) {
+        if (! empty($tables) && is_array($tables)) {
             $this->tables = $tables;
         }
     }
@@ -64,7 +64,7 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
      */
     public function getAdapter()
     {
-        if (!isset($this->adapter)) {
+        if (! isset($this->adapter)) {
             $this->adapter = GlobalAdapterFeature::getStaticAdapter();
         }
         return $this->adapter;
@@ -101,7 +101,7 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
         }
 
         // Recupera o script para criar as tabelas
-        foreach($tables as $tbl) {
+        foreach ($tables as $tbl) {
             // Cria a tabela de usuários
             $this->getAdapter()->query(file_get_contents($this->getSqlFile("$tbl.create.sql")), Adapter::QUERY_MODE_EXECUTE);
         }
@@ -147,9 +147,9 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
             $tables = array_reverse($this->tables);
         }
 
-        if (!empty($tables)) {
+        if (! empty($tables)) {
             // Verifica se existem as tabelas
-            foreach($tables as $tbl) {
+            foreach ($tables as $tbl) {
                 $this->getSqlFile("$tbl.drop.sql");
             }
 
@@ -162,7 +162,7 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
             $this->getAdapter()->query('SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'TRADITIONAL,ALLOW_INVALID_DATES\';', Adapter::QUERY_MODE_EXECUTE);
 
             // Recupera o script para remover as tabelas
-            foreach($tables as $tbl) {
+            foreach ($tables as $tbl) {
                 $this->getAdapter()->query(file_get_contents($this->getSqlFile("$tbl.drop.sql")), Adapter::QUERY_MODE_EXECUTE);
             }
 
@@ -214,12 +214,12 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
         }
 
         // Verifica se há APPLICATION_DATA
-        if (!defined('APPLICATION_DATA')) {
+        if (! defined('APPLICATION_DATA')) {
             $this->fail('APPLICATION_DATA não definido');
         }
 
         // Verifica se a pasta existe e tem permissão de escrita
-        if (!is_dir(APPLICATION_DATA) || !is_writeable(APPLICATION_DATA)) {
+        if (! is_dir(APPLICATION_DATA) || ! is_writeable(APPLICATION_DATA)) {
             $this->fail('APPLICATION_DATA não definido');
         }
 
@@ -237,11 +237,11 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
     public function isApplicationDataEmpty()
     {
         // Verifica se há APPLICATION_DATA
-        if (!defined('APPLICATION_DATA')) {
+        if (! defined('APPLICATION_DATA')) {
             $this->fail('APPLICATION_DATA não definido');
         }
         // Verifica se a pasta existe e tem permissão de escrita
-        if (!is_dir(APPLICATION_DATA) || !is_writeable(APPLICATION_DATA)) {
+        if (! is_dir(APPLICATION_DATA) || ! is_writeable(APPLICATION_DATA)) {
             $this->fail('APPLICATION_DATA não definido');
         }
 
@@ -296,12 +296,12 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
     protected function getAssetsPath($path = '')
     {
         // Verifica se há APPLICATION_DATA
-        if (!defined('APPLICATION_DATA')) {
+        if (! defined('APPLICATION_DATA')) {
             $this->fail('APPLICATION_DATA não definido');
         }
 
         // Verifica se a pasta existe e tem permissão de escrita
-        if (!is_dir(APPLICATION_DATA)) {
+        if (! is_dir(APPLICATION_DATA)) {
             $this->fail('APPLICATION_DATA não definido');
         }
 
@@ -309,7 +309,7 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
         $path = realpath(APPLICATION_DATA . '/../'. $path);
 
         // Verifica se a pasta existe e tem permissão de escrita
-        if (empty($path) || !is_dir($path)) {
+        if (empty($path) || ! is_dir($path)) {
             $this->fail(APPLICATION_DATA . "/../$path não definido");
         }
 
@@ -326,7 +326,7 @@ class AbstractTestCase extends \PHPUnit\Framework\TestCase
      *
      * @return mixed Method return.
      */
-    public function invokePrivateMethod(&$object, $methodName, array $parameters = array())
+    public function invokePrivateMethod(&$object, $methodName, array $parameters = [])
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);

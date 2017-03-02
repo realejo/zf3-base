@@ -68,7 +68,7 @@ class ArrayObject extends StdlibArrayObject
             if (is_string($data['metadata'])) {
                 $data['metadata'] = json_decode($data['metadata'], true);
             }
-            if (!empty($data['metadata'])) {
+            if (! empty($data['metadata'])) {
                 $this->setMetadata($data['metadata']);
             }
             unset($data['metadata']);
@@ -80,7 +80,7 @@ class ArrayObject extends StdlibArrayObject
     public function toArray()
     {
         $toArray = parent::toArray();
-        if (!empty($this->getMetadata()->count())) {
+        if (! empty($this->getMetadata()->count())) {
             $toArray['metadata'] = $this->getMetadata()->toArray();
         }
 
@@ -140,7 +140,7 @@ class ArrayObject extends StdlibArrayObject
 
         // Verifica as chaves estão bloqueadas
         //@todo tem que testar isso!!
-        if (!$this->getLockedKeys()) {
+        if (! $this->getLockedKeys()) {
             $this->storage[$offset] = $value;
             return;
         }

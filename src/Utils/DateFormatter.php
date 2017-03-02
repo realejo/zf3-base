@@ -17,7 +17,7 @@ class DateFormatter
      * @param string|Zend_Date $d data a se transformada para o formato do MYSQL
      * @return string
      */
-    static public function toMySQL($d)
+    public static function toMySQL($d)
     {
 
         if (empty($d)) {
@@ -30,7 +30,9 @@ class DateFormatter
                 $date = explode('/', $datetime[0]);
                 $sql = sprintf("%04d-%02d-%02d", $date[2], $date[1], $date[0]);
 
-                if (isset($datetime[1])) $sql .= ' ' . $datetime[1];
+                if (isset($datetime[1])) {
+                    $sql .= ' ' . $datetime[1];
+                }
             }
             return $sql;
         }
@@ -56,16 +58,17 @@ class DateFormatter
      */
     static function staticDiff(\DateTime $d1, \DateTime $d2, $part = null)
     {
-        if ($d1 instanceof \DateTime)
+        if ($d1 instanceof \DateTime) {
             $d1 = $d1->getTimestamp();
+        }
 
-        if ($d2 instanceof \DateTime)
+        if ($d2 instanceof \DateTime) {
             $d2 = $d2->getTimestamp();
+        }
 
         $diff = abs($d1 - $d2);
 
-        switch ($part)
-        {
+        switch ($part) {
             case 'y':
                 return floor($diff / 31536000); # 60*60*24*365
             case 'm':
@@ -79,7 +82,7 @@ class DateFormatter
             case 'n':
                 return floor($diff / 60);
             case 's':
-            default :
+            default:
                 return $diff;
         }
     }
@@ -99,7 +102,7 @@ class DateFormatter
 
             $q = $objDateTime->format("m");
 
-            return ceil ($q / 3);
+            return ceil($q / 3);
         } else {
             $objDateTime = new \DateTime();
 
@@ -117,7 +120,7 @@ class DateFormatter
      */
     static function getMeses()
     {
-        return array(
+        return [
             1  => 'Janeiro',
             2  => 'Fevereiro',
             3  => 'Março',
@@ -130,7 +133,7 @@ class DateFormatter
             10 => 'Outubro',
             11 => 'Novembro',
             12 => 'Dezembro'
-        );
+        ];
     }
 
     /**
@@ -156,38 +159,36 @@ class DateFormatter
      *
      * @return string;
      */
-    static public function getSemana($d = null)
+    public static function getSemana($d = null)
     {
-    	// Configura a semana
-    	$nome_semana = array('domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado');
+        // Configura a semana
+        $nome_semana = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 
-    	if (is_string($d)) $tempData = strlen($d) > 1 ? $d : (int) $d;
+        if (is_string($d)) {
+            $tempData = strlen($d) > 1 ? $d : (int) $d;
+        }
 
-    	// Verifica se foi passado uma data
-    	if (is_array($d) || is_string($tempData)) {
-    		// Configura a data
-    		if (is_array($d)) {
-    			$temp = $d['ano']."-".$d['mes']."-".$d['dia'];
+        // Verifica se foi passado uma data
+        if (is_array($d) || is_string($tempData)) {
+            // Configura a data
+            if (is_array($d)) {
+                $temp = $d['ano']."-".$d['mes']."-".$d['dia'];
+            } else {
+                $temp = self::toMySQL($d);
+            }
+            // converte para a semnana
+            $w = date('w', strtotime($temp));
 
-    		} else {
-    			$temp = self::toMySQL($d);
+            // Retorna qual é a semana
+            return $nome_semana[$w];
 
-    		}
-    		// converte para a semnana
-	        $w = date('w', strtotime($temp));
-
-	        // Retorna qual é a semana
-	        return $nome_semana[$w];
-
-	    // Verifica se é um semana
-    	} elseif (is_numeric($tempData)) {
-    		return isset($nome_semana[$d]) ? $nome_semana[$d] : null;
-
-    	} else {
-    		// Retorna as semanas
-    		return $nome_semana;
-
-    	}
+        // Verifica se é um semana
+        } elseif (is_numeric($tempData)) {
+            return isset($nome_semana[$d]) ? $nome_semana[$d] : null;
+        } else {
+            // Retorna as semanas
+            return $nome_semana;
+        }
     }
 
     /**
@@ -199,11 +200,11 @@ class DateFormatter
      */
     static function getData($date, $format = 'dd/MM/yyyy')
     {
-        if (!$date instanceof \DateTime) {
+        if (! $date instanceof \DateTime) {
             $date = \DateTime::createFromFormat($format, $date);
         }
 
-        if (!empty($date) && self::isDate($date, $format)) {
+        if (! empty($date) && self::isDate($date, $format)) {
             return getdate($date->getTimestamp());
         }
 
@@ -218,13 +219,13 @@ class DateFormatter
      *
      * @return boolean
      */
-    static public function isDate($date, $format = 'm/d/Y')
+    public static function isDate($date, $format = 'm/d/Y')
     {
         $dateTime = \DateTime::createFromFormat($format, $date);
 
         // Verifica se apareceu algum erro
         $errors = \DateTime::getLastErrors();
-        if (!empty($errors['warning_count'])) {
+        if (! empty($errors['warning_count'])) {
             return false;
         }
         return $dateTime !== false;

@@ -1,0 +1,16 @@
+<?php
+return [
+    'mailsender' => [
+        'name'     => 'Sender name',
+        'email'    => 'sender@somewhere.com',
+        'host'     => '0.0.0.0',
+        'username' => 'sender',
+        'password' => 'password',
+        'port'     => '25'
+    ],
+
+    'test-name' => 'To Name',
+    'test-email' => 'toemail@somewhere.com',
+
+    'test-really-send-email' => 'false'
+];

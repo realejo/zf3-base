@@ -26,13 +26,12 @@ class Loader
     public function getModel($model)
     {
         // Verifica se o model já foi previamente carregado
-        if (!$this->hasModel($model)) {
-
+        if (! $this->hasModel($model)) {
             // Cria o model
             $object = new $model();
 
             // Verifica se existe loader aplicado ao model
-            if (method_exists( $object , 'setLoader' )) {
+            if (method_exists($object, 'setLoader')) {
                 $object->setLoader($this);
             }
 
@@ -55,7 +54,7 @@ class Loader
     public function setModel($model, $object)
     {
         // Verifica se existe loader aplicado ao model
-        if (method_exists( $object , 'setLoader' )) {
+        if (method_exists($object, 'setLoader')) {
             $object->setLoader($this);
         }
 

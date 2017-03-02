@@ -11,7 +11,7 @@ class DateFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function testToMysqlFromDateTimeObject()
     {
-        $data = \DateTime::createFromFormat('d/m/Y H:i:s','12/02/2016 00:00:00');
+        $data = \DateTime::createFromFormat('d/m/Y H:i:s', '12/02/2016 00:00:00');
         $dataTest = DateFormatter::toMySQL($data);
         $this->assertEquals('2016-02-12 00:00:00', $dataTest);
     }
@@ -24,8 +24,8 @@ class DateFormatterTest extends \PHPUnit\Framework\TestCase
 
     public function testStaticDiffFromDateTimeObject()
     {
-        $data1 = \DateTime::createFromFormat('d/m/Y H:i:s','12/02/2016 01:02:03');
-        $data2 = \DateTime::createFromFormat('d/m/Y H:i:s','12/05/2018 03:02:01');
+        $data1 = \DateTime::createFromFormat('d/m/Y H:i:s', '12/02/2016 01:02:03');
+        $data2 = \DateTime::createFromFormat('d/m/Y H:i:s', '12/05/2018 03:02:01');
 
         //diferenca de anos entre as datas
         $dataDiffAno = DateFormatter::staticDiff($data1, $data2, 'y');
@@ -48,6 +48,5 @@ class DateFormatterTest extends \PHPUnit\Framework\TestCase
 
         $dataDiffSegundo = DateFormatter::staticDiff($data1, $data2, 's');
         $this->assertEquals(70858798, $dataDiffSegundo);
-
     }
 }

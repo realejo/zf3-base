@@ -6,7 +6,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
     /**
      * @var array
      */
-    protected $storage = array();
+    protected $storage = [];
 
     /**
      * @var string
@@ -15,21 +15,21 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
 
     public function __construct(array $data = null)
     {
-        if (!empty($data)) {
+        if (! empty($data)) {
             $this->populate($data);
         }
     }
 
     public function count()
     {
-        return count($this->storage) + substr_count($this->nullKeys , ':') - 1;
+        return count($this->storage) + substr_count($this->nullKeys, ':') - 1;
     }
 
     public function populate(array $data)
     {
         // remove as chaves vazias
-        if (!empty($data)) {
-            foreach($data as $key=>$value) {
+        if (! empty($data)) {
+            foreach ($data as $key => $value) {
                 if (is_null($value)) {
                     $this->nullKeys .= $key . ':';
                     unset($data[$key]);
@@ -43,7 +43,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
     {
         $toArray = $this->storage;
         if (strlen($this->nullKeys) > 1) {
-            foreach (explode(':', trim($this->nullKeys,':')) as $key) {
+            foreach (explode(':', trim($this->nullKeys, ':')) as $key) {
                 $toArray[$key] = null;
             }
         }
@@ -56,8 +56,8 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
     public function addMetadata($metadata)
     {
         // remove as chaves vazias
-        if (!empty($metadata)) {
-            foreach($metadata as $key=>$value) {
+        if (! empty($metadata)) {
+            foreach ($metadata as $key => $value) {
                 if (is_null($value)) {
                     $this->nullKeys .= $key . ':';
                     unset($metadata[$key]);
@@ -78,7 +78,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
             return true;
         }
 
-        if (isset($this->nullKeys) && strpos($this->nullKeys,":$offset:") !== false) {
+        if (isset($this->nullKeys) && strpos($this->nullKeys, ":$offset:") !== false) {
             return true;
         }
 
@@ -95,7 +95,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
             return $this->storage[$offset];
         }
 
-        if (isset($this->nullKeys) && strpos($this->nullKeys,":$offset:") !== false) {
+        if (isset($this->nullKeys) && strpos($this->nullKeys, ":$offset:") !== false) {
             return null;
         }
 
@@ -118,7 +118,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
             return;
         }
 
-        if (isset($this->nullKeys) && strpos($this->nullKeys,":$offset:") !== false) {
+        if (isset($this->nullKeys) && strpos($this->nullKeys, ":$offset:") !== false) {
             $this->storage[$offset] = $value;
             $this->nullKeys = str_replace(":$offset:", ':', $this->nullKeys);
             return $this;

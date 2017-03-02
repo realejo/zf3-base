@@ -20,23 +20,22 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($object->getMetadata());
         $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $object);
 
-        $metadata = new MetadataArrayObject(array('one'=>'first'));
+        $metadata = new MetadataArrayObject(['one' => 'first']);
 
         $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->setMetadata($metadata));
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
-        $this->assertEquals(array('one'=>'first'), $object->getMetadata()->toArray());
+        $this->assertEquals(['one' => 'first'], $object->getMetadata()->toArray());
 
         $this->assertTrue($object->hasMetadata('one'));
         $this->assertFalse($object->hasMetadata('two'));
 
-        $metadata = array('two'=>'second');
+        $metadata = ['two' => 'second'];
 
         $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->setMetadata($metadata));
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
 
         $this->assertTrue($object->hasMetadata('two'));
         $this->assertFalse($object->hasMetadata('one'));
-
     }
 
     /**
@@ -48,7 +47,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($object->getMetadata());
         $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $object);
 
-        $metadata = new MetadataArrayObject(array('one'=>'first'));
+        $metadata = new MetadataArrayObject(['one' => 'first']);
 
         $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->setMetadata($metadata));
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
@@ -56,7 +55,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($object->hasMetadata('two'));
         $this->assertTrue($object->hasMetadata('one'));
 
-        $metadata = array('two'=>'second');
+        $metadata = ['two' => 'second'];
 
         $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->addMetadata($metadata));
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
@@ -67,7 +66,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateToArray()
     {
-        $object = new ArrayObject(array('one'=>'first'));
+        $object = new ArrayObject(['one' => 'first']);
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
         $this->assertCount(0, $object->getMetadata());
         $this->assertEmpty($object->getMetadata());
@@ -78,9 +77,9 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($object->two));
         $this->assertFalse(isset($object['two']));
 
-        $this->assertEquals(array('one'=>'first'), $object->toArray());
+        $this->assertEquals(['one' => 'first'], $object->toArray());
 
-        $object = new ArrayObject(array('one'=>'first', 'metadata'=>array('two'=>'second')));
+        $object = new ArrayObject(['one' => 'first', 'metadata' => ['two' => 'second']]);
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
         $this->assertCount(1, $object->getMetadata());
 
@@ -93,10 +92,10 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($object->three));
         $this->assertFalse(isset($object['three']));
 
-        $this->assertEquals(array('two' => 'second'), $object->getMetadata()->toArray());
-        $this->assertEquals(array('one'=>'first', 'metadata'=> array('two' => 'second')), $object->toArray());
+        $this->assertEquals(['two' => 'second'], $object->getMetadata()->toArray());
+        $this->assertEquals(['one' => 'first', 'metadata' => ['two' => 'second']], $object->toArray());
 
-        $object = new ArrayObject(array('one'=>'first', 'metadata'=>'{"two":"second"}'));
+        $object = new ArrayObject(['one' => 'first', 'metadata' => '{"two":"second"}']);
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
         $this->assertCount(1, $object->getMetadata());
 
@@ -109,8 +108,8 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($object->three));
         $this->assertFalse(isset($object['three']));
 
-        $this->assertEquals(array('two' => 'second'), $object->getMetadata()->toArray());
-        $this->assertEquals(array('one'=>'first', 'metadata'=> array('two' => 'second')), $object->toArray());
+        $this->assertEquals(['two' => 'second'], $object->getMetadata()->toArray());
+        $this->assertEquals(['one' => 'first', 'metadata' => ['two' => 'second']], $object->toArray());
     }
 
     /**
@@ -118,7 +117,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetterSetter()
     {
-        $object = new ArrayObject(array('one'=>'first', 'metadata'=>array('two'=>'second')));
+        $object = new ArrayObject(['one' => 'first', 'metadata' => ['two' => 'second']]);
         $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
         $this->assertCount(1, $object->getMetadata());
 
@@ -146,7 +145,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testGetKeyNonExisting()
+    public function testGetKeyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object['test']));
@@ -156,7 +155,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testGetPropertyNonExisting()
+    public function testGetPropertyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object->test));
@@ -166,7 +165,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testGetKeyNonExistingWithNoLockedKeys()
+    public function testGetKeyNonExistingWithNoLockedKeys()
     {
         $object = new ArrayObject();
         $object->setLockedKeys(false);
@@ -178,7 +177,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testGetPropertyNonExistingWithNoLockedKeys()
+    public function testGetPropertyNonExistingWithNoLockedKeys()
     {
         $object = new ArrayObject();
         $object->setLockedKeys(false);
@@ -189,7 +188,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testSetKeyNonExisting()
+    public function testSetKeyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object['test']));
@@ -199,7 +198,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testSetPropertyNonExisting()
+    public function testSetPropertyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object->test));
@@ -209,7 +208,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException Exception
      */
-    function testUnsetKeyNonExisting()
+    public function testUnsetKeyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object['test']));
@@ -219,11 +218,10 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException Exception
      */
-    function testUnsetPropertyNonExisting()
+    public function testUnsetPropertyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object->test));
         unset($object->test);
     }
 }
-

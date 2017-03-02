@@ -8,8 +8,8 @@ namespace RealejoTest\Utils;
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
-use Realejo\Utils\Cache,
-    RealejoTest\BaseTestCase;
+use Realejo\Utils\Cache;
+use RealejoTest\BaseTestCase;
 
 class CacheTest extends BaseTestCase
 {
@@ -142,4 +142,3 @@ class CacheTest extends BaseTestCase
         $this->assertInstanceOf('Zend\Cache\Storage\Adapter\Filesystem', $cache);
     }
 }
-

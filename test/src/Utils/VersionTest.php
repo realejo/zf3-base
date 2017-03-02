@@ -17,6 +17,6 @@ class VersionTest extends \PHPUnit\Framework\TestCase
     public function testCompareVersion()
     {
         $this->assertEquals(0, Version::compareVersion(Version::VERSION));
-        $this->assertContains(Version::compareVersion(Version::getLatest()), array(-1, 0, 1));
+        $this->assertContains(Version::compareVersion(Version::getLatest()), [-1, 0, 1]);
     }
 }

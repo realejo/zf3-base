@@ -37,21 +37,21 @@ class MetadataService extends ServiceAbstract
 
     public function getWhere($where)
     {
-        if (empty($where) || !is_array($where)) {
+        if (empty($where) || ! is_array($where)) {
             return parent::getWhere($where);
         }
 
         $schema = $this->getSchemaByKeyNames();
 
         // Verifica se tem a chave de metadata
-        $metadata  = array();
+        $metadata  = [];
         if (array_key_exists('metadata', $where)) {
             $metadata = $where['metadata'];
             unset($where['metadata']);
         }
 
         // Verifica se metadata direto no where
-        foreach(array_keys($schema) as $key) {
+        foreach (array_keys($schema) as $key) {
             if (array_key_exists($key, $where)) {
                 $metadata[$key] = $where[$key];
                 unset($where[$key]);
@@ -68,11 +68,10 @@ class MetadataService extends ServiceAbstract
         $mapperTable = $this->getMapper()->getTableName();
         $mapperKey   = $this->getMapper()->getTableKey(true);
 
-        foreach($metadata as $id=>$value) {
-
+        foreach ($metadata as $id => $value) {
             // Ignora as chaves que não existam
             //@todo deveria retornar Exception?
-            if (!array_key_exists($id, $schema)) {
+            if (! array_key_exists($id, $schema)) {
                 continue;
             }
 
@@ -144,13 +143,13 @@ class MetadataService extends ServiceAbstract
      */
     public function setMetadataMappers($schemaTable, $valueTable, $mapperForeignKey)
     {
-        if (!is_string($schemaTable) || empty($schemaTable)) {
+        if (! is_string($schemaTable) || empty($schemaTable)) {
             throw new \Exception("schemaTable invalid");
         }
-        if (!is_string($valueTable) || empty($valueTable)) {
+        if (! is_string($valueTable) || empty($valueTable)) {
             throw new \Exception("valueTable invalid");
         }
-        if (!is_string($mapperForeignKey) || empty($mapperForeignKey)) {
+        if (! is_string($mapperForeignKey) || empty($mapperForeignKey)) {
             throw new \Exception("mapperForeignKey invalid");
         }
 
@@ -166,9 +165,9 @@ class MetadataService extends ServiceAbstract
     {
         $schema = $this->getSchema($useCache);
         $schemaByKeynames = null;
-        if (!empty($schema)) {
-            $schemaByKeynames = array();
-            foreach($schema as $row) {
+        if (! empty($schema)) {
+            $schemaByKeynames = [];
+            foreach ($schema as $row) {
                 $schemaByKeynames[$row['nick']] = $row;
             }
         }
@@ -184,9 +183,9 @@ class MetadataService extends ServiceAbstract
         $fetchAll = $this->getMapperSchema()->fetchAll();
 
         $schema = null;
-        if (!empty($fetchAll)) {
-            $schema = array();
-            foreach($fetchAll as $row) {
+        if (! empty($fetchAll)) {
+            $schema = [];
+            foreach ($fetchAll as $row) {
                 $schema[$row['id_info']] = $row->toArray();
             }
         }
@@ -205,24 +204,24 @@ class MetadataService extends ServiceAbstract
      */
     public function getValues($foreignkey, $complete = false)
     {
-        $fetchAll = $this->getMapperValue()->fetchAll(array($this->referenceKey=>$foreignkey));
+        $fetchAll = $this->getMapperValue()->fetchAll([$this->referenceKey => $foreignkey]);
         if (empty($fetchAll) && $complete !== true) {
             return $fetchAll;
         }
 
         $schema = $this->getSchema();
-        $getValues = array();
+        $getValues = [];
 
-        if (!empty($fetchAll)) {
-            foreach($fetchAll as $row) {
+        if (! empty($fetchAll)) {
+            foreach ($fetchAll as $row) {
                 $getValues[$schema[$row['fk_info']]['nick']] = $this->getCurrentValue($schema[$row['fk_info']], $row);
             }
         }
 
         // Adiciona as chaves vazias
         if ($complete === true) {
-            foreach($schema as $s) {
-                if (!isset($getValues[$s['nick']])) {
+            foreach ($schema as $s) {
+                if (! isset($getValues[$s['nick']])) {
                     $getValues[$s['nick']] = null;
                 }
             }
@@ -249,7 +248,7 @@ class MetadataService extends ServiceAbstract
     {
         $metadataKeys = $this->getSchemaByKeyNames(false);
         $currentValues = $this->getValues($foreignKey);
-        $saveMetadataLog = array();
+        $saveMetadataLog = [];
 
         // Verifica se tem alguma chave definida
         if (empty($metadataKeys)) {
@@ -259,7 +258,7 @@ class MetadataService extends ServiceAbstract
 
         foreach ($metadataKeys as $schema) {
             // Verifica se existe o metadado no dados enviados
-            if (!array_key_exists($schema['nick'], $set)) {
+            if (! array_key_exists($schema['nick'], $set)) {
                 continue;
             }
 
@@ -268,45 +267,45 @@ class MetadataService extends ServiceAbstract
             // Nao pode usar empty pois 0 (zero) e FALSE são empty e são válidos
             $setMetadataValue = $this->getCorrectSetValue($schema, $set[$schema['nick']]);
             if ($setMetadataValue === '') {
-               $setMetadataValue = null;
+                $setMetadataValue = null;
             }
             $setMetadataKey = $this->getCorrectSetKey($schema);
 
             // Verifica se existe o metadado salvo e se é diferente
             // $currentValues pode ser vazio quando o PDV for novo
-            if (!empty($currentValues) && array_key_exists($schema['nick'], $currentValues)) {
-                $whereKey = array(
+            if (! empty($currentValues) && array_key_exists($schema['nick'], $currentValues)) {
+                $whereKey = [
                     'fk_info' => $schema['fk_info'],
                     $this->referenceKey => $foreignKey
-                );
+                ];
                 if ($setMetadataValue !== $currentValues[$schema['nick']]) {
                     if (is_null($setMetadataValue)) {
                         $this->getMapperValue()
                              ->delete($whereKey);
-                        $saveMetadataLog[$schema['nick']] = array($currentValues[$schema['nick']], null);
+                        $saveMetadataLog[$schema['nick']] = [$currentValues[$schema['nick']], null];
                     } else {
                         $this->getMapperValue()
                              ->update(
-                                 array($setMetadataKey => $setMetadataValue),
+                                 [$setMetadataKey => $setMetadataValue],
                                  $whereKey
                              );
-                        $saveMetadataLog[$schema['nick']] = array($currentValues[$schema['nick']], $setMetadataValue);
+                        $saveMetadataLog[$schema['nick']] = [$currentValues[$schema['nick']], $setMetadataValue];
                     }
                 }
-            } elseif (!is_null($setMetadataValue)) {
+            } elseif (! is_null($setMetadataValue)) {
                 $this->getMapperValue()
-                     ->insert(array(
+                     ->insert([
                          'fk_info'           => $schema['fk_info'],
                          $this->referenceKey => $foreignKey,
                          $setMetadataKey     => $setMetadataValue
-                     ));
-                $saveMetadataLog[$schema['nick']] = array(null, $setMetadataValue);
+                     ]);
+                $saveMetadataLog[$schema['nick']] = [null, $setMetadataValue];
             }
             unset($set[$schema['nick']]);
         }
 
         // Verifica se algum dos metadados foi alterado e recarrega o campo resumo no PDV
-        if (!empty($saveMetadataLog)) {
+        if (! empty($saveMetadataLog)) {
             $set['metadata'] = json_encode($this->getValues($foreignKey, true));
         }
 
@@ -327,7 +326,7 @@ class MetadataService extends ServiceAbstract
     public function fixMetadata($key, $dbMetaField = 'metadata')
     {
         // Verifica o código do PDV
-        if (empty($key) || !is_numeric($key)) {
+        if (empty($key) || ! is_numeric($key)) {
             throw new \Exception('Código inválido em MetadaService::fixMetadata()');
         }
 
@@ -338,7 +337,7 @@ class MetadataService extends ServiceAbstract
         $jsonValues = Json::encode($values);
 
         // Atualiza o PDV sem passar pelo log
-        $this->getMapper()->getTableGateway()->update(array($dbMetaField=>$jsonValues), "{$this->getMapper()->getTableKey()}=$key");
+        $this->getMapper()->getTableGateway()->update([$dbMetaField => $jsonValues], "{$this->getMapper()->getTableKey()}=$key");
     }
 
     public function getLastSaveMetadataLog()
@@ -522,7 +521,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperValue()
     {
         if (is_string($this->mapperValue)) {
-            $this->mapperValue = new MetadataMapper($this->mapperValue, array('fk_info', $this->referenceKey));
+            $this->mapperValue = new MetadataMapper($this->mapperValue, ['fk_info', $this->referenceKey]);
             $this->mapperValue->setCache($this->getCache());
         }
 

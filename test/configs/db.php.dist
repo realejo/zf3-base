@@ -1,11 +1,11 @@
 <?php
-return array(
+return [
     'driver' => 'Mysqli',
     'hostname' => '127.0.0.1',
     'database' => 'test',
     'username' => 'root',
     'password' => '',
-    'options' => array(
+    'options' => [
         'buffer_results' => true
-    )
-);
+    ]
+];

@@ -22,7 +22,7 @@ class HydratorPagination extends \Zend\Paginator\Adapter\DbSelect
      */
     public function getHydrator()
     {
-        if (!isset($this->hydrator)) {
+        if (! isset($this->hydrator)) {
             $this->hydrator = new ArraySerializable();
         }
 
@@ -72,7 +72,7 @@ class HydratorPagination extends \Zend\Paginator\Adapter\DbSelect
         }
         $hydratorEntity = $this->getHydratorEntity();
 
-        foreach ($fetchAll as $id=>$row) {
+        foreach ($fetchAll as $id => $row) {
             $fetchAll[$id] = $hydrator->hydrate($row->getArrayCopy(), new $hydratorEntity);
         }
 

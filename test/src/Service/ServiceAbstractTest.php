@@ -16,39 +16,39 @@ class ServiceTest extends AbstractTestCase
      */
     protected $tableKeyName = 'id';
 
-    protected $tables = array('album');
+    protected $tables = ['album'];
 
     /**
      * @var \RealejoTest\Service\ServiceConcrete
      */
     private $Service;
 
-    protected $defaultValues = array(
-        array(
+    protected $defaultValues = [
+        [
             'id' => 1,
             'artist' => 'Rush',
             'title' => 'Rush',
             'deleted' => 0
-        ),
-        array(
+        ],
+        [
             'id' => 2,
             'artist' => 'Rush',
             'title' => 'Moving Pictures',
             'deleted' => 0
-        ),
-        array(
+        ],
+        [
             'id' => 3,
             'artist' => 'Dream Theater',
             'title' => 'Images And Words',
             'deleted' => 0
-        ),
-        array(
+        ],
+        [
             'id' => 4,
             'artist' => 'Claudia Leitte',
             'title' => 'Exttravasa',
             'deleted' => 1
-        )
-    );
+        ]
+    ];
 
     /**
      * @return self
@@ -126,7 +126,7 @@ class ServiceTest extends AbstractTestCase
         unset($albuns[3]); // remove o deleted=1
 
         $findAll = $this->Service->findAll();
-        foreach($findAll as $id=>$row) {
+        foreach ($findAll as $id => $row) {
             $findAll[$id] = $row->toArray();
         }
         $this->assertEquals($albuns, $findAll);
@@ -135,7 +135,7 @@ class ServiceTest extends AbstractTestCase
         $this->Service->getMapper()->setShowDeleted(true);
 
         $findAll = $this->Service->findAll();
-        foreach($findAll as $id=>$row) {
+        foreach ($findAll as $id => $row) {
             $findAll[$id] = $row->toArray();
         }
         $this->assertEquals($this->defaultValues, $findAll);
@@ -144,19 +144,19 @@ class ServiceTest extends AbstractTestCase
         $this->assertCount(3, $this->Service->findAll());
 
         // Verifica o where
-        $this->assertCount(2, $this->Service->findAll(array('artist'=>$albuns[0]['artist'])));
-        $this->assertNull($this->Service->findAll(array('artist'=>$this->defaultValues[3]['artist'])));
+        $this->assertCount(2, $this->Service->findAll(['artist' => $albuns[0]['artist']]));
+        $this->assertNull($this->Service->findAll(['artist' => $this->defaultValues[3]['artist']]));
 
         // Verifica o paginator com o padrão
         $paginator = $this->Service->findPaginated();
 
-        $temp = array();
-        foreach($paginator->getIterator() as $p) {
+        $temp = [];
+        foreach ($paginator->getIterator() as $p) {
             $temp[] = $p->getArrayCopy();
         }
 
         $findAll = $this->Service->findAll();
-        foreach($findAll as $id=>$row) {
+        foreach ($findAll as $id => $row) {
             $findAll[$id] = $row->toArray();
         }
         $paginator = json_encode($temp);
@@ -171,15 +171,15 @@ class ServiceTest extends AbstractTestCase
         $paginator = $this->Service->findPaginated();
 
         $temp = [];
-        foreach($paginator->getCurrentItems() as $p) {
+        foreach ($paginator->getCurrentItems() as $p) {
             $temp[] = $p->getArrayCopy();
         }
         $paginator = json_encode($temp);
 
         $this->assertNotEquals(json_encode($this->defaultValues), $paginator);
         $fetchAll = $this->Service->findPaginated(null, null, 2);
-        $temp = array();
-        foreach($fetchAll as $p) {
+        $temp = [];
+        foreach ($fetchAll as $p) {
             $temp[] = $p->toArray();
         }
         $fetchAll = $temp;
@@ -194,8 +194,8 @@ class ServiceTest extends AbstractTestCase
         // Liga o cache
         $this->Service->setUseCache(true);
         $findAll = $this->Service->findAll();
-        $temp = array();
-        foreach($findAll as $p) {
+        $temp = [];
+        foreach ($findAll as $p) {
             $temp[] = $p->toArray();
         }
         $findAll = $temp;
@@ -203,7 +203,7 @@ class ServiceTest extends AbstractTestCase
         $this->assertCount(4, $findAll, 'Deve conter 4 registros');
 
         // Grava um registro "sem o cache saber"
-        $this->Service->getMapper()->getTableGateway()->insert(array('id'=>10, 'artist'=>'nao existo por enquanto', 'title'=>'bla bla', 'deleted' => 0));
+        $this->Service->getMapper()->getTableGateway()->insert(['id' => 10, 'artist' => 'nao existo por enquanto', 'title' => 'bla bla', 'deleted' => 0]);
 
         $this->assertCount(4, $this->Service->findAll(), 'Deve conter 4 registros depois do insert "sem o cache saber"');
         $this->assertTrue($this->Service->getCache()->flush(), 'limpa o cache');
@@ -219,7 +219,6 @@ class ServiceTest extends AbstractTestCase
         $this->assertCount(5, $this->Service->findAll(), 'Deve conter 5 registros');
         $this->assertTrue($this->Service->getCache()->flush(), 'apaga o cache');
         $this->assertCount(4, $this->Service->findAll(), 'Deve conter 4 registros 4');
-
     }
 
     /**
@@ -291,7 +290,7 @@ class ServiceTest extends AbstractTestCase
      */
     public function testFindAssocWithMultipleKeys()
     {
-        $this->Service->getMapper()->setTableKey(array($this->tableKeyName, 'naoexisto'));
+        $this->Service->getMapper()->setTableKey([$this->tableKeyName, 'naoexisto']);
 
         $this->Service->getMapper()->setOrder('id');
 
@@ -339,7 +338,7 @@ class ServiceTest extends AbstractTestCase
 
         $this->Service->getMapper()->setOrder('id');
 
-        $select = $this->Service->getHtmlSelect($id, null, array('where'=>array('artist'=>'Rush')));
+        $select = $this->Service->getHtmlSelect($id, null, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 
@@ -358,7 +357,7 @@ class ServiceTest extends AbstractTestCase
         $this->assertEquals($this->defaultValues[1]['id'], $options->current()->getAttribute('value'), "valor do terceiro ok 1");
 
 
-        $select = $this->Service->getHtmlSelect($id, 1, array('where'=>array('artist'=>'Rush')));
+        $select = $this->Service->getHtmlSelect($id, 1, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 
@@ -471,7 +470,7 @@ class ServiceTest extends AbstractTestCase
     {
         $ph = 'myplaceholder';
         $this->Service->getMapper()->setOrder('id');
-        $select = $this->Service->getHtmlSelect('nome_usado', null, array('placeholder'=>$ph));
+        $select = $this->Service->getHtmlSelect('nome_usado', null, ['placeholder' => $ph]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe');
@@ -499,21 +498,21 @@ class ServiceTest extends AbstractTestCase
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe COM valor padrão');
         $this->assertCount(4, $dom->execute('option'), '4 opções existem COM valor padrão');
 
-        $select = $this->Service->getHtmlSelect('nome_usado', null, array('show-empty'=>false));
+        $select = $this->Service->getHtmlSelect('nome_usado', null, ['show-empty' => false]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe SEM valor padrão e show-empty=false');
         $this->assertCount(4, $dom->execute('option'), '4 opções existem SEM valor padrão e show-empty=false');
 
         // sem mostrar o empty
-        $select = $this->Service->getHtmlSelect('nome_usado', 1, array('show-empty'=>false));
+        $select = $this->Service->getHtmlSelect('nome_usado', 1, ['show-empty' => false]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe com valor padrão e show-empty=false');
         $this->assertCount(4, $dom->execute('option'), '4 opções existem com valor padrão e show-empty=false');
 
         // sem mostrar o empty
-        $select = $this->Service->getHtmlSelect('nome_usado', 1, array('show-empty'=>true));
+        $select = $this->Service->getHtmlSelect('nome_usado', 1, ['show-empty' => true]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe com valor padrão e show-empty=true');
@@ -527,7 +526,7 @@ class ServiceTest extends AbstractTestCase
         $id = 'teste';
         $this->Service->getMapper()->setOrder('id');
 
-        $select = $this->Service->setHtmlSelectOption('{title}')->getHtmlSelect($id, 1, array('grouped'=>'artist'));
+        $select = $this->Service->setHtmlSelectOption('{title}')->getHtmlSelect($id, 1, ['grouped' => 'artist']);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
         $this->assertCount(1, $dom->execute("#$id"), "id #$id existe");
@@ -574,7 +573,7 @@ class ServiceTest extends AbstractTestCase
 
         // SELECT VAZIO!
 
-        $select = $this->Service->setHtmlSelectOption('{title}')->getHtmlSelect($id, 1, array('grouped'=>'artist', 'where'=>array('id'=>100)));
+        $select = $this->Service->setHtmlSelectOption('{title}')->getHtmlSelect($id, 1, ['grouped' => 'artist', 'where' => ['id' => 100]]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
         $this->assertCount(1, $dom->execute("#$id"), "id #$id existe");
@@ -590,13 +589,13 @@ class ServiceTest extends AbstractTestCase
     {
         // Define a chave multipla
         // como ele deve considerar apenas o primeiro o teste abaixo é o mesmo de testHtmlSelectWhere
-        $this->Service->getMapper()->setTableKey(array('id', 'nao-existo'));
+        $this->Service->getMapper()->setTableKey(['id', 'nao-existo']);
         $this->Service->getMapper()->setOrder('id');
 
         $id = 'teste';
         $this->Service->setHtmlSelectOption('{title}');
 
-        $select = $this->Service->getHtmlSelect($id, null, array('where'=>array('artist'=>'Rush')));
+        $select = $this->Service->getHtmlSelect($id, null, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 
@@ -615,7 +614,7 @@ class ServiceTest extends AbstractTestCase
         $this->assertEquals($this->defaultValues[1]['id'], $options->current()->getAttribute('value'), "valor do terceiro ok 1");
 
 
-        $select = $this->Service->getHtmlSelect($id, 1, array('where'=>array('artist'=>'Rush')));
+        $select = $this->Service->getHtmlSelect($id, 1, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 
@@ -637,13 +636,13 @@ class ServiceTest extends AbstractTestCase
     {
         // Define a chave multipla
         // como ele deve considerar apenas o primeiro o teste abaixo é o mesmo de testHtmlSelectWhere
-        $this->Service->getMapper()->setTableKey(array('CAST'=>'id', 'nao-existo'));
+        $this->Service->getMapper()->setTableKey(['CAST' => 'id', 'nao-existo']);
         $this->Service->getMapper()->setOrder('id');
 
         $id = 'teste';
         $this->Service->setHtmlSelectOption('{title}');
 
-        $select = $this->Service->getHtmlSelect($id, null, array('where'=>array('artist'=>'Rush')));
+        $select = $this->Service->getHtmlSelect($id, null, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 
@@ -662,7 +661,7 @@ class ServiceTest extends AbstractTestCase
         $this->assertEquals($this->defaultValues[1]['id'], $options->current()->getAttribute('value'), "valor do terceiro ok 1");
 
 
-        $select = $this->Service->getHtmlSelect($id, 1, array('where'=>array('artist'=>'Rush')));
+        $select = $this->Service->getHtmlSelect($id, 1, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 

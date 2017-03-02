@@ -18,13 +18,13 @@ class Upload
      *
      * @return string
      */
-    static public function getUploadPath($path = '')
+    public static function getUploadPath($path = '')
     {
         // Define a pasta de upload
         $path = self::getUploadRoot() . '/' . str_replace('_', '/', strtolower($path));
 
         // Verifica se a pasta do cache existe
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $oldumask = umask(0);
             mkdir($path, 0777, true);
             umask($oldumask);
@@ -42,13 +42,13 @@ class Upload
      *
      * @return string
      */
-    static public function getAssetsReservedPath($path = '')
+    public static function getAssetsReservedPath($path = '')
     {
         // Define a pasta de upload
         $path = self::getAssetsReservedRoot() . '/' . str_replace('_', '/', strtolower($path));
 
         // Verifica se a pasta do cache existe
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $oldumask = umask(0);
             mkdir($path, 0777, true);
             umask($oldumask);
@@ -66,13 +66,13 @@ class Upload
      *
      * @return string
      */
-    static public function getAssetsPublicPath($path = '')
+    public static function getAssetsPublicPath($path = '')
     {
         // Define a pasta de upload
         $path = self::getAssetsPublicRoot() . '/' . str_replace('_', '/', strtolower($path));
 
         // Verifica se a pasta do cache existe
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $oldumask = umask(0);
             mkdir($path, 0777, true);
             umask($oldumask);
@@ -87,19 +87,19 @@ class Upload
      *
      * @return string
      */
-    static public function getUploadRoot()
+    public static function getUploadRoot()
     {
          // Verifica se a pasta de cache existe
-         if ( !defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false )  {
-             throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA em Realejo\Upload::getUploadRoot()');
-         }
+        if (! defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
+            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA em Realejo\Upload::getUploadRoot()');
+        }
 
          $path = APPLICATION_DATA . '/uploads';
 
          // Verifica se existe e se tem permissão de escrita
-         if (!is_dir($path) || !is_writable($path) )  {
-             throw new \Exception('A pasta raiz de upload data/uploads não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()');
-         }
+        if (! is_dir($path) || ! is_writable($path)) {
+            throw new \Exception('A pasta raiz de upload data/uploads não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()');
+        }
 
         // retorna a pasta raiz do cache
         return $path;
@@ -110,17 +110,17 @@ class Upload
      *
      * @return string
      */
-    static public function getAssetsReservedRoot()
+    public static function getAssetsReservedRoot()
     {
         // Verifica se a pasta de upload existe
-        if ( !defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
+        if (! defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
             throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA em Realejo\Upload::getAssetsReservedRoot()');
         }
 
         $path = APPLICATION_DATA . '/assets';
 
         // Verifica se existe e se tem permissão de escrita
-        if (!is_dir($path) || !is_writable($path) )  {
+        if (! is_dir($path) || ! is_writable($path)) {
             throw new \Exception('A pasta raiz de upload data/assets não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()');
         }
 
@@ -133,17 +133,17 @@ class Upload
      *
      * @return string
      */
-    static public function getAssetsPublicRoot()
+    public static function getAssetsPublicRoot()
     {
         // Verifica se a pasta de upload existe
-        if ( !defined('APPLICATION_HTTP')  || realpath(APPLICATION_HTTP) == false) {
+        if (! defined('APPLICATION_HTTP')  || realpath(APPLICATION_HTTP) == false) {
             throw new \Exception('A pasta raiz do site não está definido em APPLICATION_HTTP em Realejo\Upload::getAssetsPublicRoot()');
         }
 
         $path = APPLICATION_HTTP . '/assets';
 
         // Verifica se existe e se tem permissão de escrita
-        if (!is_dir($path) || !is_writable($path) )  {
+        if (! is_dir($path) || ! is_writable($path)) {
             throw new \Exception("A pasta raiz de upload site/assets não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()'");
         }
 

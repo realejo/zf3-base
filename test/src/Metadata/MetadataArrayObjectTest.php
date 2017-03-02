@@ -16,7 +16,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($object->one));
         $this->assertFalse(isset($object['one']));
 
-        $object->addMetadata(array('one'=>'first'));
+        $object->addMetadata(['one' => 'first']);
         $this->assertNotEmpty($object);
         $this->assertEquals('first', $object->one);
         $this->assertEquals('first', $object['one']);
@@ -26,23 +26,23 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($object);
         $this->assertEquals(null, $object->one);
         $this->assertEquals(null, $object['one']);
-        $this->assertEquals(array('one'=>null), $object->toArray());
+        $this->assertEquals(['one' => null], $object->toArray());
 
         $object->one = 'again';
 
         $this->assertNotEmpty($object);
         $this->assertEquals('again', $object->one);
         $this->assertEquals('again', $object['one']);
-        $this->assertEquals(array('one'=>'again'), $object->toArray());
+        $this->assertEquals(['one' => 'again'], $object->toArray());
 
         $object->one = 'oncemore';
 
         $this->assertNotEmpty($object);
         $this->assertEquals('oncemore', $object->one);
         $this->assertEquals('oncemore', $object['one']);
-        $this->assertEquals(array('one'=>'oncemore'), $object->toArray());
+        $this->assertEquals(['one' => 'oncemore'], $object->toArray());
 
-        $object->addMetadata(array('two'=>null));
+        $object->addMetadata(['two' => null]);
         $this->assertNotEmpty($object);
         $this->assertNull($object->two);
         $this->assertNull($object['two']);
@@ -59,7 +59,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
 
         unset($object->one);
 
-        $this->assertEquals(array('two'=>null, 'one'=>null), $object->toArray());
+        $this->assertEquals(['two' => null, 'one' => null], $object->toArray());
 
         $this->assertTrue(isset($object->one));
         $this->assertTrue(isset($object->two));
@@ -74,14 +74,14 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($object);
         $this->assertFalse(empty($object));
 
-        $object = new MetadataArrayObject(array('one'=>'two'));
+        $object = new MetadataArrayObject(['one' => 'two']);
         $this->assertNotEmpty($object);
         $this->assertCount(1, $object);
 
         $object->one = null;
         $this->assertCount(1, $object);
 
-        $object->addMetadata(array('two'=>'second'));
+        $object->addMetadata(['two' => 'second']);
         $this->assertCount(2, $object);
 
         $object->two = null;
@@ -90,7 +90,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
         $object->one = 'first';
         $this->assertCount(2, $object);
 
-        $object->addMetadata(array('three'=>null));
+        $object->addMetadata(['three' => null]);
         $this->assertCount(3, $object);
     }
 
@@ -103,20 +103,20 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($object);
         $this->assertEmpty($object->toArray());
 
-        $object = new MetadataArrayObject(array('one'=>'first'));
+        $object = new MetadataArrayObject(['one' => 'first']);
         $this->assertNotEmpty($object);
         $this->assertNotEmpty($object->toArray());
-        $this->assertEquals(array('one'=>'first'), $object->toArray());
+        $this->assertEquals(['one' => 'first'], $object->toArray());
 
-        $object->populate(array('two'=>'second'));
+        $object->populate(['two' => 'second']);
         $this->assertNotEmpty($object);
         $this->assertNotEmpty($object->toArray());
-        $this->assertEquals(array('two'=>'second'), $object->toArray());
+        $this->assertEquals(['two' => 'second'], $object->toArray());
 
-        $object->populate(array('third'=>null));
+        $object->populate(['third' => null]);
         $this->assertNotEmpty($object);
         $this->assertNotEmpty($object->toArray());
-        $this->assertEquals(array('third'=>null), $object->toArray());
+        $this->assertEquals(['third' => null], $object->toArray());
     }
 
     /**
@@ -173,4 +173,3 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
         unset($object->test);
     }
 }
-

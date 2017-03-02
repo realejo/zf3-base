@@ -14,7 +14,7 @@ class Version
      * indentificador de versão
      * @see compareVersion()
      */
-    CONST VERSION = '0.2';
+    const VERSION = '0.2';
 
     /**
      * The latest stable version Zend Framework available

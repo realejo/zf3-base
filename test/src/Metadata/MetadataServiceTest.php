@@ -17,39 +17,39 @@ class MetadataServiceTest extends AbstractTestCase
      */
     private $metadataService;
 
-    private $schema = array(
-        array(
+    private $schema = [
+        [
             'id_info' => 123,
             'tipo' => MetadataService::BOOLEAN,
             'nick' => 'bool'
-        ),
-        array(
+        ],
+        [
             'id_info' => 321,
             'tipo' => MetadataService::DATE,
             'nick' => 'date'
-        ),
-        array(
+        ],
+        [
             'id_info' => 159,
             'tipo' => MetadataService::DATETIME,
             'nick' => 'datetime'
-        ),
-        array(
+        ],
+        [
             'id_info' => 753,
             'tipo' => MetadataService::DECIMAL,
             'nick' => 'decimal'
-        ),
-        array(
+        ],
+        [
             'id_info' => 78,
             'tipo' => MetadataService::INTEGER,
             'nick' => 'integer'
-        )
+        ]
         ,
-        array(
+        [
             'id_info' => 456,
             'tipo' => MetadataService::TEXT,
             'nick' => 'text'
-        )
-    );
+        ]
+    ];
 
     private $cacheFetchAllKey;
 
@@ -74,11 +74,10 @@ class MetadataServiceTest extends AbstractTestCase
          $this->cacheFetchAllKey = 'fetchAll'.md5(var_export(false, true) . var_export(null, true) . var_export(null, true) . var_export(null, true) . var_export(null, true));
 
          // Grava no cache um fetchAll ficticio
-         $fetchAll = array();
-         foreach($this->schema as $row)
-         {
-             $fetchAll[] = new ArrayObject($row);
-         }
+         $fetchAll = [];
+        foreach ($this->schema as $row) {
+            $fetchAll[] = new ArrayObject($row);
+        }
          $this->metadataService
               ->getCache()
               ->setItem($this->cacheFetchAllKey, $fetchAll);
@@ -86,10 +85,10 @@ class MetadataServiceTest extends AbstractTestCase
          $this->assertEquals($fetchAll, $this->metadataService->getCache()->getItem($this->cacheFetchAllKey));
 
          // Cria o schema associado pelo id
-         $schemaById = array();
-         foreach ($this->schema as $s) {
-             $schemaById[$s['id_info']] = $s;
-         }
+         $schemaById = [];
+        foreach ($this->schema as $s) {
+            $schemaById[$s['id_info']] = $s;
+        }
 
         // Grava no cache um metada ficticio
         $this->metadataService
@@ -101,7 +100,7 @@ class MetadataServiceTest extends AbstractTestCase
 
     private function createTableSchema()
     {
-        $this->createTables(array('metadata_schema', 'metadata_value'));
+        $this->createTables(['metadata_schema', 'metadata_value']);
     }
 
     /**
@@ -111,7 +110,7 @@ class MetadataServiceTest extends AbstractTestCase
     {
         $this->metadataService->cleanCache();
         $this->metadataService = null;
-        $this->dropTables(array('metadata_schema', 'metadata_value'));
+        $this->dropTables(['metadata_schema', 'metadata_value']);
         parent::tearDown();
     }
 
@@ -121,7 +120,7 @@ class MetadataServiceTest extends AbstractTestCase
     public function testGetSchemaByKeyNames()
     {
         // Cria o schema exemplo para keyname
-        $schemaByKeyname = array();
+        $schemaByKeyname = [];
         foreach ($this->schema as $s) {
             $schemaByKeyname[$s['nick']] = $s;
         }
@@ -140,13 +139,12 @@ class MetadataServiceTest extends AbstractTestCase
         $method = $reflection->getMethod('getCorrectSetKey');
         $method->setAccessible(true);
 
-        $this->assertEquals('value_boolean', $method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN))));
-        $this->assertEquals('value_date', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATE))));
-        $this->assertEquals('value_datetime', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATETIME))));
-        $this->assertEquals('value_decimal', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DECIMAL))));
-        $this->assertEquals('value_integer', $method->invokeArgs($service, array(array('tipo'=>MetadataService::INTEGER))));
-        $this->assertEquals('value_text', $method->invokeArgs($service, array(array('tipo'=>MetadataService::TEXT))));
-
+        $this->assertEquals('value_boolean', $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN]]));
+        $this->assertEquals('value_date', $method->invokeArgs($service, [['tipo' => MetadataService::DATE]]));
+        $this->assertEquals('value_datetime', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME]]));
+        $this->assertEquals('value_decimal', $method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL]]));
+        $this->assertEquals('value_integer', $method->invokeArgs($service, [['tipo' => MetadataService::INTEGER]]));
+        $this->assertEquals('value_text', $method->invokeArgs($service, [['tipo' => MetadataService::TEXT]]));
     }
 
     /**
@@ -159,32 +157,32 @@ class MetadataServiceTest extends AbstractTestCase
         $method = $reflection->getMethod('getCorrectSetValue');
         $method->setAccessible(true);
 
-        $this->assertEquals(1, $method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN), 1)));
-        $this->assertEquals(1, $method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN), true)));
-        $this->assertEquals(0, $method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN), 0)));
-        $this->assertEquals(0, $method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN), false)));
+        $this->assertEquals(1, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], 1]));
+        $this->assertEquals(1, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], true]));
+        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], 0]));
+        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], false]));
 
-        $this->assertNull($method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN), null)));
-        $this->assertEquals(0, $method->invokeArgs($service, array(array('tipo'=>MetadataService::BOOLEAN), '')));
+        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], null]));
+        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], '']));
 
-        $this->assertEquals('2016-12-10', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATE), '10/12/2016')));
-        $this->assertEquals('2016-12-10', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATE), '10/12/2016 14:25:24')));
-        $this->assertEquals('0', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATE), '0')));
-        $this->assertNull(null, $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATE), null)));
+        $this->assertEquals('2016-12-10', $method->invokeArgs($service, [['tipo' => MetadataService::DATE], '10/12/2016']));
+        $this->assertEquals('2016-12-10', $method->invokeArgs($service, [['tipo' => MetadataService::DATE], '10/12/2016 14:25:24']));
+        $this->assertEquals('0', $method->invokeArgs($service, [['tipo' => MetadataService::DATE], '0']));
+        $this->assertNull(null, $method->invokeArgs($service, [['tipo' => MetadataService::DATE], null]));
 
-        $this->assertEquals('value_datetime', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATETIME), 'value_datetime')));
-        $this->assertEquals('2016-12-10 00:00:00', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATETIME), '10/12/2016')));
-        $this->assertEquals('2016-12-10 13:13:12', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DATETIME), '10/12/2016 13:13:12')));
+        $this->assertEquals('value_datetime', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME], 'value_datetime']));
+        $this->assertEquals('2016-12-10 00:00:00', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME], '10/12/2016']));
+        $this->assertEquals('2016-12-10 13:13:12', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME], '10/12/2016 13:13:12']));
 
-        $this->assertEquals(0, $method->invokeArgs($service, array(array('tipo'=>MetadataService::DECIMAL), 'value_decimal')));
-        $this->assertEquals('0', $method->invokeArgs($service, array(array('tipo'=>MetadataService::DECIMAL), 'value_decimal')));
-        $this->assertEquals(0, $method->invokeArgs($service, array(array('tipo'=>MetadataService::INTEGER), 'value_integer')));
-        $this->assertEquals('0', $method->invokeArgs($service, array(array('tipo'=>MetadataService::INTEGER), 'value_integer')));
-        $this->assertEquals('value_text', $method->invokeArgs($service, array(array('tipo'=>MetadataService::TEXT), 'value_text')));
+        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL], 'value_decimal']));
+        $this->assertEquals('0', $method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL], 'value_decimal']));
+        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::INTEGER], 'value_integer']));
+        $this->assertEquals('0', $method->invokeArgs($service, [['tipo' => MetadataService::INTEGER], 'value_integer']));
+        $this->assertEquals('value_text', $method->invokeArgs($service, [['tipo' => MetadataService::TEXT], 'value_text']));
 
-        $this->assertNull($method->invokeArgs($service, array(array('tipo'=>MetadataService::DECIMAL), null)));
-        $this->assertNull($method->invokeArgs($service, array(array('tipo'=>MetadataService::INTEGER), null)));
-        $this->assertNull($method->invokeArgs($service, array(array('tipo'=>MetadataService::TEXT), null)));
+        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL], null]));
+        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::INTEGER], null]));
+        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::TEXT], null]));
     }
 
     /**
@@ -200,7 +198,7 @@ class MetadataServiceTest extends AbstractTestCase
         $this->assertEquals('schemaTable', $service->getMapperSchema()->getTableName());
         $this->assertInstanceOf('\Realejo\Metadata\MetadataMapper', $service->getMapperValue());
         $this->assertEquals('valuesTable', $service->getMapperValue()->getTableName());
-        $this->assertEquals(array('fk_info', 'foreignKeyName'), $service->getMapperValue()->getTableKey());
+        $this->assertEquals(['fk_info', 'foreignKeyName'], $service->getMapperValue()->getTableKey());
         $this->assertEquals('fk_info', $service->getMapperValue()->getTableKey(true));
     }
 
@@ -254,7 +252,6 @@ class MetadataServiceTest extends AbstractTestCase
         $this->assertNull($service->getMapperSchema()->getCache()->getItem('schemakey'));
         $this->assertFalse($service->getMapperValue()->getCache()->hasItem('valuekey'));
         $this->assertNull($service->getMapperValue()->getCache()->getItem('valuekey'));
-
     }
 
     /**
@@ -263,7 +260,7 @@ class MetadataServiceTest extends AbstractTestCase
     public function testGetSchema()
     {
         // Cria o schema associado pelo id
-        $schemaById = array();
+        $schemaById = [];
         foreach ($this->schema as $s) {
             $schemaById[$s['id_info']] = $s;
         }
@@ -286,16 +283,16 @@ class MetadataServiceTest extends AbstractTestCase
      */
     public function testGetWhere()
     {
-        $this->assertInternalType('array', $this->metadataService->getWhere(array()));
-        $this->assertEquals(array(), $this->metadataService->getWhere(array()));
+        $this->assertInternalType('array', $this->metadataService->getWhere([]));
+        $this->assertEquals([], $this->metadataService->getWhere([]));
 
         $this->assertNull($this->metadataService->getWhere(null));
 
-        $this->assertInternalType('array', $this->metadataService->getWhere(array('metadata'=>array())));
-        $this->assertEquals(array(), $this->metadataService->getWhere(array('metadata'=>array())));
+        $this->assertInternalType('array', $this->metadataService->getWhere(['metadata' => []]));
+        $this->assertEquals([], $this->metadataService->getWhere(['metadata' => []]));
 
-        $this->assertInternalType('array', $this->metadataService->getWhere(array('metadata'=>null)));
-        $this->assertEquals(array(), $this->metadataService->getWhere(array('metadata'=>null)));
+        $this->assertInternalType('array', $this->metadataService->getWhere(['metadata' => null]));
+        $this->assertEquals([], $this->metadataService->getWhere(['metadata' => null]));
     }
 
     /**
@@ -307,61 +304,61 @@ class MetadataServiceTest extends AbstractTestCase
         // Cria as tabelas
         $this->createTableSchema();
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('bool' => true)));
+        $where = $this->metadataService->getWhere(['metadata' => ['bool' => true]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 1)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('bool' => true));
+        $where = $this->metadataService->getWhere(['bool' => true]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 1)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('bool' => false)));
+        $where = $this->metadataService->getWhere(['metadata' => ['bool' => false]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 0)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('bool' => false));
+        $where = $this->metadataService->getWhere(['bool' => false]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 0)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('bool' => 1)));
+        $where = $this->metadataService->getWhere(['metadata' => ['bool' => 1]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 1)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('bool' => 1));
+        $where = $this->metadataService->getWhere(['bool' => 1]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 1)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('bool' => 0)));
+        $where = $this->metadataService->getWhere(['metadata' => ['bool' => 0]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 0)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('bool' => 0));
+        $where = $this->metadataService->getWhere(['bool' => 0]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean = 0)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('bool' => null)));
+        $where = $this->metadataService->getWhere(['metadata' => ['bool' => null]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(123)} AND value_boolean IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(123)})", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('bool' => null));
+        $where = $this->metadataService->getWhere(['bool' => null]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
@@ -383,7 +380,6 @@ class MetadataServiceTest extends AbstractTestCase
          'nick' => 'decimal'
          ),
          ) */
-
     }
 
     /**
@@ -395,43 +391,43 @@ class MetadataServiceTest extends AbstractTestCase
         // Cria as tabelas
         $this->createTableSchema();
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('integer' => 10)));
+        $where = $this->metadataService->getWhere(['metadata' => ['integer' => 10]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(78)} AND value_integer = 10)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('integer' => 10));
+        $where = $this->metadataService->getWhere(['integer' => 10]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(78)} AND value_integer = 10)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('integer' => 0)));
+        $where = $this->metadataService->getWhere(['metadata' => ['integer' => 0]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(78)} AND value_integer = 0)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('integer' => 0));
+        $where = $this->metadataService->getWhere(['integer' => 0]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(78)} AND value_integer = 0)", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('integer' => null)));
+        $where = $this->metadataService->getWhere(['metadata' => ['integer' => null]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(78)} AND value_integer IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(78)})", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('integer' => null));
+        $where = $this->metadataService->getWhere(['integer' => null]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(78)} AND value_integer IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(78)})", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('integer' => -99));
+        $where = $this->metadataService->getWhere(['integer' => -99]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
@@ -447,62 +443,62 @@ class MetadataServiceTest extends AbstractTestCase
         // Cria as tabelas
         $this->createTableSchema();
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('text' => 10)));
+        $where = $this->metadataService->getWhere(['metadata' => ['text' => 10]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text = '10')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('text' => 10));
+        $where = $this->metadataService->getWhere(['text' => 10]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text = '10')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('text' => 0)));
+        $where = $this->metadataService->getWhere(['metadata' => ['text' => 0]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text = '0')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('text' => 0));
+        $where = $this->metadataService->getWhere(['text' => 0]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text = '0')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('text' => 'qwerty')));
+        $where = $this->metadataService->getWhere(['metadata' => ['text' => 'qwerty']]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text = 'qwerty')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('text' => 'qwerty'));
+        $where = $this->metadataService->getWhere(['text' => 'qwerty']);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text = 'qwerty')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('text' => '')));
+        $where = $this->metadataService->getWhere(['metadata' => ['text' => '']]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(456)})", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('text' => ''));
+        $where = $this->metadataService->getWhere(['text' => '']);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(456)})", $where[0]->getExpression());
 
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('text' => null)));
+        $where = $this->metadataService->getWhere(['metadata' => ['text' => null]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(456)} AND value_text IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(456)})", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('text' => null));
+        $where = $this->metadataService->getWhere(['text' => null]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
@@ -518,77 +514,77 @@ class MetadataServiceTest extends AbstractTestCase
         // Cria as tabelas
         $this->createTableSchema();
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('date' => '15/10/2016')));
+        $where = $this->metadataService->getWhere(['metadata' => ['date' => '15/10/2016']]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('date' => '15/10/2016'));
-        $this->assertInternalType('array', $where);
-        $this->assertCount(1, $where);
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
-        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
-
-
-        $where = $this->metadataService->getWhere(array('metadata'=>array('date' => '2016-10-15')));
-        $this->assertInternalType('array', $where);
-        $this->assertCount(1, $where);
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
-        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
-
-        $where = $this->metadataService->getWhere(array('date' => '2016-10-15'));
+        $where = $this->metadataService->getWhere(['date' => '15/10/2016']);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
 
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('date' => '15/10/2016 14:24:35')));
+        $where = $this->metadataService->getWhere(['metadata' => ['date' => '2016-10-15']]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('date' => '15/10/2016 14:24:35'));
-        $this->assertInternalType('array', $where);
-        $this->assertCount(1, $where);
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
-        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
-
-
-        $where = $this->metadataService->getWhere(array('metadata'=>array('date' => '2016-10-15 14:24:35')));
-        $this->assertInternalType('array', $where);
-        $this->assertCount(1, $where);
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
-        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
-
-        $where = $this->metadataService->getWhere(array('date' => '2016-10-15 14:24:35'));
+        $where = $this->metadataService->getWhere(['date' => '2016-10-15']);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
 
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('date' => '')));
+        $where = $this->metadataService->getWhere(['metadata' => ['date' => '15/10/2016 14:24:35']]);
+        $this->assertInternalType('array', $where);
+        $this->assertCount(1, $where);
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
+        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
+
+        $where = $this->metadataService->getWhere(['date' => '15/10/2016 14:24:35']);
+        $this->assertInternalType('array', $where);
+        $this->assertCount(1, $where);
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
+        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
+
+
+        $where = $this->metadataService->getWhere(['metadata' => ['date' => '2016-10-15 14:24:35']]);
+        $this->assertInternalType('array', $where);
+        $this->assertCount(1, $where);
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
+        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
+
+        $where = $this->metadataService->getWhere(['date' => '2016-10-15 14:24:35']);
+        $this->assertInternalType('array', $where);
+        $this->assertCount(1, $where);
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
+        $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '2016-10-15')", $where[0]->getExpression());
+
+
+        $where = $this->metadataService->getWhere(['metadata' => ['date' => '']]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('date' => ''));
+        $where = $this->metadataService->getWhere(['date' => '']);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date = '')", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('metadata'=>array('date' => null)));
+        $where = $this->metadataService->getWhere(['metadata' => ['date' => null]]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
         $this->assertEquals("EXISTS ({$this->getSqlSchemaString(321)} AND value_date IS NULL) OR NOT EXISTS ({$this->getSqlSchemaString(321)})", $where[0]->getExpression());
 
-        $where = $this->metadataService->getWhere(array('date' => null));
+        $where = $this->metadataService->getWhere(['date' => null]);
         $this->assertInternalType('array', $where);
         $this->assertCount(1, $where);
         $this->assertInstanceOf('\Zend\Db\Sql\Expression', $where[0]);
@@ -663,4 +659,3 @@ class MetadataServiceTest extends AbstractTestCase
         $service->setMetadataMappers('tableone', 'tableone', null);
     }
 }
-
