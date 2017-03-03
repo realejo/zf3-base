@@ -13,7 +13,7 @@ class Loader
     /**
      * @var array
      */
-    private $_models;
+    private $models;
 
     /**
      * Verifica se um model já está carregado
@@ -36,11 +36,11 @@ class Loader
             }
 
             // Grava na lista de models já carregados
-            $this->_models[$model] = $object;
+            $this->models[$model] = $object;
         }
 
         // Retorna o model
-        return $this->_models[$model];
+        return $this->models[$model];
     }
 
     /**
@@ -59,7 +59,7 @@ class Loader
         }
 
         // Grava na lista de models já carregados
-        $this->_models[$model] = $object;
+        $this->models[$model] = $object;
 
         // Retorna o loader
         return $this;
@@ -74,6 +74,6 @@ class Loader
      */
     public function hasModel($model)
     {
-        return isset($this->_models[$model]);
+        return isset($this->models[$model]);
     }
 }

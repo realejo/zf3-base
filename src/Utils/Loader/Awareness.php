@@ -15,32 +15,32 @@ namespace Realejo\App\Loader;
 abstract class Awareness
 {
     /**
-     * @var \Realejo\App\Loader\Loader
+     * @var Loader
      */
-    private $_loader;
+    private $loader;
 
     /**
      * Retorna o App_Loader a ser usado
      *
-     * @return \Realejo\App\Loader\Loader
+     * @return Loader
      */
     public function getLoader()
     {
-        if (! isset($this->_loader)) {
-            $this->setLoader(new \Realejo\App\Loader\Loader());
+        if (! isset($this->loader)) {
+            $this->setLoader(new Loader());
         }
 
-        return $this->_loader;
+        return $this->loader;
     }
 
     /**
      * Grava o App_Loader que deve ser usado
      * Ele é usado com DI durante a criação do model no App_Loader
      *
-     * @param \Realejo\App\Loader\Loader $loader
+     * @param Loader $loader
      */
     public function setLoader($loader)
     {
-        $this->_loader = $loader;
+        $this->loader = $loader;
     }
 }

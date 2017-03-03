@@ -53,8 +53,10 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
         ];
 
         $oMailer->setEmailMessage(
-            null, null,
-            $config['test-name'], $config['test-email'],
+            null,
+            null,
+            $config['test-name'],
+            $config['test-email'],
             'Olá',
             'Olá mundo, teste do anexo com array de strings',
             ['anexos' => $files]
@@ -104,8 +106,10 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
         ];
 
         $oMailer->setEmailMessage(
-            null, null,
-            $config['test-name'], $config['test-email'],
+            null,
+            null,
+            $config['test-name'],
+            $config['test-email'],
             'Olá',
             'Olá mundo, teste do anexo com array de strings',
             ['anexos' => $files]
@@ -120,7 +124,10 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
         //define e verifica o reply-to
         $oMailer->getMessage()->setReplyTo($config['mailsender']['email'], $config['mailsender']['name']);
         $this->assertEquals($config['mailsender']['name'], $oMailer->getMessage()->getReplyTo()->current()->getName());
-        $this->assertEquals($config['mailsender']['email'], $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+        $this->assertEquals(
+            $config['mailsender']['email'],
+            $oMailer->getMessage()->getReplyTo()->current()->getEmail()
+        );
 
         //verifica o assunto
         $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());
@@ -146,12 +153,16 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
     {
         $config = $this->getMailSenderConfig();
         $oMailer = new MailSender($config['mailsender']);
-        $htmlEmail = '<html><head><title>Olá mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
+        $htmlEmail = '<html><head><title>Olá mundo</title></head>'
+            .'<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
 
         $oMailer->setEmailMessage(
-            null, null,
-            $config['test-name'], $config['test-email'],
-            'Olá', $htmlEmail
+            null,
+            null,
+            $config['test-name'],
+            $config['test-email'],
+            'Olá',
+            $htmlEmail
         );
 
         //verifica se os remetentes e destinatarios estao ok
@@ -175,7 +186,11 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
         $parts = $oMailer->getMessage()->getBody()->getParts();
         $this->assertInstanceOf(Mime\Part::class, $parts[0]);
 
-        $this->assertEquals('<html><head><title>Olá mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>', $parts[0]->getContent());
+        $this->assertEquals(
+            '<html><head><title>Olá mundo</title></head>'
+            .'<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>',
+            $parts[0]->getContent()
+        );
 
         if ($config['test-really-send-email'] === true) {
             $this->assertNull($oMailer->send());
@@ -189,12 +204,16 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
     {
         $config = $this->getMailSenderConfig();
         $oMailer = new MailSender($config['mailsender']);
-        $htmlEmail = '<html><head><title>Olá mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
+        $htmlEmail = '<html><head><title>Olá mundo</title></head>'
+                    .'<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
 
         $oMailer->setEmailMessage(
-            'Another sender', 'another-email@somewhere.com',
-            $config['test-name'], $config['test-email'],
-            'Olá', $htmlEmail
+            'Another sender',
+            'another-email@somewhere.com',
+            $config['test-name'],
+            $config['test-email'],
+            'Olá',
+            $htmlEmail
         );
 
         //verifica se os remetentes e destinatarios estao ok
@@ -218,7 +237,11 @@ class MailSenderTest extends \PHPUnit\Framework\TestCase
         $parts = $oMailer->getMessage()->getBody()->getParts();
         $this->assertInstanceOf(Mime\Part::class, $parts[0]);
 
-        $this->assertEquals('<html><head><title>Olá mundo</title></head><body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>', $parts[0]->getContent());
+        $this->assertEquals(
+            '<html><head><title>Olá mundo</title></head>'
+            . '<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>',
+            $parts[0]->getContent()
+        );
 
         if ($config['test-really-send-email'] === true) {
             $this->assertNull($oMailer->send());

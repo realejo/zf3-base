@@ -122,7 +122,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testGetKeyNonExisting()
+    public function testGetKeyNonExisting()
     {
         $object = new MetadataArrayObject();
         $object['test'];
@@ -131,7 +131,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testGetPropertyNonExisting()
+    public function testGetPropertyNonExisting()
     {
         $object = new MetadataArrayObject();
         $object->test;
@@ -140,7 +140,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testSetKeyNonExisting()
+    public function testSetKeyNonExisting()
     {
         $object = new MetadataArrayObject();
         $object['test'] = 'tessst';
@@ -149,7 +149,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testSetPropertyNonExisting()
+    public function testSetPropertyNonExisting()
     {
         $object = new MetadataArrayObject();
         $object->test = 'tessst';
@@ -158,7 +158,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testUnsetKeyNonExisting()
+    public function testUnsetKeyNonExisting()
     {
         $object = new MetadataArrayObject();
         unset($object['test']);
@@ -167,7 +167,7 @@ class MetadataArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testUnsetPropertyNonExisting()
+    public function testUnsetPropertyNonExisting()
     {
         $object = new MetadataArrayObject();
         unset($object->test);

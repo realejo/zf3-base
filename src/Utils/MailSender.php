@@ -146,12 +146,12 @@ class MailSender
     public function setEmailMessage($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = [])
     {
         // Verifica a codificação
-        $replyName  = $this->_fixEncoding($replyName);
-        $replyEmail = $this->_fixEncoding($replyEmail);
-        $toName     = $this->_fixEncoding($toName);
-        $toEmail    = $this->_fixEncoding($toEmail);
-        $subject    = $this->_fixEncoding($subject);
-        $message    = $this->_fixEncoding($message);
+        $replyName  = $this->fixEncoding($replyName);
+        $replyEmail = $this->fixEncoding($replyEmail);
+        $toName     = $this->fixEncoding($toName);
+        $toEmail    = $this->fixEncoding($toEmail);
+        $subject    = $this->fixEncoding($subject);
+        $message    = $this->fixEncoding($message);
 
         // Verifica o email do destinatário
         if (empty($toEmail)) {
@@ -165,12 +165,12 @@ class MailSender
 
         // Verifica o nome do remetente
         if (empty($replyName)) {
-            $replyName = $this->_fixEncoding($this->senderName);
+            $replyName = $this->fixEncoding($this->senderName);
         }
 
         // Verifica o email de resposta do remetente
         if (empty($replyEmail)) {
-            $replyEmail = $this->_fixEncoding($this->senderEmail);
+            $replyEmail = $this->fixEncoding($this->senderEmail);
         }
 
         // Cria o Zend_Mail
@@ -233,7 +233,7 @@ class MailSender
         // Verifica se há headers para serem adicionados ao email
         if (is_array($opt) && isset($opt['headers']) &&  is_array($opt['headers'])) {
             foreach ($opt['headers'] as $h => $v) {
-                $oMessage->getHeaders()->addHeader(new GenericHeader($h, $v));
+                $oMessage->getHeaders()->addHeader(new Mail\Header\GenericHeader($h, $v));
             }
         }
 
@@ -260,7 +260,7 @@ class MailSender
 
         // Cria o TXT a partir do HTML
         if (is_null($msgText) && ! is_null($msgHtml)) {
-            $msgText = $this->_extractText($msgHtml);
+            $msgText = $this->extractText($msgHtml);
         }
 
         if (! is_null($msgText)) {
@@ -379,12 +379,12 @@ class MailSender
      * @param array|string  $str Texto a ser corrigido
      * @return array|string
      */
-    private function _fixEncoding($str)
+    private function fixEncoding($str)
     {
         if (is_array($str)) {
             foreach ($str as $key => $value) {
-                $key   = $this->_fixEncoding($key);
-                $value = $this->_fixEncoding($value);
+                $key   = $this->fixEncoding($key);
+                $value = $this->fixEncoding($value);
                 $str[$key] = $value;
             }
         } elseif ($this->checkUTF8($str)) {
@@ -441,7 +441,7 @@ class MailSender
      * @param string $email Email a ser verificado
      * @return boolean
      */
-    static function isEmail($email)
+    public static function isEmail($email)
     {
         return \Zend\Validator\StaticValidator::execute($email, 'EmailAddress');
     }
@@ -452,7 +452,7 @@ class MailSender
      * @param string $html HTML para ser transformado em TXT
      * @return string
      */
-    private function _extractText($html)
+    private function extractText($html)
     {
         $text = str_replace("\n", '', $html);
         $text = str_replace("<br>", "\n", $text);
@@ -466,7 +466,7 @@ class MailSender
 
 
     /**
-     * @param \Zend\Mail\Transport\Smtp
+     * @param Mail\Transport\TransportInterface
      * @return $this
      */
     public function setTransport($transport)
@@ -477,7 +477,7 @@ class MailSender
     }
 
     /**
-     * @return Smtp
+     * @return Mail\Transport\TransportInterface
      */
     public function getTransport()
     {
@@ -485,7 +485,7 @@ class MailSender
     }
 
     /**
-     * @return Message
+     * @return Mail\Message
      */
     public function getMessage()
     {

@@ -124,7 +124,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \PHPUnit_Framework_Error_Notice
      */
-    function testGetKeyNonExisting()
+    public function testGetKeyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object['test']));
@@ -134,7 +134,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \PHPUnit_Framework_Error_Notice
      */
-    function testGetPropertyNonExisting()
+    public function testGetPropertyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object->test));
@@ -144,7 +144,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \PHPUnit_Framework_Error_Notice
      */
-    function testGetKeyNonExistingWithNoLockedKeys()
+    public function testGetKeyNonExistingWithNoLockedKeys()
     {
         $object = new ArrayObject();
         $object->setLockedKeys(false);
@@ -156,7 +156,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \PHPUnit_Framework_Error_Notice
      */
-    function testGetPropertyNonExistingWithNoLockedKeys()
+    public function testGetPropertyNonExistingWithNoLockedKeys()
     {
         $object = new ArrayObject();
         $object->setLockedKeys(false);
@@ -167,7 +167,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \PHPUnit_Framework_Error_Notice
      */
-    function testSetKeyNonExisting()
+    public function testSetKeyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object['test']));
@@ -177,7 +177,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \PHPUnit_Framework_Error_Notice
      */
-    function testSetPropertyNonExisting()
+    public function testSetPropertyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object->test));
@@ -187,7 +187,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \Exception
      */
-    function testUnsetKeyNonExisting()
+    public function testUnsetKeyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object['test']));
@@ -197,7 +197,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @expectedException \Exception
      */
-    function testUnsetPropertyNonExisting()
+    public function testUnsetPropertyNonExisting()
     {
         $object = new ArrayObject();
         $this->assertFalse(isset($object->test));

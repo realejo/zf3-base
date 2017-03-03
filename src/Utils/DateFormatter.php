@@ -56,7 +56,7 @@ class DateFormatter
      * @param string $part
      * @return int
      */
-    static function staticDiff(\DateTime $d1, \DateTime $d2, $part = null)
+    public static function staticDiff(\DateTime $d1, \DateTime $d2, $part = null)
     {
         if ($d1 instanceof \DateTime) {
             $d1 = $d1->getTimestamp();
@@ -118,7 +118,7 @@ class DateFormatter
      *
      * @return array
      */
-    static function getMeses()
+    public static function getMeses()
     {
         return [
             1  => 'Janeiro',
@@ -143,7 +143,7 @@ class DateFormatter
      *
      * @return string
      */
-    static function getMes($m)
+    public static function getMes($m)
     {
         // Recupera os meses
         $meses = self::getMeses();
@@ -198,7 +198,7 @@ class DateFormatter
      * @param string $format OPCIONAL
      * @return array|NULL
      */
-    static function getData($date, $format = 'dd/MM/yyyy')
+    public static function getData($date, $format = 'dd/MM/yyyy')
     {
         if (! $date instanceof \DateTime) {
             $date = \DateTime::createFromFormat($format, $date);

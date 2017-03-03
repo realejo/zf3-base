@@ -89,7 +89,7 @@ class Cache
     {
         // Verifica se a pasta de cache existe
         if (defined('APPLICATION_DATA') === false) {
-            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA em App_Model_Cache::getCacheRoot()');
+            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA');
         }
 
         $cachePath = APPLICATION_DATA . '/cache';

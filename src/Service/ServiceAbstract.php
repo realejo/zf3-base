@@ -143,7 +143,11 @@ abstract class ServiceAbstract
 
         // Verifica se tem valor padrão
         if (! is_null($selecionado)) {
-            $temp = str_replace("<option value=\"$selecionado\"", "<option value=\"$selecionado\" selected=\"selected\"", $options);
+            $temp = str_replace(
+                "<option value=\"$selecionado\"",
+                "<option value=\"$selecionado\" selected=\"selected\"",
+                $options
+            );
             if ($temp === $options) {
                 $selecionado = null;
             }
@@ -228,7 +232,14 @@ abstract class ServiceAbstract
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAll'.$this->getUniqueCacheKey().md5(var_export($where, true) . var_export($order, true) . var_export($count, true) . var_export($offset, true) . var_export($this->getMapper()->getShowDeleted(), true));
+        $cacheKey = 'findAll'.$this->getUniqueCacheKey()
+            .md5(
+                var_export($where, true)
+                . var_export($order, true)
+                . var_export($count, true)
+                . var_export($offset, true)
+                . var_export($this->getMapper()->getShowDeleted(), true)
+            );
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -255,7 +266,12 @@ abstract class ServiceAbstract
     public function findOne($where = null, $order = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findOne'.md5(var_export($where, true) . var_export($order, true) . var_export($this->getMapper()->getShowDeleted(), true));
+        $cacheKey = 'findOne'
+            .md5(
+                var_export($where, true)
+                . var_export($order, true)
+                . var_export($this->getMapper()->getShowDeleted(), true)
+            );
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -285,7 +301,14 @@ abstract class ServiceAbstract
     public function findAssoc($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAssoc'.md5(var_export($where, true) . var_export($order, true) . var_export($count, true) . var_export($offset, true) . var_export($this->getMapper()->getShowDeleted(), true));
+        $cacheKey = 'findAssoc'
+            .md5(
+                var_export($where, true)
+                . var_export($order, true)
+                . var_export($count, true)
+                . var_export($offset, true)
+                . var_export($this->getMapper()->getShowDeleted(), true)
+            );
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -329,7 +352,8 @@ abstract class ServiceAbstract
 
 
         // Verifica se deve usar o cache
-        $cacheKey = 'findPaginated'.md5($select->getSqlString($this->getMapper()->getTableGateway()->getAdapter()->getPlatform()));
+        $cacheKey = 'findPaginated'
+                  .md5($select->getSqlString($this->getMapper()->getTableGateway()->getAdapter()->getPlatform()));
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {

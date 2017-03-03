@@ -28,14 +28,14 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      *
      * @var array
      */
-    protected $_traversal = [];
+    protected $traversal = [];
 
     /**
      * Automatically is set to true once traversal info is set and verified
      *
      * @var boolean
     */
-    protected $_isTraversable = false;
+    protected $isTraversable = false;
 
     /**
      * Modified to initialize traversal
@@ -47,67 +47,67 @@ abstract class MpttServiceAbstract extends ServiceAbstract
     {
         $this->setMapper($mapper);
         $this->getMapper()->setTableKey($key);
-        $this->_initTraversal();
+        $this->initTraversal();
     }
 
     /**
      * Prepares the traversal information
      *
      */
-    protected function _initTraversal()
+    protected function initTraversal()
     {
-        if (empty($this->_traversal)) {
+        if (empty($this->traversal)) {
             return;
         }
 
         $columns = $this->getColumns();
 
         // Verify 'left' value and column
-        if (! isset($this->_traversal['left'])) {
-            $this->_traversal['left'] = 'lft';
+        if (! isset($this->traversal['left'])) {
+            $this->traversal['left'] = 'lft';
         }
 
-        if (! in_array($this->_traversal['left'], $columns)) {
-            throw new \Exception("Column '" . $this->_traversal['left'] . "' not found in table for tree traversal");
+        if (! in_array($this->traversal['left'], $columns)) {
+            throw new \Exception("Column '" . $this->traversal['left'] . "' not found in table for tree traversal");
         }
 
         // Verify 'right' value and column
-        if (! isset($this->_traversal['right'])) {
-            $this->_traversal['right'] = 'rgt';
+        if (! isset($this->traversal['right'])) {
+            $this->traversal['right'] = 'rgt';
         }
 
-        if (! in_array($this->_traversal['right'], $columns)) {
-            throw new \Exception("Column '" . $this->_traversal['right'] . "' not found in table for tree traversal");
+        if (! in_array($this->traversal['right'], $columns)) {
+            throw new \Exception("Column '" . $this->traversal['right'] . "' not found in table for tree traversal");
         }
 
         // Check for identifying column
-        if (! isset($this->_traversal['column'])) {
-            $this->_traversal['column'] = $this->getMapper()->getTableKey();
+        if (! isset($this->traversal['column'])) {
+            $this->traversal['column'] = $this->getMapper()->getTableKey();
         }
 
-        if (! in_array($this->_traversal['column'], $columns)) {
-            throw new \Exception("Column '" . $this->_traversal['column'] . "' not found in table for tree traversal");
+        if (! in_array($this->traversal['column'], $columns)) {
+            throw new \Exception("Column '" . $this->traversal['column'] . "' not found in table for tree traversal");
         }
 
         // Check for reference column
-        if (! isset($this->_traversal['refColumn'])) {
+        if (! isset($this->traversal['refColumn'])) {
             throw new \Exception("Unable to determine reference column for traversal");
         }
 
-        if (! in_array($this->_traversal['refColumn'], $columns)) {
-            throw new \Exception("Column '" . $this->_traversal['refColumn'] . "' not found in table for tree traversal");
+        if (! in_array($this->traversal['refColumn'], $columns)) {
+            throw new \Exception("Column '" . $this->traversal['refColumn'] . "' not found in table for tree traversal");
         }
 
         // Check the order
-        if (! isset($this->_traversal['order'])) {
-            $this->_traversal['order'] = $this->getMapper()->getTableKey();
+        if (! isset($this->traversal['order'])) {
+            $this->traversal['order'] = $this->getMapper()->getTableKey();
         }
 
-        if (! in_array($this->_traversal['order'], $columns)) {
-            throw new \Exception("Column '" . $this->_traversal['order'] . "' not found in table for tree traversal");
+        if (! in_array($this->traversal['order'], $columns)) {
+            throw new \Exception("Column '" . $this->traversal['order'] . "' not found in table for tree traversal");
         }
 
-        $this->_isTraversable = true;
+        $this->isTraversable = true;
     }
 
     /**
@@ -118,7 +118,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      */
     public function rebuildTreeTraversal()
     {
-        $this->_rebuildTreeTraversal();
+        $this->rebuildTreeTraversalRecursive();
 
         return $this;
     }
@@ -131,36 +131,36 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      * @param int $leftValue
      * @return int new right value
      */
-    protected function _rebuildTreeTraversal($parentId = null, $leftValue = 0)
+    protected function rebuildTreeTraversalRecursive($parentId = null, $leftValue = 0)
     {
-        $this->_verifyTraversable();
+        $this->verifyTraversable();
 
         // Do not use getSQLSelect() to avoid defined joins
         $select = $this->getMapper()->getTableGateway()
                        ->getSql()->select();
 
         if (! empty($parentId)) {
-            $select->where([$this->_traversal['refColumn'] => $parentId]);
+            $select->where([$this->traversal['refColumn'] => $parentId]);
         } else {
-            $select->where(new Expression("{$this->_traversal['refColumn']} IS NULL OR {$this->_traversal['refColumn']} = 0"));
+            $select->where(new Expression("{$this->traversal['refColumn']} IS NULL OR {$this->traversal['refColumn']} = 0"));
         }
 
         // Define the order
-        $select->order($this->_traversal['order']);
+        $select->order($this->traversal['order']);
 
         $rightValue = $leftValue + 1;
 
         $rowset = $this->getMapper()->getTableGateway()->selectWith($select);
         foreach ($rowset as $row) {
-            $rightValue = $this->_rebuildTreeTraversal($row->{$this->_traversal['column']}, $rightValue);
+            $rightValue = $this->rebuildTreeTraversalRecursive($row->{$this->traversal['column']}, $rightValue);
         }
 
         if (! empty($parentId)) {
             $this->getMapper()->getTableGateway()
                  ->update([
-                     $this->_traversal['left'] => $leftValue,
-                     $this->_traversal['right'] => $rightValue
-                 ], [$this->_traversal['column'] => $parentId]);
+                     $this->traversal['left'] => $leftValue,
+                     $this->traversal['right'] => $rightValue
+                 ], [$this->traversal['column'] => $parentId]);
         }
 
         return $rightValue + 1;
@@ -175,7 +175,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      */
     public function insert($set)
     {
-        return $this->isTraversable() ? $this->_insertTraversable($set) : parent::getMapper()->insert($set);
+        return $this->isTraversable() ? $this->insertTraversable($set) : parent::getMapper()->insert($set);
     }
 
     /**
@@ -186,28 +186,28 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      * @return int $id
      * @throws \Exception
      */
-    protected function _insertTraversable($set)
+    protected function insertTraversable($set)
     {
-        $this->_verifyTraversable();
+        $this->verifyTraversable();
 
         // Disable traversable flag to prevent automatic traversable manipulation during updates.
-        $isTraversable = $this->_isTraversable;
-        $this->_isTraversable = false;
+        $isTraversable = $this->isTraversable;
+        $this->isTraversable = false;
 
-        if (array_key_exists($this->_traversal['refColumn'], $set) && $set[$this->_traversal['refColumn']] > 0) {
+        if (array_key_exists($this->traversal['refColumn'], $set) && $set[$this->traversal['refColumn']] > 0) {
             // Find parent
-            $parent_id = $set[$this->_traversal['refColumn']];
+            $parent_id = $set[$this->traversal['refColumn']];
             $parent = $this->getMapper()->getTableGateway()->select([$this->getMapper()->getTableKey() => $parent_id])->current();
             if (null === $parent) {
                 throw new \Exception("Traversable error: Parent id {$parent_id} not found");
             }
 
-            $lt = (double) $parent->{$this->_traversal['left']};
-            $rt = (double) $parent->{$this->_traversal['right']};
+            $lt = (double) $parent->{$this->traversal['left']};
+            $rt = (double) $parent->{$this->traversal['right']};
 
             // Find siblings
             $select = $this->getMapper()->getTableGateway()->getSql()->select();
-            $select->where([$this->_traversal['refColumn'] => $parent_id]);
+            $select->where([$this->traversal['refColumn'] => $parent_id]);
 
             $siblings = $this->getMapper()->getTableGateway()->selectWith($select);
 
@@ -215,12 +215,12 @@ abstract class MpttServiceAbstract extends ServiceAbstract
             // Checks if it has any sibling on the left, considering the defined order
             $previousSibling = null;
             foreach ($siblings as $s) {
-                if (is_string($s[$this->_traversal['order']])) {
-                    if (strcmp($s[$this->_traversal['order']], $set[$this->_traversal['order']]) > 0) {
+                if (is_string($s[$this->traversal['order']])) {
+                    if (strcmp($s[$this->traversal['order']], $set[$this->traversal['order']]) > 0) {
                         break;
                     }
                 } else {
-                    if ($s[$this->_traversal['order']] >= $set[$this->_traversal['order']]) {
+                    if ($s[$this->traversal['order']] >= $set[$this->traversal['order']]) {
                         break;
                     }
                 }
@@ -229,47 +229,47 @@ abstract class MpttServiceAbstract extends ServiceAbstract
 
             // If there is a sibling on the left, use it for positioning
             if (! empty($previousSibling)) {
-                $lt = (double) $previousSibling->{$this->_traversal['left']};
-                $rt = (double) $previousSibling->{$this->_traversal['right']};
+                $lt = (double) $previousSibling->{$this->traversal['left']};
+                $rt = (double) $previousSibling->{$this->traversal['right']};
                 $pos = $rt;
 
-                $set[$this->_traversal['left']] = $rt + 1;
-                $set[$this->_traversal['right']] = $rt + 2;
+                $set[$this->traversal['left']] = $rt + 1;
+                $set[$this->traversal['right']] = $rt + 2;
 
             // Insert o the start os the list os siblings or alone
             } else {
-                $set[$this->_traversal['left']] = $lt + 1;
-                $set[$this->_traversal['right']] = $lt + 2;
+                $set[$this->traversal['left']] = $lt + 1;
+                $set[$this->traversal['right']] = $lt + 2;
                 $pos = $lt;
             }
 
             // Make room for the new node
             $this->getMapper()->getTableGateway()->update(
                 [
-                    $this->_traversal['left'] => new Expression("{$this->_traversal['left']} + 2"),
+                    $this->traversal['left'] => new Expression("{$this->traversal['left']} + 2"),
                 ],
-                new Expression("{$this->_traversal['left']} > $pos")
+                new Expression("{$this->traversal['left']} > $pos")
             );
 
             $this->getMapper()->getTableGateway()->update(
                 [
-                    $this->_traversal['right'] => new Expression("{$this->_traversal['right']} + 2"),
+                    $this->traversal['right'] => new Expression("{$this->traversal['right']} + 2"),
                 ],
-                new Expression("{$this->_traversal['right']} > $pos")
+                new Expression("{$this->traversal['right']} > $pos")
             );
         } else {
             $select = $this->getMapper()->getTableGateway()->getSql()->select();
-            $select->reset('columns')->columns(['theMax' => new Expression("MAX({$this->_traversal['right']})")]);
+            $select->reset('columns')->columns(['theMax' => new Expression("MAX({$this->traversal['right']})")]);
             $maxRt = (double) $this->getMapper()->getTableGateway()->selectWith($select)->current()->theMax;
-            $set[$this->_traversal['left']] = $maxRt + 1;
-            $set[$this->_traversal['right']] = $maxRt + 2;
+            $set[$this->traversal['left']] = $maxRt + 1;
+            $set[$this->traversal['right']] = $maxRt + 2;
         }
 
         // Do insert
         $id = $this->getMapper()->getTableGateway()->insert($set);
 
         // Reset isTraversable flag to previous value.
-        $this->_isTraversable = $isTraversable;
+        $this->isTraversable = $isTraversable;
 
         return $id;
     }
@@ -282,7 +282,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      */
     public function delete($key)
     {
-        return $this->isTraversable() ? $this->_deleteTraversable($key) : parent::getMapper()->delete($key);
+        return $this->isTraversable() ? $this->deleteTraversable($key) : parent::getMapper()->delete($key);
     }
 
     /**
@@ -292,38 +292,43 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      * @param array $key
      * @return int
      */
-    protected function _deleteTraversable($key)
+    protected function deleteTraversable($key)
     {
-        $this->_verifyTraversable();
+        $this->verifyTraversable();
 
         // Disable traversable flag to prevent automatic traversable manipulation during updates.
-        $isTraversable = $this->_isTraversable;
-        $this->_isTraversable = false;
+        $isTraversable = $this->isTraversable;
+        $this->isTraversable = false;
 
         // Get the row to be deleted
         $row = $this->getMapper()->fetchRow($key);
 
         // Delete the node and it's childs
-        $delete = $this->getMapper()->getTableGateway()->delete(new Expression("{$this->_traversal['left']} >= {$row[$this->_traversal['left']]} and {$this->_traversal['right']} <= {$row[$this->_traversal['right']]}"));
+        $delete = $this->getMapper()
+                       ->getTableGateway()
+                       ->delete(new Expression(
+                           "{$this->traversal['left']} >= {$row[$this->traversal['left']]}"
+                           . " and {$this->traversal['right']} <= {$row[$this->traversal['right']]}"
+                       ));
 
         // Fixes the left,right for the remaining nodes
-        $fix = $row[$this->_traversal['right']] - $row[$this->_traversal['left']] + 1;
+        $fix = $row[$this->traversal['right']] - $row[$this->traversal['left']] + 1;
         $this->getMapper()->getTableGateway()->update(
             [
-                $this->_traversal['left'] => new Expression("{$this->_traversal['left']} - $fix"),
+                $this->traversal['left'] => new Expression("{$this->traversal['left']} - $fix"),
             ],
-            new Expression("{$this->_traversal['left']} > {$row[$this->_traversal['left']]}")
+            new Expression("{$this->traversal['left']} > {$row[$this->traversal['left']]}")
         );
         $this->getMapper()->getTableGateway()->update(
             [
-                $this->_traversal['right'] => new Expression("{$this->_traversal['right']} - $fix"),
+                $this->traversal['right'] => new Expression("{$this->traversal['right']} - $fix"),
             ],
-            new Expression("{$this->_traversal['right']} > {$row[$this->_traversal['right']]}")
+            new Expression("{$this->traversal['right']} > {$row[$this->traversal['right']]}")
         );
 
 
         // Reset isTraversable flag to previous value.
-        $this->_isTraversable = $isTraversable;
+        $this->isTraversable = $isTraversable;
 
         return $delete;
     }
@@ -361,9 +366,9 @@ abstract class MpttServiceAbstract extends ServiceAbstract
             $traversal = ['refColumn' => $traversal];
         }
 
-        $this->_traversal = $traversal;
+        $this->traversal = $traversal;
 
-        $this->_initTraversal();
+        $this->initTraversal();
 
         return $this;
     }
@@ -374,16 +379,16 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      */
     public function isTraversable()
     {
-        return $this->_isTraversable;
+        return $this->isTraversable;
     }
 
 
     /**
      * Verifies that the current table is a traversable
      *
-     * @throws Exception - Table is not traversable
+     * @throws \Exception - Table is not traversable
      */
-    protected function _verifyTraversable()
+    protected function verifyTraversable()
     {
         if (! $this->isTraversable()) {
             throw new \Exception("Table {$this->getMapper()->getTableName()} is not traversable");

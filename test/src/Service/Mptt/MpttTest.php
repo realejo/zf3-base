@@ -107,7 +107,7 @@ class MpttTest extends BaseTestCase
     /**
      * Tests Mptt->__construct()
      */
-    public function test__construct()
+    public function testConstruct()
     {
         // Cria a tabela sem a implementação do transversable
         $mptt = new ServiceConcrete(MapperConcrete::class, 'id');

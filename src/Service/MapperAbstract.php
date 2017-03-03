@@ -139,7 +139,14 @@ abstract class MapperAbstract
         if ($where instanceof Select) {
             $cacheKey = 'fetchAll'. md5($where->getSqlString());
         } else {
-            $cacheKey = 'fetchAll'. md5(var_export($this->showDeleted, true) . var_export($where, true) . var_export($order, true) . var_export($count, true) . var_export($offset, true));
+            $cacheKey = 'fetchAll'
+                .md5(
+                    var_export($this->showDeleted, true)
+                    . var_export($where, true)
+                    . var_export($order, true)
+                    . var_export($count, true)
+                    . var_export($offset, true)
+                );
         }
 
         // Verifica se tem no cache
@@ -203,17 +210,15 @@ abstract class MapperAbstract
             // Verifica se há chave definida
             if (empty($this->tableKey)) {
                 throw new \InvalidArgumentException('Chave não definida em ' . get_class($this) . '::fetchRow()');
+            }
 
-                // Verifica se é uma chave múltipla ou com cast
-            } elseif (is_array($this->tableKey)) {
+            // Verifica se é uma chave múltipla ou com cast
+            if (is_array($this->tableKey)) {
                 // Verifica se é uma chave simples com cast
-                if (count($this->tableKey) == 1) {
-                    $where = [$this->getTableKey(true) => $where];
-
-                    // Não é possível acessar um registro com chave multipla usando apenas uma delas
-                } else {
-                    throw new \InvalidArgumentException('Não é possível acessar chaves múltiplas informando apenas uma em ' . get_class($this) . '::fetchRow()');
+                if (count($this->tableKey) != 1) {
+                    throw new \InvalidArgumentException('Não é possível acessar chaves múltiplas informando apenas uma');
                 }
+                $where = [$this->getTableKey(true) => $where];
             } else {
                 $where = [$this->tableKey => $where];
             }
@@ -406,7 +411,7 @@ abstract class MapperAbstract
     {
         // Verifica se o código é válido
         if (empty($key)) {
-            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido em " . get_class($this) . "::update()");
+            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido");
         }
 
         // Verifica se há algo para alterar
@@ -495,11 +500,11 @@ abstract class MapperAbstract
     public function delete($key)
     {
         if (empty($key)) {
-            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido em " . get_class($this) . '::delete()');
+            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido");
         }
 
         if (! is_array($key) && is_array($this->getTableKey()) && count($this->getTableKey()) > 1) {
-            throw new \InvalidArgumentException("Não é possível acessar direto uma coluna usando chaves múltiplas em " . get_class($this) . "::delete()");
+            throw new \InvalidArgumentException('Não é possível acessar direto uma coluna usando chaves múltiplas');
         }
 
         // Grava os dados alterados para referencia
@@ -529,7 +534,7 @@ abstract class MapperAbstract
 
         // Caso não seja, envia um Exception
         if (! is_numeric($dados[$this->getTableKey()])) {
-            throw new \Exception("Inválido o Código '{$dados[$this->getTableKey()]}' em '{$this->tableName}'::save()");
+            throw new \Exception("Chave invalida: '{$dados[$this->getTableKey()]}'");
         }
 
         if ($this->fetchRow($dados[$this->getTableKey()])) {
@@ -561,7 +566,7 @@ abstract class MapperAbstract
         }
 
         if (! is_array($this->getTableKey())) {
-            throw new \LogicException('Chave mal definida em ' . get_class($this) . '::_getWhere()');
+            throw new \LogicException('Chave mal definida');
         }
 
         $where = [];
@@ -599,12 +604,14 @@ abstract class MapperAbstract
 
         // Verifica se alguma chave foi definida
         if (empty($where)) {
-            throw new \LogicException('Nenhuma chave múltipla informada em ' . get_class($this) . '::_getWhere()');
+            throw new \LogicException('Nenhuma chave múltipla informada');
         }
 
         // Verifica se todas as chaves foram usadas
-        if ($this->getUseAllKeys() === true && is_array($this->getTableKey()) && count($usedKeys) !== count($this->getTableKey())) {
-            throw new \LogicException('Não é permitido usar chaves parciais ' . get_class($this) . '::_getWhere()');
+        if ($this->getUseAllKeys() === true
+            && is_array($this->getTableKey())
+            && count($usedKeys) !== count($this->getTableKey())) {
+            throw new \LogicException('Não é permitido usar chaves parciais');
         }
 
         return '(' . implode(') AND (', $where). ')';
@@ -770,22 +777,29 @@ abstract class MapperAbstract
                 #TODO validar se tem os tres campos no array
 
                 if (empty($tableJoinLeft['table']) && ! is_string($tableJoinLeft['table'])) {
-                    throw new \InvalidArgumentException('Tabela não definida em ' . get_class($this) . '::getTableSelect()');
+                    throw new \InvalidArgumentException('Tabela não definida');
                 }
 
                 if (empty($tableJoinLeft['condition']) && ! is_string($tableJoinLeft['condition'])) {
-                    throw new \InvalidArgumentException('Condição não definida em ' . get_class($this) . '::getTableSelect()');
+                    throw new \InvalidArgumentException('Condição não definida');
                 }
 
-                if (isset($tableJoinLeft['columns']) && ! empty($tableJoinLeft['columns']) && ! is_array($tableJoinLeft['columns'])) {
-                    throw new \InvalidArgumentException('Colunas devem ser um array em ' . get_class($this) . '::getTableSelect()');
+                if (isset($tableJoinLeft['columns']) && ! empty($tableJoinLeft['columns'])
+                    && ! is_array($tableJoinLeft['columns'])) {
+                    throw new \InvalidArgumentException('Colunas devem ser um array');
                 }
 
-                if (isset($tableJoinLeft['schema']) && ! empty($tableJoinLeft['schema']) && ! is_string($tableJoinLeft['schema'])) {
-                    throw new \InvalidArgumentException('Schema devem ser uma string em ' . get_class($this) . '::getTableSelect()');
+                if (isset($tableJoinLeft['schema']) && ! empty($tableJoinLeft['schema'])
+                    && ! is_string($tableJoinLeft['schema'])) {
+                    throw new \InvalidArgumentException('Schema devem ser uma string');
                 }
 
-                $select->join($tableJoinLeft['table'], $tableJoinLeft['condition'], $tableJoinLeft['columns'], $tableJoinLeft['schema']);
+                $select->join(
+                    $tableJoinLeft['table'],
+                    $tableJoinLeft['condition'],
+                    $tableJoinLeft['columns'],
+                    $tableJoinLeft['schema']
+                );
             }
         }
 
@@ -993,7 +1007,7 @@ abstract class MapperAbstract
     public function setHydrator($hydrator)
     {
         if (empty($this->hydrator)) {
-            throw new \Exception('Invalid hydrator at ' . get_class($this));
+            throw new \Exception('Invalid hydrator');
         }
         $this->hydrator = $hydrator;
     }

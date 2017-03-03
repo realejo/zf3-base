@@ -112,20 +112,28 @@ class MetadataService extends ServiceAbstract
 
             // Faz a busca pelo campo
             if (is_null($value)) {
-                $where[] = new Expression("EXISTS (SELECT * FROM $valueTable WHERE fk_info={$schema[$id]['id_info']} " .
-                                                        "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
-                                                        "AND $field IS NULL) " .
-                                                "OR NOT EXISTS (SELECT * FROM $valueTable " .
-                                                                "WHERE fk_info={$schema[$id]['id_info']} " .
-                                                                    "AND $mapperTable.$mapperKey=$valueTable.$referenceKey)");
+                $where[] = new Expression(
+                    "EXISTS (SELECT * FROM $valueTable WHERE fk_info={$schema[$id]['id_info']} " .
+                            "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
+                            "AND $field IS NULL) " .
+                    "OR NOT EXISTS (SELECT * FROM $valueTable " .
+                                    "WHERE fk_info={$schema[$id]['id_info']} " .
+                    "AND $mapperTable.$mapperKey=$valueTable.$referenceKey)"
+                );
             } else {
-                $where[] = new Expression($this->quoteInto("EXISTS (SELECT * FROM $valueTable " .
-                                                "WHERE fk_info={$schema[$id]['id_info']} " .
-                                                    "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
-                                                    "AND $field = ?)", $value, $this->getMapperSchema()
-                                                                                    ->getTableGateway()
-                                                                                    ->getAdapter()
-                                                                                    ->getPlatform(), null, $cast));
+                $where[] = new Expression($this->quoteInto(
+                    "EXISTS (SELECT * FROM $valueTable " .
+                    "WHERE fk_info={$schema[$id]['id_info']} " .
+                        "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
+                        "AND $field = ?)",
+                    $value,
+                    $this->getMapperSchema()
+                                                        ->getTableGateway()
+                                                        ->getAdapter()
+                    ->getPlatform(),
+                    null,
+                    $cast
+                ));
             }
         }
 
@@ -336,7 +344,9 @@ class MetadataService extends ServiceAbstract
         $jsonValues = Json::encode($values);
 
         // Atualiza o PDV sem passar pelo log
-        $this->getMapper()->getTableGateway()->update([$dbMetaField => $jsonValues], "{$this->getMapper()->getTableKey()}=$key");
+        $this->getMapper()
+            ->getTableGateway()
+            ->update([$dbMetaField => $jsonValues], "{$this->getMapper()->getTableKey()}=$key");
     }
 
     public function getLastSaveMetadataLog()

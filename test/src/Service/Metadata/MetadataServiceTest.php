@@ -647,7 +647,7 @@ class MetadataServiceTest extends BaseTestCase
      * @expectedException \Exception
      * @expectedExceptionMessage schemaTable invalid
      */
-    function testSetSchemaMapper()
+    public function testSetSchemaMapper()
     {
         $service = new MetadataService();
         $service->setMetadataMappers(new \Realejo\Service\Metadata\MetadataMapper('tablename', 'keyname'), null, null);
@@ -657,7 +657,7 @@ class MetadataServiceTest extends BaseTestCase
      * @expectedException \Exception
      * @expectedExceptionMessage valueTable invalid
      */
-    function testSetValuesMapper()
+    public function testSetValuesMapper()
     {
         $service = new MetadataService();
         $service->setMetadataMappers('tableone', new \Realejo\Service\Metadata\MetadataMapper('tablename', 'keyname'), null);
@@ -667,7 +667,7 @@ class MetadataServiceTest extends BaseTestCase
      * @expectedException \Exception
      * @expectedExceptionMessage mapperForeignKey invalid
      */
-    function testSetForeignKey()
+    public function testSetForeignKey()
     {
         $service = new MetadataService();
         $service->setMetadataMappers('tableone', 'tableone', null);

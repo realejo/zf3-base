@@ -231,24 +231,28 @@ class MapperAbstractTest extends BaseTestCase
         $this->assertEquals(
             'SELECT `album`.* FROM `album` ORDER BY `id` ASC',
             $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
-            'showDeleted=false, useDeleted=false');
+            'showDeleted=false, useDeleted=false'
+        );
 
         // Marca para usar o campo deleted
         $this->Mapper->setUseDeleted(true);
         $this->assertEquals(
             'SELECT `album`.* FROM `album` WHERE `album`.`deleted` = \'0\' ORDER BY `id` ASC',
             $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
-            'showDeleted=false, useDeleted=true');
+            'showDeleted=false, useDeleted=true'
+        );
 
         // Marca para não usar o campo deleted
         $this->Mapper->setUseDeleted(false);
 
         $this->assertEquals(
             'SELECT `album`.* FROM `album` WHERE `album`.`id` = \'1234\' ORDER BY `id` ASC',
-            $this->Mapper->getSelect(['id' => 1234])->getSqlString($this->adapter->getPlatform()));
+            $this->Mapper->getSelect(['id' => 1234])->getSqlString($this->adapter->getPlatform())
+        );
         $this->assertEquals(
             'SELECT `album`.* FROM `album` WHERE `album`.`texto` = \'textotextotexto\' ORDER BY `id` ASC',
-            $this->Mapper->getSelect(['texto' => 'textotextotexto'])->getSqlString($this->adapter->getPlatform()));
+            $this->Mapper->getSelect(['texto' => 'textotextotexto'])->getSqlString($this->adapter->getPlatform())
+        );
     }
 
     /**

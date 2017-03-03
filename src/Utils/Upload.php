@@ -91,14 +91,14 @@ class Upload
     {
          // Verifica se a pasta de cache existe
         if (! defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
-            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA em Realejo\Upload::getUploadRoot()');
+            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA');
         }
 
          $path = APPLICATION_DATA . '/uploads';
 
          // Verifica se existe e se tem permissão de escrita
         if (! is_dir($path) || ! is_writable($path)) {
-            throw new \Exception('A pasta raiz de upload data/uploads não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()');
+            throw new \Exception('A pasta raiz de upload data/uploads não existe ou não tem permissão de escrita');
         }
 
         // retorna a pasta raiz do cache
@@ -107,21 +107,21 @@ class Upload
 
     /**
      * Retorna a pasta raiz no data para gravar os arquivos enviados
-     *
      * @return string
+     * @throws \Exception
      */
     public static function getAssetsReservedRoot()
     {
         // Verifica se a pasta de upload existe
         if (! defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
-            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA em Realejo\Upload::getAssetsReservedRoot()');
+            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA');
         }
 
         $path = APPLICATION_DATA . '/assets';
 
         // Verifica se existe e se tem permissão de escrita
         if (! is_dir($path) || ! is_writable($path)) {
-            throw new \Exception('A pasta raiz de upload data/assets não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()');
+            throw new \Exception('A pasta raiz de upload data/assets não existe ou não tem permissão de escrita');
         }
 
         // retorna a pasta raiz do cache
@@ -130,21 +130,21 @@ class Upload
 
     /**
      * Retorna a pasta raiz no public para gravar os arquivos enviados
-     *
      * @return string
+     * @throws \Exception
      */
     public static function getAssetsPublicRoot()
     {
         // Verifica se a pasta de upload existe
         if (! defined('APPLICATION_HTTP')  || realpath(APPLICATION_HTTP) == false) {
-            throw new \Exception('A pasta raiz do site não está definido em APPLICATION_HTTP em Realejo\Upload::getAssetsPublicRoot()');
+            throw new \Exception('A pasta raiz do site não está definido em APPLICATION_HTTP');
         }
 
         $path = APPLICATION_HTTP . '/assets';
 
         // Verifica se existe e se tem permissão de escrita
         if (! is_dir($path) || ! is_writable($path)) {
-            throw new \Exception("A pasta raiz de upload site/assets não existe ou não tem permissão de escrita em Realejo\Upload::getUploadRoot()'");
+            throw new \Exception('A pasta raiz de upload site/assets não existe ou não tem permissão de escrita');
         }
 
         // retorna a pasta raiz do cache
