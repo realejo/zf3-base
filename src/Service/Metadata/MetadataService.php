@@ -397,16 +397,16 @@ class MetadataService extends ServiceAbstract
             // Remove qualquer hora se houver
             $value = explode(' ', $value);
             $value = array_shift($value);
-            if (\Realejo\Utils\DateFormatter::isFormat('d/m/Y', $value)) {
+            if (\Realejo\Utils\DateHelper::isFormat('d/m/Y', $value)) {
                 return \DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d');
             }
         }
 
-        if ($schema['tipo'] == self::DATETIME && \Realejo\Utils\DateFormatter::isFormat('d/m/Y H:i:s', $value)) {
+        if ($schema['tipo'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y H:i:s', $value)) {
             return \DateTime::createFromFormat('d/m/Y H:i:s', $value)->format('Y-m-d H:i:s');
         }
 
-        if ($schema['tipo'] == self::DATETIME && \Realejo\Utils\DateFormatter::isFormat('d/m/Y', $value)) {
+        if ($schema['tipo'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y', $value)) {
             return \DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d 00:00:00');
         }
 
