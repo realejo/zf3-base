@@ -70,20 +70,20 @@ class DateFormatter
 
         switch ($part) {
             case 'y':
-                return floor($diff / 31536000); # 60*60*24*365
+                return (int) floor($diff / 31536000); # 60*60*24*365
             case 'm':
-                return floor($diff / 2592000); # 60*60*24*30
+                return (int) floor($diff / 2592000); # 60*60*24*30
             case 'w':
-                return floor($diff / 604800); # 60*60*24*7
+                return (int) floor($diff / 604800); # 60*60*24*7
             case 'd':
-                return floor($diff / 86400); # 60*60*24
+                return (int) floor($diff / 86400); # 60*60*24
             case 'h':
-                return floor($diff / 3600);  # 60*60
+                return (int) floor($diff / 3600);  # 60*60
             case 'n':
-                return floor($diff / 60);
+                return (int) floor($diff / 60);
             case 's':
             default:
-                return $diff;
+                return (int) $diff;
         }
     }
 
