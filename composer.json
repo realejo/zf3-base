@@ -8,18 +8,18 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require" : {
-    "php": "^5.6 || ^7.0",
+    "php" : "~5.6 || ~7.0 || ~7.1",
     "zendframework/zend-db" : "^2.8.1",
     "zendframework/zend-cache": "^2.7.1",
     "zendframework/zend-paginator": "^2.7.0",
-    "zendframework/zend-json": "^3.0.0",
+    "zendframework/zend-json": "~2.6 || ~3.0",
     "zendframework/zend-serializer": "^2.8.0",
     "zendframework/zend-mail": "^2.7.2",
     "zendframework/zend-hydrator": "~2.2.1"
   },
   "require-dev" : {
     "squizlabs/php_codesniffer": "^2.8",
-    "phpunit/PHPUnit" : "~5.7.12",
+    "phpunit/PHPUnit" : "~5.7",
     "zendframework/zend-dom": "~2.6.0"
   },
   "autoload" : {
@@ -35,9 +35,6 @@
   "scripts": {
     "cs-check": "phpcs",
     "cs-fix": "phpcbf",
-    "dev-disable": "zf-development-mode disable",
-    "dev-enable": "zf-development-mode enable",
-    "dev-status": "zf-development-mode status",
     "test": "phpunit"
   }
 }
