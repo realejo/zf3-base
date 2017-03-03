@@ -1,19 +1,28 @@
-ZF3 Library
+ZF3 Base
 ===========
 
-Biblioteca com models comuns utilizados nos projetos ZF3.
+Biblioteca com classes comuns utilizados nos projetos ZF3 da Realejo.
 
-Db\TableAdapter
----------------
+Service
+-------
 
 Model para utilizar o TableGateway com funções mais comuns.
 
-Permite criar o campo '''deleted''' onde o registro é marcado como removido e não definitavemente removido da tabela no banco do dados.
+Permite criar o campo `deleted` onde o registro é marcado como removido e não definitavemente removido da tabela no banco do dados.
 
-Realejo\Mail
+
+Service MPTT
+------------
+Implementação da árvore pre-ordernada modificada. Ideal para lidar com dados hierarquicos. 
+
+http://www.sitepoint.com/print/hierarchical-data-database
+
+Utils\MailSender
 ------------
 
-Model utilizado para enviar emails via smtp. É necessário ter as configurações definidas na pasta /config/autoload/config_email.php ou enviá-las no momento de construção do objeto.
+Classe utilizado para enviar emails via smtp.
+
+É necessário ter as configurações definidas na pasta /config/autoload/config_email.php ou enviá-las no momento de construção do objeto.
 
 Exemplo do arquivo:
 ```
@@ -22,7 +31,7 @@ return [
     'name'       => 'Nome do remetente',
     'email'      => 'email@do.remetente',
     'returnPath' => 'email@do.remetente',
-    'host'       => '***REMOVED***',
+    'host'       => 'smtp.dominio.com',
     'username'   => '',
     'password'   => '',
     'port'       => '2525',
