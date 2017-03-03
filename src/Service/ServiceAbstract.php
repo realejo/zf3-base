@@ -1,11 +1,13 @@
 <?php
 namespace Realejo\Service;
 
+use Realejo\Stdlib\ArrayObject;
+
 abstract class ServiceAbstract
 {
 
     /**
-     * @var \Realejo\Mapper\MapperAbstract
+     * @var MapperAbstract
      */
     protected $mapper;
 
@@ -216,12 +218,12 @@ abstract class ServiceAbstract
     /**
      * Retorna vários registros
      *
-     * @param string|array oUsuario OPTIONAL An SQL WHERE clause
-     * @param string|array oUsuario OPTIONAL An SQL ORDER clause.
-     * @param int          oUsuario OPTIONAL An SQL LIMIT count.
-     * @param int          oUsuario OPTIONAL An SQL LIMIT offset.
+     * @param string|array $where OPTIONAL An SQL WHERE clause
+     * @param string|array $order OPTIONAL An SQL ORDER clause.
+     * @param int          $count OPTIONAL An SQL LIMIT count.
+     * @param int          $offset OPTIONAL An SQL LIMIT offset.
      *
-     * @return array|null Lista de pdvs ou nulo se não localizar nenhuma
+     * @return ArrayObject[] | null
      */
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
@@ -246,12 +248,9 @@ abstract class ServiceAbstract
     /**
      * Retorna um registro
      *
-     * @param string|array oUsuario OPTIONAL An SQL WHERE clause
-     * @param string|array oUsuario OPTIONAL An SQL ORDER clause.
-     * @param int          oUsuario OPTIONAL An SQL LIMIT count.
-     * @param int          oUsuario OPTIONAL An SQL LIMIT offset.
-     *
-     * @return array|null Lista de pdvs ou nulo se não localizar nenhuma
+     * @param string|array $where OPTIONAL An SQL WHERE clause
+     * @param string|array $order OPTIONAL An SQL ORDER clause.
+     * @return null|ArrayObject
      */
     public function findOne($where = null, $order = null)
     {
@@ -281,7 +280,7 @@ abstract class ServiceAbstract
      * @param int          oUsuario OPTIONAL An SQL LIMIT count.
      * @param int          oUsuario OPTIONAL An SQL LIMIT offset.
      *
-     * @return array|null Lista de pdvs ou nulo se não localizar nenhuma
+     * @return ArrayObject[] | null
      */
     public function findAssoc($where = null, $order = null, $count = null, $offset = null)
     {
@@ -392,7 +391,7 @@ abstract class ServiceAbstract
     }
 
     /**
-     * @param \Realejo\Mapper\MapperAbstract|string $mapper
+     * @param MapperAbstract|string $mapper
      * @return $this
      * @throws \Exception
      */
@@ -401,7 +400,7 @@ abstract class ServiceAbstract
         if (is_string($mapper)) {
             $this->mapperClass = $mapper;
             $this->mapper      = null;
-        } elseif ($mapper instanceof \Realejo\Mapper\MapperAbstract) {
+        } elseif ($mapper instanceof MapperAbstract) {
             $this->mapper      = $mapper;
             $this->mapperClass = get_class($mapper);
         } else {
@@ -412,14 +411,14 @@ abstract class ServiceAbstract
     }
 
     /**
-     * @return \Realejo\Mapper\MapperAbstract
+     * @return MapperAbstract
      * @throws \Exception
      */
     public function getMapper()
     {
         if (! isset($this->mapper)) {
             if (! isset($this->mapperClass)) {
-                throw new \Exception('Mapper class not definded at ' . get_class($this));
+                throw new \Exception('Mapper class not defined at ' . get_class($this));
             }
             $this->mapper = new $this->mapperClass();
             $this->mapper->setCache($this->getCache());
@@ -447,12 +446,12 @@ abstract class ServiceAbstract
     }
 
     /**
-     * @return \Realejo\Options\PaginatorOptions
+     * @return PaginatorOptions
      */
     public function getPaginatorOptions()
     {
         if (! isset($this->paginatorOptions)) {
-            $this->paginatorOptions = new \Realejo\Options\PaginatorOptions();
+            $this->paginatorOptions = new PaginatorOptions();
         }
 
         return $this->paginatorOptions;

@@ -1,8 +1,7 @@
 <?php
-namespace Realejo\Mapper;
+namespace Realejo\Service;
 
 use Zend\Db\Sql\Expression;
-use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\Db\TableGateway\TableGateway;
@@ -43,7 +42,7 @@ abstract class MapperAbstract
     protected $tableKey;
 
     /**
-     * Join lefts que dfevem ser usados no mapper
+     * Join lefts que devem ser usados no mapper
      *
      * @var array
      */
@@ -52,7 +51,7 @@ abstract class MapperAbstract
     /**
      * Join lefts que devem ser usados no mapper
      *
-     * @var array
+     * @var boolean
      */
     protected $useJoin = false;
 
@@ -128,12 +127,15 @@ abstract class MapperAbstract
     }
 
     /**
-     * {@inheritDoc}
-     * @see RW_App_Model_Base::fetchAll()
+     * @param null $where
+     * @param null $order
+     * @param null $count
+     * @param null $offset
+     * @return ArrayObject[]
      */
     public function fetchAll($where = null, $order = null, $count = null, $offset = null)
     {
-    // Cria a assinatura da consulta
+        // Cria a assinatura da consulta
         if ($where instanceof Select) {
             $cacheKey = 'fetchAll'. md5($where->getSqlString());
         } else {
@@ -190,8 +192,9 @@ abstract class MapperAbstract
      * Recupera um registro
      *
      * @param mixed $where condições para localizar o registro
+     * @param null $order
      *
-     * @return array|null Array com o registro ou null se não localizar
+     * @return null|ArrayObject
      */
     public function fetchRow($where, $order = null)
     {
@@ -253,9 +256,12 @@ abstract class MapperAbstract
             $select->order($order);
         }
 
-        // Verifica se há paginação, não confundir com o Zend_Paginator
+        // Verifica se há paginação, não confundir com o Zend\Paginator
         if (! is_null($count)) {
-            $select->limit($count, $offset);
+            $select->limit($count);
+        }
+        if (! is_null($offset)) {
+            $select->offset($offset);
         }
 
         // Checks $where is not null
@@ -426,7 +432,7 @@ abstract class MapperAbstract
         $set = $hydrator->extract($set);
 
         //@todo Quem deveria fazer isso é o hydrator!
-        if ($row instanceof \Realejo\Metadata\ArrayObject) {
+        if ($row instanceof Metadata\ArrayObject) {
             $row = $row->toArray();
             if (isset($row['metadata'])) {
                 $row[$row->getMappedKeyname('metadata', true)] = $row['metadata'];
@@ -482,14 +488,14 @@ abstract class MapperAbstract
     /**
      * Excluí um registro
      *
-     * @param int $key Código da registro a ser excluído
+     * @param int|array $key Código da registro a ser excluído
      *
      * @return bool Informa se teve o registro foi removido
      */
     public function delete($key)
     {
         if (empty($key)) {
-            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido em " . get_class($this) . "::delete()");
+            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido em " . get_class($this) . '::delete()');
         }
 
         if (! is_array($key) && is_array($this->getTableKey()) && count($this->getTableKey()) > 1) {
@@ -517,20 +523,20 @@ abstract class MapperAbstract
 
     public function save($dados)
     {
-        if (! isset($dados[$this->id])) {
+        if (! isset($dados[$this->getTableKey()])) {
             return $this->insert($dados);
         }
 
         // Caso não seja, envia um Exception
-        if (! is_numeric($dados[$this->id])) {
-            throw new \Exception("Inválido o Código '{$dados[$this->id]}' em '{$this->tableName}'::save()");
+        if (! is_numeric($dados[$this->getTableKey()])) {
+            throw new \Exception("Inválido o Código '{$dados[$this->getTableKey()]}' em '{$this->tableName}'::save()");
         }
 
-        if ($this->fetchRow($dados[$this->id])) {
-            return $this->update($dados, $dados[$this->id]);
+        if ($this->fetchRow($dados[$this->getTableKey()])) {
+            return $this->update($dados, $dados[$this->getTableKey()]);
         }
 
-        throw new \Exception("{$this->id} key does not exist");
+        throw new \Exception("{$this->getTableKey()} key does not exist");
     }
 
     /**
@@ -838,7 +844,7 @@ abstract class MapperAbstract
     }
 
     /**
-     * @return boolean $tableJoinLeft
+     * @return array $tableJoinLeft
      */
     public function getTableJoinLeft()
     {
@@ -954,6 +960,10 @@ abstract class MapperAbstract
         return new ArraySerializable();
     }
 
+    /**
+     * @param bool $asObject
+     * @return ArrayObject
+     */
     public function getHydratorEntity($asObject = true)
     {
         if ($asObject === false) {

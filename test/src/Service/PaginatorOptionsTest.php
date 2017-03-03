@@ -1,8 +1,7 @@
 <?php
+namespace RealejoTest\Service;
 
-namespace RealejoTest\Options;
-
-use Realejo\Options\PaginatorOptions;
+use Realejo\Service\PaginatorOptions;
 
 /**
  * PaginatorOptions test case.

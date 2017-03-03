@@ -122,7 +122,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     function testGetKeyNonExisting()
     {
@@ -132,7 +132,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     function testGetPropertyNonExisting()
     {
@@ -142,7 +142,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     function testGetKeyNonExistingWithNoLockedKeys()
     {
@@ -154,7 +154,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     function testGetPropertyNonExistingWithNoLockedKeys()
     {
@@ -165,7 +165,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     function testSetKeyNonExisting()
     {
@@ -175,7 +175,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     function testSetPropertyNonExisting()
     {
@@ -185,7 +185,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      */
     function testUnsetKeyNonExisting()
     {
@@ -195,7 +195,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      */
     function testUnsetPropertyNonExisting()
     {

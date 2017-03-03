@@ -1,10 +1,10 @@
 <?php
 namespace RealejoTest\Service;
 
-use Realejo\Utils\AbstractTestCase;
+use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
 
-class ServiceTest extends AbstractTestCase
+class ServiceTest extends BaseTestCase
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class ServiceTest extends AbstractTestCase
     protected $tables = ['album'];
 
     /**
-     * @var \RealejoTest\Service\ServiceConcrete
+     * @var ServiceConcrete
      */
     private $Service;
 
@@ -76,7 +76,7 @@ class ServiceTest extends AbstractTestCase
 
         $this->dropTables()->createTables()->insertDefaultRows();
 
-        $this->Service = new \RealejoTest\Service\ServiceConcrete();
+        $this->Service = new ServiceConcrete();
 
         // Remove as pastas criadas
         $this->clearApplicationData();
@@ -110,7 +110,7 @@ class ServiceTest extends AbstractTestCase
         $this->Service->getMapper()->setShowDeleted(true)->setUseDeleted(false);
         $this->assertCount(4, $this->Service->findAll(), 'showDeleted=true, useDeleted=false');
 
-        // Marca pra não mostar os removidos e usar o campo deleted
+        // Marca pra não mostrar os removidos e usar o campo deleted
         $this->Service->getMapper()->setShowDeleted(false)->setUseDeleted(true);
         $this->assertCount(3, $this->Service->findAll(), 'showDeleted=false, useDeleted=true');
 

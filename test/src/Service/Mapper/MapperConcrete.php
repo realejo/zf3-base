@@ -1,7 +1,7 @@
 <?php
-namespace RealejoTest\Mapper;
+namespace RealejoTest\Service\Mapper;
 
-use Realejo\Mapper\MapperAbstract;
+use Realejo\Service\MapperAbstract;
 
 class MapperConcrete extends MapperAbstract
 {

@@ -2,9 +2,9 @@
 /**
  * Classe mapper para ser usada nos testes
  */
-namespace RealejoTest\Metadata;
+namespace RealejoTest\Service\Metadata;
 
-use Realejo\Mapper\MapperAbstract;
+use Realejo\Service\MapperAbstract;
 
 class MetadataMapperReference extends MapperAbstract
 {

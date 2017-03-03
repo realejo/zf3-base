@@ -1,5 +1,5 @@
 <?php
-namespace Realejo\Options;
+namespace Realejo\Service;
 
 class PaginatorOptions
 {
@@ -21,7 +21,7 @@ class PaginatorOptions
 
     /**
      * @param number $pageRange
-     * @return \Realejo\Options\PaginatorOptions
+     * @return PaginatorOptions
      */
     public function setPageRange($pageRange)
     {
@@ -33,7 +33,7 @@ class PaginatorOptions
 
     /**
      * @param number $currentPageNumber
-     * @return \Realejo\Options\PaginatorOptions
+     * @return PaginatorOptions
      */
     public function setCurrentPageNumber($currentPageNumber)
     {
@@ -45,7 +45,7 @@ class PaginatorOptions
 
     /**
      * @param number $itemCountPerPage
-     * @return \Realejo\Options\PaginatorOptions
+     * @return PaginatorOptions
      */
     public function setItemCountPerPage($itemCountPerPage)
     {

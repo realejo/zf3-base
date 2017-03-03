@@ -18,13 +18,14 @@ class Cache
      *
      * @var \Zend\Cache\StorageFactory
      */
-    private $_cache;
+    private $cache;
 
-     /**
-      * Configura o cache
-      *
-      * @return \Zend\Cache\Storage\Adapter\Filesystem
-      */
+    /**
+     * Configura o cache
+     *
+     * @param string $class
+     * @return \Zend\Cache\Storage\Adapter\Filesystem
+     */
     public static function getFrontend($class = '')
     {
         $oCache = new self();
@@ -33,7 +34,7 @@ class Cache
 
         if (! empty($path)) {
             // Configura o cache
-            $oCache->_cache = StorageFactory::factory([
+            $oCache->cache = StorageFactory::factory([
                             'adapter' => [
                                 'name' => 'filesystem',
                                 'options' => [
@@ -55,7 +56,7 @@ class Cache
                     ]);
         }
 
-        return $oCache->_cache;
+        return $oCache->cache;
     }
 
      /**
@@ -129,8 +130,8 @@ class Cache
     }
 
      /**
-      * Ignora o backend e apaga os arquivos do cache. inclui as subpastas.
-      * Serão removio apenas os arquivos de cache e não as pastas
+      * Ignora o backend e apaga os arquivos do cache. inclui as sub pastas.
+      * Serão removidos apenas os arquivos de cache e não as pastas
       *
       * @param string $path
       */

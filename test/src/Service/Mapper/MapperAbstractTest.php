@@ -1,12 +1,13 @@
 <?php
-namespace RealejoTest\Mapper;
+namespace RealejoTest\Service\Mapper;
 
-use Realejo\Utils\AbstractTestCase;
 use Realejo\Stdlib\ArrayObject;
-use Realejo\Mapper\MapperAbstract;
+use Realejo\Service\MapperAbstract;
+use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
+use \Zend\Db\Sql;
 
-class MapperAbstractTest extends AbstractTestCase
+class MapperAbstractTest extends BaseTestCase
 {
     /**
      * @var string
@@ -21,7 +22,7 @@ class MapperAbstractTest extends AbstractTestCase
     protected $tables = ['album'];
 
     /**
-     * @var \RealejoTest\Mapper\MapperConcrete
+     * @var MapperConcrete
      */
     private $Mapper;
 
@@ -83,7 +84,7 @@ class MapperAbstractTest extends AbstractTestCase
         $this->clearApplicationData();
 
         // Configura o mapper
-        $this->Mapper = new \RealejoTest\Mapper\MapperConcrete($this->tableName, $this->tableKeyName, $this->getAdapter());
+        $this->Mapper = new MapperConcrete($this->tableName, $this->tableKeyName, $this->getAdapter());
     }
 
     /**
@@ -100,7 +101,7 @@ class MapperAbstractTest extends AbstractTestCase
 
     /**
      * Definição de chave invalido
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testKeyNameInvalido()
     {
@@ -109,7 +110,7 @@ class MapperAbstractTest extends AbstractTestCase
 
     /**
      * Definição de ordem invalido
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testOrderInvalida()
     {
@@ -118,7 +119,7 @@ class MapperAbstractTest extends AbstractTestCase
 
     /**
      * Definição de ordem invalido
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testfetchRowMultiKeyException()
     {
@@ -140,12 +141,12 @@ class MapperAbstractTest extends AbstractTestCase
         $this->assertEquals(['meuid', 'com array'], $this->Mapper->setTableKey(['meuid', 'com array'])->getTableKey(false));
         $this->assertEquals('meuid', $this->Mapper->setTableKey(['meuid', 'com array'])->getTableKey(true));
 
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setTableKey(new \Zend\Db\Sql\Expression('chave muito exotica!'))->getTableKey());
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setTableKey([new \Zend\Db\Sql\Expression('chave muito mais exotica!'), 'não existo'])->getTableKey(true));
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setTableKey(new Sql\Expression('chave muito exotica!'))->getTableKey());
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setTableKey([new Sql\Expression('chave muito mais exotica!'), 'não existo'])->getTableKey(true));
 
         $this->assertEquals('minhaordem', $this->Mapper->setOrder('minhaordem')->getOrder());
         $this->assertEquals(['minhaordem', 'comarray'], $this->Mapper->setOrder(['minhaordem', 'comarray'])->getOrder());
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setOrder(new \Zend\Db\Sql\Expression('ordem muito exotica!'))->getOrder());
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setOrder(new Sql\Expression('ordem muito exotica!'))->getOrder());
     }
 
     /**
@@ -154,17 +155,17 @@ class MapperAbstractTest extends AbstractTestCase
     public function testCreateBase()
     {
         $Base = new MapperConcrete($this->tableName, $this->tableKeyName);
-        $this->assertInstanceOf('\Realejo\Mapper\MapperAbstract', $Base);
+        $this->assertInstanceOf(MapperAbstract::class, $Base);
         $this->assertEquals($this->tableKeyName, $Base->getTableKey());
         $this->assertEquals($this->tableName, $Base->getTableName());
 
         $Base = new MapperConcrete($this->tableName, [$this->tableKeyName, $this->tableKeyName]);
-        $this->assertInstanceOf('\Realejo\Mapper\MapperAbstract', $Base);
+        $this->assertInstanceOf(MapperAbstract::class, $Base);
         $this->assertEquals([$this->tableKeyName, $this->tableKeyName], $Base->getTableKey());
         $this->assertEquals($this->tableName, $Base->getTableName());
 
         $Base = new MapperConcrete($this->tableName, $this->tableKeyName);
-        $this->assertInstanceOf('\Realejo\Mapper\MapperAbstract', $Base);
+        $this->assertInstanceOf(MapperAbstract::class, $Base);
         $this->assertInstanceOf(get_class($this->getAdapter()), $Base->getTableGateway()->getAdapter(), 'tem o Adapter padrão');
         $this->assertEquals($this->getAdapter(), $Base->getTableGateway()->getAdapter(), 'tem a mesma configuração do adapter padrão');
     }
@@ -227,17 +228,27 @@ class MapperAbstractTest extends AbstractTestCase
     {
         // Verifica o padrão de não usar o campo deleted e não mostrar os removidos
         $this->Mapper->setOrder('id');
-        $this->assertEquals('SELECT `album`.* FROM `album` ORDER BY `id` ASC', $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()), 'showDeleted=false, useDeleted=false');
+        $this->assertEquals(
+            'SELECT `album`.* FROM `album` ORDER BY `id` ASC',
+            $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
+            'showDeleted=false, useDeleted=false');
 
         // Marca para usar o campo deleted
         $this->Mapper->setUseDeleted(true);
-        $this->assertEquals('SELECT `album`.* FROM `album` WHERE `album`.`deleted` = \'0\' ORDER BY `id` ASC', $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()), 'showDeleted=false, useDeleted=true');
+        $this->assertEquals(
+            'SELECT `album`.* FROM `album` WHERE `album`.`deleted` = \'0\' ORDER BY `id` ASC',
+            $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
+            'showDeleted=false, useDeleted=true');
 
         // Marca para não usar o campo deleted
         $this->Mapper->setUseDeleted(false);
 
-        $this->assertEquals('SELECT `album`.* FROM `album` WHERE `album`.`id` = \'1234\' ORDER BY `id` ASC', $this->Mapper->getSelect(['id' => 1234])->getSqlString($this->adapter->getPlatform()));
-        $this->assertEquals('SELECT `album`.* FROM `album` WHERE `album`.`texto` = \'textotextotexto\' ORDER BY `id` ASC', $this->Mapper->getSelect(['texto' => 'textotextotexto'])->getSqlString($this->adapter->getPlatform()));
+        $this->assertEquals(
+            'SELECT `album`.* FROM `album` WHERE `album`.`id` = \'1234\' ORDER BY `id` ASC',
+            $this->Mapper->getSelect(['id' => 1234])->getSqlString($this->adapter->getPlatform()));
+        $this->assertEquals(
+            'SELECT `album`.* FROM `album` WHERE `album`.`texto` = \'textotextotexto\' ORDER BY `id` ASC',
+            $this->Mapper->getSelect(['texto' => 'textotextotexto'])->getSqlString($this->adapter->getPlatform()));
     }
 
     /**
@@ -345,16 +356,16 @@ class MapperAbstractTest extends AbstractTestCase
         $this->Mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(1));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(1));
         $this->assertEquals($this->defaultValues[0], $this->Mapper->fetchRow(1)->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(2));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(2));
         $this->assertEquals($this->defaultValues[1], $this->Mapper->fetchRow(2)->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(3));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(3));
         $this->assertEquals($this->defaultValues[2], $this->Mapper->fetchRow(3)->toArray());
 
         // Verifica o item removido
         $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(4));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(4));
         $this->assertEquals($this->defaultValues[3], $this->Mapper->fetchRow(4)->toArray());
         $this->Mapper->setShowDeleted(false);
     }
@@ -371,16 +382,16 @@ class MapperAbstractTest extends AbstractTestCase
         $this->Mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(1));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(1));
         $this->assertEquals($this->defaultValues[0], $this->Mapper->fetchRow(1)->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(2));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(2));
         $this->assertEquals($this->defaultValues[1], $this->Mapper->fetchRow(2)->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(3));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(3));
         $this->assertEquals($this->defaultValues[2], $this->Mapper->fetchRow(3)->toArray());
 
         // Verifica o item removido
         $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(4));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(4));
         $this->assertEquals($this->defaultValues[3], $this->Mapper->fetchRow(4)->toArray());
         $this->Mapper->setShowDeleted(false);
     }
@@ -435,16 +446,16 @@ class MapperAbstractTest extends AbstractTestCase
         $this->Mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow('A'));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('A'));
         $this->assertEquals($defaultValues[0], $this->Mapper->fetchRow('A')->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow('B'));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('B'));
         $this->assertEquals($defaultValues[1], $this->Mapper->fetchRow('B')->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow('C'));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('C'));
         $this->assertEquals($defaultValues[2], $this->Mapper->fetchRow('C')->toArray());
 
         // Verifica o item removido
         $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow('D'));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('D'));
         $this->assertEquals($defaultValues[3], $this->Mapper->fetchRow('D')->toArray());
         $this->Mapper->setShowDeleted(false);
     }
@@ -504,18 +515,18 @@ class MapperAbstractTest extends AbstractTestCase
         $this->Mapper->setOrder(['id_int', 'id_char']);
 
         // Verifica os itens que existem
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]));
         $this->assertEquals($defaultValues[0], $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1])->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]));
         $this->assertEquals($defaultValues[1], $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2])->toArray());
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 3]));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 3]));
         $this->assertEquals($defaultValues[2], $this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 3])->toArray());
 
         $this->assertNull($this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 2]));
 
         // Verifica o item removido
         $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $this->Mapper->fetchRow(['id_char' => 'D', 'id_int' => 4]));
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'D', 'id_int' => 4]));
         $this->assertEquals($defaultValues[3], $this->Mapper->fetchRow(['id_char' => 'D', 'id_int' => 4])->toArray());
         $this->Mapper->setShowDeleted(false);
     }
@@ -614,10 +625,10 @@ class MapperAbstractTest extends AbstractTestCase
         $this->assertNotNull($this->Mapper->fetchAll());
         $this->assertCount(2, $this->Mapper->fetchAll());
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         $rowUpdate = [
@@ -632,14 +643,14 @@ class MapperAbstractTest extends AbstractTestCase
         $this->assertNotNull($this->Mapper->fetchAll());
         $this->assertCount(2, $this->Mapper->fetchAll());
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($rowUpdate, $row->toArray(), 'Alterou o 2?');
 
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'Alterou o 1?');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertNotEquals($row2, $row->toArray(), 'O 2 não é mais o mesmo?');
 
         $row = $row->toArray();
@@ -680,10 +691,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
@@ -697,7 +708,7 @@ class MapperAbstractTest extends AbstractTestCase
         $row = $this->Mapper->fetchRow(1);
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe');
 
         // Marca para mostrar os removidos
@@ -705,10 +716,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v1');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para remover o registro da tabela
@@ -719,10 +730,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se ele foi removido
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v2');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v2');
 
         // Remove o registro
@@ -731,7 +742,7 @@ class MapperAbstractTest extends AbstractTestCase
         // Verifica se ele foi removido
         $this->assertNull($this->Mapper->fetchRow(1), 'row1 não existe v3');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v3');
     }
 
@@ -765,10 +776,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
@@ -782,7 +793,7 @@ class MapperAbstractTest extends AbstractTestCase
         $row = $this->Mapper->fetchRow(1);
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe');
 
         // Marca para mostrar os removidos
@@ -790,10 +801,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v1');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para remover o registro da tabela
@@ -804,10 +815,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se ele foi removido
         $row = $this->Mapper->fetchRow(1);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v2');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v2');
 
         // Remove o registro
@@ -816,7 +827,7 @@ class MapperAbstractTest extends AbstractTestCase
         // Verifica se ele foi removido
         $this->assertNull($this->Mapper->fetchRow(1), 'row1 não existe v3');
         $row = $this->Mapper->fetchRow(2);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v3');
     }
 
@@ -850,10 +861,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow('A');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
         $row = $this->Mapper->fetchRow('B');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
@@ -867,7 +878,7 @@ class MapperAbstractTest extends AbstractTestCase
         $row = $this->Mapper->fetchRow('A');
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
         $row = $this->Mapper->fetchRow('B');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe');
 
         // Marca para mostrar os removidos
@@ -875,10 +886,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow('A');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v1');
         $row = $this->Mapper->fetchRow('B');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para remover o registro da tabela
@@ -889,10 +900,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se ele foi removido
         $row = $this->Mapper->fetchRow('A');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v2');
         $row = $this->Mapper->fetchRow('B');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v2');
 
         // Remove o registro
@@ -901,14 +912,14 @@ class MapperAbstractTest extends AbstractTestCase
         // Verifica se ele foi removido
         $this->assertNull($this->Mapper->fetchRow('A'), 'row1 não existe v3');
         $row = $this->Mapper->fetchRow('B');
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v3');
     }
 
     /**
      * Acesso de chave multiplica com acesso simples
      *
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testDeleteInvalidArrayKey()
     {
@@ -919,7 +930,7 @@ class MapperAbstractTest extends AbstractTestCase
     /**
      * Acesso de chave multiplica com acesso simples
      *
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testDeleteInvalidArraySingleKey()
     {
@@ -961,10 +972,10 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
         $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
@@ -976,11 +987,11 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se foi removido
         $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
 
         $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row);
+        $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para mostrar os removidos
@@ -988,16 +999,16 @@ class MapperAbstractTest extends AbstractTestCase
 
         // Verifica se o registro existe
         $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row, 'row1 ainda existe v1');
+        $this->assertInstanceOf(ArrayObject::class, $row, 'row1 ainda existe v1');
         $this->assertEquals($row1, $row->toArray());
         $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
-        $this->assertInstanceOf('\Realejo\Stdlib\ArrayObject', $row, 'row2 ainda existe v1');
+        $this->assertInstanceOf(ArrayObject::class, $row, 'row2 ainda existe v1');
         $this->assertEquals($row2, $row->toArray());
 
         // Marca para remover o registro da tabela
         $this->Mapper->setUseDeleted(false);
 
-        // Remove o registro qwue não existe
+        // Remove o registro que não existe
         $this->Mapper->delete(['id_char' => 'C']);
 
         // Verifica se ele foi removido

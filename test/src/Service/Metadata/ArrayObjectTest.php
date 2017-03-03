@@ -1,8 +1,8 @@
 <?php
-namespace RealejoTest\Metadata;
+namespace RealejoTest\Service\Metadata;
 
-use Realejo\Metadata\ArrayObject;
-use Realejo\Metadata\MetadataArrayObject;
+use Realejo\Service\Metadata\ArrayObject;
+use Realejo\Service\Metadata\MetadataArrayObject;
 
 /**
  * ArrayObject test case.
@@ -22,8 +22,8 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new MetadataArrayObject(['one' => 'first']);
 
-        $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->setMetadata($metadata));
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(ArrayObject::class, $object->setMetadata($metadata));
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
         $this->assertEquals(['one' => 'first'], $object->getMetadata()->toArray());
 
         $this->assertTrue($object->hasMetadata('one'));
@@ -31,8 +31,8 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
 
         $metadata = ['two' => 'second'];
 
-        $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->setMetadata($metadata));
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(ArrayObject::class, $object->setMetadata($metadata));
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
 
         $this->assertTrue($object->hasMetadata('two'));
         $this->assertFalse($object->hasMetadata('one'));
@@ -49,16 +49,16 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new MetadataArrayObject(['one' => 'first']);
 
-        $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->setMetadata($metadata));
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(ArrayObject::class, $object->setMetadata($metadata));
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
 
         $this->assertFalse($object->hasMetadata('two'));
         $this->assertTrue($object->hasMetadata('one'));
 
         $metadata = ['two' => 'second'];
 
-        $this->assertInstanceOf('\Realejo\Metadata\ArrayObject', $object->addMetadata($metadata));
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(ArrayObject::class, $object->addMetadata($metadata));
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
 
         $this->assertTrue($object->hasMetadata('two'));
         $this->assertTrue($object->hasMetadata('one'));
@@ -67,7 +67,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     public function testPopulateToArray()
     {
         $object = new ArrayObject(['one' => 'first']);
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
         $this->assertCount(0, $object->getMetadata());
         $this->assertEmpty($object->getMetadata());
 
@@ -80,7 +80,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['one' => 'first'], $object->toArray());
 
         $object = new ArrayObject(['one' => 'first', 'metadata' => ['two' => 'second']]);
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
         $this->assertCount(1, $object->getMetadata());
 
         $this->assertTrue(isset($object->one));
@@ -96,7 +96,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['one' => 'first', 'metadata' => ['two' => 'second']], $object->toArray());
 
         $object = new ArrayObject(['one' => 'first', 'metadata' => '{"two":"second"}']);
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
         $this->assertCount(1, $object->getMetadata());
 
         $this->assertTrue(isset($object->one));
@@ -118,7 +118,7 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     public function testGetterSetter()
     {
         $object = new ArrayObject(['one' => 'first', 'metadata' => ['two' => 'second']]);
-        $this->assertInstanceOf('\Realejo\Metadata\MetadataArrayObject', $object->getMetadata());
+        $this->assertInstanceOf(MetadataArrayObject::class, $object->getMetadata());
         $this->assertCount(1, $object->getMetadata());
 
         $object->one = 'once';

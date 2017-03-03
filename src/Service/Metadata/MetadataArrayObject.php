@@ -1,5 +1,5 @@
 <?php
-namespace Realejo\Metadata;
+namespace Realejo\Service\Metadata;
 
 class MetadataArrayObject implements \ArrayAccess, \Countable
 {
@@ -115,7 +115,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
             } else {
                 $this->storage[$offset] = $value;
             }
-            return;
+            return null;
         }
 
         if (isset($this->nullKeys) && strpos($this->nullKeys, ":$offset:") !== false) {

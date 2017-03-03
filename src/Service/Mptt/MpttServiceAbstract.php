@@ -8,12 +8,12 @@
  *
  * @see http://www.sitepoint.com/print/hierarchical-data-database
  */
-namespace Realejo\Service;
+namespace Realejo\Service\Mptt;
 
 use Realejo\Service\ServiceAbstract;
 use Zend\Db\Sql\Predicate\Expression;
 
-class Mptt extends ServiceAbstract
+abstract class MpttServiceAbstract extends ServiceAbstract
 {
     /**
      * Traversal tree information for

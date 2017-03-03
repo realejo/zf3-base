@@ -20,9 +20,6 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     $loader = require __DIR__ . '/../vendor/autoload.php';
 }
 
-// Carrega os namespaces para teste
-$loader->addPsr4("RealejoTest\\", __DIR__ .'/src');
-
 // Procura pelas configurações do Semaphore
 if (isset($_SERVER['DATABASE_MYSQL_USERNAME'])) {
     // Define o banco de dados de testes

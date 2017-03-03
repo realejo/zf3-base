@@ -1,5 +1,5 @@
 <?php
-namespace Realejo\Metadata;
+namespace Realejo\Service\Metadata;
 
 interface ArrayObjectInterface
 {

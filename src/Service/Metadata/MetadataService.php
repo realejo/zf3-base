@@ -1,8 +1,7 @@
 <?php
-namespace Realejo\Metadata;
+namespace Realejo\Service\Metadata;
 
 use Realejo\Service\ServiceAbstract;
-use Realejo\Metadata\MetadataMapper;
 use Zend\Db\Sql\Expression;
 use Zend\Json\Json;
 

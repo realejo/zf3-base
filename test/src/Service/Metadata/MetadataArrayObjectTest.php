@@ -1,7 +1,7 @@
 <?php
-namespace RealejoTest\Metadata;
+namespace RealejoTest\Service\Metadata;
 
-use Realejo\Metadata\MetadataArrayObject;
+use Realejo\Service\Metadata\MetadataArrayObject;
 
 /**
  * MetadataArrayObject test case.

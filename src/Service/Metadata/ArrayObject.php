@@ -1,23 +1,23 @@
 <?php
 /**
- * Extende as funcionadlidades do ArrayObject com as informações disponíveis no metadata
+ * Estende as funcionalidades do ArrayObject com as informações disponíveis no metadata
  *
  * Ele deveria extender Realejo\Stdlib\ArrayObject mas como rescreve a maioria dos
  * metodos eu deixei numa classe a parte
  */
-namespace Realejo\Metadata;
+namespace Realejo\Service\Metadata;
 
 use \Realejo\Stdlib\ArrayObject as StdlibArrayObject;
 
 class ArrayObject extends StdlibArrayObject
 {
     /**
-     * @var \Realejo\Metadata\MetadataArrayObject
+     * @var MetadataArrayObject
      */
     protected $metadata;
 
     /**
-     * @return \Realejo\Metadata\MetadataArrayObject
+     * @return MetadataArrayObject
      */
     public function getMetadata()
     {
@@ -28,7 +28,7 @@ class ArrayObject extends StdlibArrayObject
     }
 
     /**
-     * @param array $metadata
+     * @param array|MetadataArrayObject $metadata
      * @return $this
      */
     public function setMetadata($metadata)

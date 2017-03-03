@@ -1,8 +1,6 @@
 <?php
 namespace RealejoTest;
 
-use RealejoTest\BaseTestCase;
-
 /**
  * Test case para as funcionalidades com conexão ao banco de dados
  *

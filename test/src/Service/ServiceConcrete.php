@@ -8,5 +8,5 @@ class ServiceConcrete extends ServiceAbstract
     /**
      * @var string
      */
-    protected $mapperClass = '\RealejoTest\Mapper\MapperConcrete';
+    protected $mapperClass = Mapper\MapperConcrete::class;
 }
