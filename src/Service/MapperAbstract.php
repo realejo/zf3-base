@@ -1,6 +1,7 @@
 <?php
 namespace Realejo\Service;
 
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
@@ -10,16 +11,16 @@ use Realejo\Stdlib\ArrayObject;
 
 abstract class MapperAbstract
 {
-    const KEY_STRING  = 'STRING';
+    const KEY_STRING = 'STRING';
     const KEY_INTEGER = 'INTEGER';
 
     /**
-     * @var \Realejo\Stdlib\ArrayObject
+     * @var ArrayObject
      */
     protected $hydratorEntity = null;
 
     /**
-     * @var \Zend\Hydrator\ArraySerializable
+     * @var ArraySerializable
      */
     protected $hydrator = null;
 
@@ -30,7 +31,6 @@ abstract class MapperAbstract
     protected $tableName;
 
     /**
-     * @todo tem que colocar no service locator
      * @var TableGateway
      */
     protected $tableGateway;
@@ -68,6 +68,13 @@ abstract class MapperAbstract
      * @var string|array
      */
     protected $order;
+
+    /**
+     * Define o adapter a ser usado
+     *
+     * @var Adapter
+     */
+    protected $adapter;
 
     /**
      * Define se deve remover os registros ou apenas marcar como removido
@@ -109,20 +116,20 @@ abstract class MapperAbstract
 
     /**
      *
-     * @param string       $tableName Nome da tabela a ser usada
-     * @param string|array $tableKey   Nome ou array de chaves a serem usadas
+     * @param string $tableName Nome da tabela a ser usada
+     * @param string|array $tableKey Nome ou array de chaves a serem usadas
      *
      */
     public function __construct($tableName = null, $tableKey = null)
     {
         // Verifica o nome da tabela
-        if (! empty($tableName) && is_string($tableName)) {
+        if (!empty($tableName) && is_string($tableName)) {
             $this->tableName = $tableName;
         }
 
         // Verifica o nome da chave
-        if (! empty($tableKey) && (is_string($tableKey) || is_array($tableKey))) {
-            $this->tableKey  = $tableKey;
+        if (!empty($tableKey) && (is_string($tableKey) || is_array($tableKey))) {
+            $this->tableKey = $tableKey;
         }
     }
 
@@ -137,10 +144,10 @@ abstract class MapperAbstract
     {
         // Cria a assinatura da consulta
         if ($where instanceof Select) {
-            $cacheKey = 'fetchAll'. md5($where->getSqlString());
+            $cacheKey = 'fetchAll' . md5($where->getSqlString());
         } else {
             $cacheKey = 'fetchAll'
-                .md5(
+                . md5(
                     var_export($this->showDeleted, true)
                     . var_export($where, true)
                     . var_export($order, true)
@@ -166,7 +173,7 @@ abstract class MapperAbstract
         $fetchAll = $this->getTableGateway()->selectWith($select);
 
         // Verifica se foi localizado algum registro
-        if (! is_null($fetchAll) && count($fetchAll) > 0) {
+        if (!is_null($fetchAll) && count($fetchAll) > 0) {
             // Passa o $fetch para array para poder incluir campos extras
             $fetchAll = $fetchAll->toArray();
         } else {
@@ -228,16 +235,16 @@ abstract class MapperAbstract
         $fetchRow = $this->fetchAll($where, $order, 1);
 
         // Retorna o registro se algum foi encontrado
-        return (! empty($fetchRow)) ? $fetchRow[0] : null;
+        return (!empty($fetchRow)) ? $fetchRow[0] : null;
     }
 
     /**
      * Retorna o select para a consulta
      *
-     * @param string|array $where  OPTIONAL An SQL WHERE clause
-     * @param string|array $order  OPTIONAL An SQL ORDER clause.
-     * @param int          $count  OPTIONAL An SQL LIMIT count.
-     * @param int          $offset OPTIONAL An SQL LIMIT offset.
+     * @param string|array $where OPTIONAL An SQL WHERE clause
+     * @param string|array $order OPTIONAL An SQL ORDER clause.
+     * @param int $count OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return \Zend\Db\Sql\Select
      */
@@ -257,32 +264,32 @@ abstract class MapperAbstract
         }
 
         // Define a ordem
-        if (! empty($order)) {
+        if (!empty($order)) {
             $select->order($order);
         }
 
         // Verifica se há paginação, não confundir com o Zend\Paginator
-        if (! is_null($count)) {
+        if (!is_null($count)) {
             $select->limit($count);
         }
-        if (! is_null($offset)) {
+        if (!is_null($offset)) {
             $select->offset($offset);
         }
 
         // Checks $where is not null
         if (empty($where)) {
-            if ($this->getUseDeleted() && ! $this->getShowDeleted()) {
-                $where = new Expression($this->getTableGateway()->getTable().'deleted = 0');
+            if ($this->getUseDeleted() && !$this->getShowDeleted()) {
+                $where = new Expression($this->getTableGateway()->getTable() . 'deleted = 0');
             }
         }
 
         // Verifica se é um array para fazer o processamento abaixo
-        if (! is_array($where)) {
+        if (!is_array($where)) {
             $where = (empty($where)) ? [] : [$where];
         }
 
         // Checks $where is deleted
-        if ($this->getUseDeleted() && ! $this->getShowDeleted() && ! isset($where['deleted'])) {
+        if ($this->getUseDeleted() && !$this->getShowDeleted() && !isset($where['deleted'])) {
             $where['deleted'] = 0;
         }
 
@@ -310,14 +317,14 @@ abstract class MapperAbstract
                 unset($where['ativo']);
 
                 // Valor numerico
-            } elseif (! is_numeric($id) && is_numeric($w)) {
+            } elseif (!is_numeric($id) && is_numeric($w)) {
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
                 }
                 $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
 
                 // Texto e Data
-            } elseif (! is_numeric($id)) {
+            } elseif (!is_numeric($id)) {
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
                 }
@@ -403,7 +410,7 @@ abstract class MapperAbstract
      * Altera um registro
      *
      * @param array $set Dados a serem atualizados
-     * @param int   $key Chave do registro a ser alterado
+     * @param int $key Chave do registro a ser alterado
      *
      * @return boolean
      */
@@ -464,8 +471,8 @@ abstract class MapperAbstract
         $diff = array_diff_assoc($set, $row);
 
         // Grava os dados alterados para referencia
-        $this->lastUpdateSet  = $set;
-        $this->lastUpdateKey  = $key;
+        $this->lastUpdateSet = $set;
+        $this->lastUpdateKey = $key;
 
         // Grava o que foi alterado
         $this->lastUpdateDiff = [];
@@ -503,7 +510,7 @@ abstract class MapperAbstract
             throw new \InvalidArgumentException("O código <b>'$key'</b> inválido");
         }
 
-        if (! is_array($key) && is_array($this->getTableKey()) && count($this->getTableKey()) > 1) {
+        if (!is_array($key) && is_array($this->getTableKey()) && count($this->getTableKey()) > 1) {
             throw new \InvalidArgumentException('Não é possível acessar direto uma coluna usando chaves múltiplas');
         }
 
@@ -526,19 +533,24 @@ abstract class MapperAbstract
         return $return;
     }
 
-    public function save($dados)
+    /**
+     * @param $set
+     * @return bool|int
+     * @throws \Exception
+     */
+    public function save($set)
     {
-        if (! isset($dados[$this->getTableKey()])) {
-            return $this->insert($dados);
+        if (!isset($set[$this->getTableKey()])) {
+            return $this->insert($set);
         }
 
         // Caso não seja, envia um Exception
-        if (! is_numeric($dados[$this->getTableKey()])) {
-            throw new \Exception("Chave invalida: '{$dados[$this->getTableKey()]}'");
+        if (!is_numeric($set[$this->getTableKey()])) {
+            throw new \Exception("Chave invalida: '{$set[$this->getTableKey()]}'");
         }
 
-        if ($this->fetchRow($dados[$this->getTableKey()])) {
-            return $this->update($dados, $dados[$this->getTableKey()]);
+        if ($this->fetchRow($set[$this->getTableKey()])) {
+            return $this->update($set, $set[$this->getTableKey()]);
         }
 
         throw new \Exception("{$this->getTableKey()} key does not exist");
@@ -565,7 +577,7 @@ abstract class MapperAbstract
             return "{$this->getTableKey()} = '$key'";
         }
 
-        if (! is_array($this->getTableKey())) {
+        if (!is_array($this->getTableKey())) {
             throw new \LogicException('Chave mal definida');
         }
 
@@ -575,7 +587,7 @@ abstract class MapperAbstract
         // Verifica as chaves definidas
         foreach ($this->getTableKey() as $type => $definedKey) {
             // Verifica se é uma chave única com cast
-            if (count($this->getTableKey()) === 1 && ! is_array($key)) {
+            if (count($this->getTableKey()) === 1 && !is_array($key)) {
                 // Grava a chave como integer
                 if (is_numeric($type) || $type === self::KEY_INTEGER) {
                     $where[] = "$definedKey = $key";
@@ -610,22 +622,30 @@ abstract class MapperAbstract
         // Verifica se todas as chaves foram usadas
         if ($this->getUseAllKeys() === true
             && is_array($this->getTableKey())
-            && count($usedKeys) !== count($this->getTableKey())) {
+            && count($usedKeys) !== count($this->getTableKey())
+        ) {
             throw new \LogicException('Não é permitido usar chaves parciais');
         }
 
-        return '(' . implode(') AND (', $where). ')';
+        return '(' . implode(') AND (', $where) . ')';
     }
 
+    /**
+     * @return \Zend\Cache\Storage\Adapter\Filesystem
+     */
     public function getCache()
     {
-        if (! isset($this->cache)) {
+        if (!isset($this->cache)) {
             $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
         }
 
         return $this->cache;
     }
 
+    /**
+     * @param $cache
+     * @return MapperAbstract
+     */
     public function setCache($cache)
     {
         $this->cache = $cache;
@@ -636,14 +656,12 @@ abstract class MapperAbstract
      * Define se deve usar o cache
      *
      * @param boolean $useCache
-     * @return $this
+     * @return MapperAbstract
      */
     public function setUseCache($useCache)
     {
-        // Grava o cache
         $this->useCache = $useCache;
 
-        // Mantem a cadeia
         return $this;
     }
 
@@ -730,6 +748,7 @@ abstract class MapperAbstract
 
         return $this;
     }
+
     /**
      *
      * @return string
@@ -740,23 +759,17 @@ abstract class MapperAbstract
     }
 
     /**
-     * @param string $table
-     *
      * @return TableGateway
      */
-    public function getTableGateway($table = null)
+    public function getTableGateway()
     {
-        if (empty($table) && isset($this->tableName)) {
-            $table = $this->tableName;
-        }
-
-        if (empty($table)) {
-            throw new \InvalidArgumentException('Tabela não definida em ' . get_class($this) . '::getTableGateway()');
+        if (null === $this->tableName) {
+            throw new \InvalidArgumentException('Tabela não definida');
         }
 
         // Verifica se a tabela já foi previamente carregada
-        if (! isset($this->tableGateway)) {
-            $this->tableGateway = new TableGateway($table, GlobalAdapterFeature::getStaticAdapter());
+        if (null === $this->tableGateway) {
+            $this->tableGateway = new TableGateway($this->tableName, $this->getAdapter());
         }
 
         // Retorna a tabela
@@ -772,25 +785,27 @@ abstract class MapperAbstract
     {
         $select = $this->getTableGateway()->getSql()->select();
 
-        if ($this->getUseJoin() && ! empty($this->tableJoinLeft)) {
+        if ($this->getUseJoin() && !empty($this->tableJoinLeft)) {
             foreach ($this->tableJoinLeft as $tableJoinLeft) {
                 #TODO validar se tem os tres campos no array
 
-                if (empty($tableJoinLeft['table']) && ! is_string($tableJoinLeft['table'])) {
+                if (empty($tableJoinLeft['table']) && !is_string($tableJoinLeft['table'])) {
                     throw new \InvalidArgumentException('Tabela não definida');
                 }
 
-                if (empty($tableJoinLeft['condition']) && ! is_string($tableJoinLeft['condition'])) {
+                if (empty($tableJoinLeft['condition']) && !is_string($tableJoinLeft['condition'])) {
                     throw new \InvalidArgumentException('Condição não definida');
                 }
 
-                if (isset($tableJoinLeft['columns']) && ! empty($tableJoinLeft['columns'])
-                    && ! is_array($tableJoinLeft['columns'])) {
+                if (isset($tableJoinLeft['columns']) && !empty($tableJoinLeft['columns'])
+                    && !is_array($tableJoinLeft['columns'])
+                ) {
                     throw new \InvalidArgumentException('Colunas devem ser um array');
                 }
 
-                if (isset($tableJoinLeft['schema']) && ! empty($tableJoinLeft['schema'])
-                    && ! is_string($tableJoinLeft['schema'])) {
+                if (isset($tableJoinLeft['schema']) && !empty($tableJoinLeft['schema'])
+                    && !is_string($tableJoinLeft['schema'])
+                ) {
                     throw new \InvalidArgumentException('Schema devem ser uma string');
                 }
 
@@ -848,7 +863,7 @@ abstract class MapperAbstract
      */
     public function setTableKey($key)
     {
-        if (empty($key) && ! is_string($key) && ! is_array($key)) {
+        if (empty($key) && !is_string($key) && !is_array($key)) {
             throw new \InvalidArgumentException('Chave inválida em ' . get_class($this) . '::setTableKey()');
         }
 
@@ -867,10 +882,14 @@ abstract class MapperAbstract
 
     /**
      * @param array $tableJoinLeft
+     *
+     * @return MapperAbstract
      */
     public function setTableJoinLeft($tableJoinLeft)
     {
         $this->tableJoinLeft = $tableJoinLeft;
+
+        return $this;
     }
 
     /**
@@ -883,10 +902,13 @@ abstract class MapperAbstract
 
     /**
      * @param boolean $useJoin
+     *
+     * @return MapperAbstract
      */
     public function setUseJoin($useJoin)
     {
         $this->useJoin = $useJoin;
+        return $this;
     }
 
     /**
@@ -902,11 +924,11 @@ abstract class MapperAbstract
      *
      * @param string|array|Expression $order
      *
-     * @return self
+     * @return MapperAbstract
      */
     public function setOrder($order)
     {
-        if (empty($order) && ! is_string($order) && ! is_array($order) && ( ! $order instanceof Expression)) {
+        if (empty($order) && !is_string($order) && !is_array($order) && (!$order instanceof Expression)) {
             throw new \InvalidArgumentException('Chave inválida em ' . get_class($this) . '::setOrder()');
         }
 
@@ -930,13 +952,12 @@ abstract class MapperAbstract
      *
      * @param boolean $useDeleted
      *
-     * @return  self
+     * @return MapperAbstract
      */
     public function setUseDeleted($useDeleted)
     {
         $this->useDeleted = $useDeleted;
 
-        // Mantem a cadeia
         return $this;
     }
 
@@ -955,19 +976,17 @@ abstract class MapperAbstract
      *
      * @param boolean $showDeleted
      *
-     * @return  self
+     * @return MapperAbstract
      */
     public function setShowDeleted($showDeleted)
     {
         $this->showDeleted = $showDeleted;
 
-        // Mantem a cadeia
         return $this;
     }
 
     /**
-     *
-     * @return \Zend\Hydrator\ArraySerializable
+     * @return ArraySerializable
      */
     public function getHydrator()
     {
@@ -993,23 +1012,33 @@ abstract class MapperAbstract
     }
 
     /**
-     * @param \Realejo\Stdlib\ArrayObject $hydratorEntity
+     * @param ArrayObject $hydratorEntity
+     *
+     * @return MapperAbstract
      */
-    public function setHydratorEntity($hydratorEntity)
+    public function setHydratorEntity(ArrayObject $hydratorEntity)
     {
         $this->hydratorEntity = $hydratorEntity;
+
+        return $this;
     }
 
     /**
-     * @param \Zend\Hydrator\ArraySerializable $hydrator
+     * @param ArraySerializable $hydrator
+     *
+     * @return MapperAbstract
+     *
      * @throws \Exception
+     *
      */
-    public function setHydrator($hydrator)
+    public function setHydrator(ArraySerializable $hydrator)
     {
-        if (empty($this->hydrator)) {
+        if (empty($hydrator)) {
             throw new \Exception('Invalid hydrator');
         }
         $this->hydrator = $hydrator;
+
+        return $this;
     }
 
     /**
@@ -1023,12 +1052,35 @@ abstract class MapperAbstract
     /**
      * @param boolean $autoCleanCache
      *
-     * @return self
+     * @return MapperAbstract
      */
     public function setAutoCleanCache($autoCleanCache)
     {
         $this->autoCleanCache = $autoCleanCache;
 
+        return $this;
+    }
+
+    /**
+     * @return Adapter
+     */
+    public function getAdapter()
+    {
+        if (null === $this->adapter) {
+            $this->adapter = GlobalAdapterFeature::getStaticAdapter();
+        }
+
+        return $this->adapter;
+    }
+
+    /**
+     * @param Adapter $adapter
+     *
+     * @return MapperAbstract
+     */
+    public function setAdapter(Adapter $adapter)
+    {
+        $this->adapter = $adapter;
         return $this;
     }
 }
