@@ -1,6 +1,7 @@
 <?php
 namespace Realejo\Service;
 
+use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
 
 abstract class ServiceAbstract
@@ -39,6 +40,11 @@ abstract class ServiceAbstract
      * @var string|array
      */
     protected $htmlSelectOptionData;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $serviceLocator;
 
     /**
      * Retorna o HTML de um <select> apra usar em formulários
@@ -446,6 +452,9 @@ abstract class ServiceAbstract
             }
             $this->mapper = new $this->mapperClass();
             $this->mapper->setCache($this->getCache());
+            if ($this->hasServiceLocator()) {
+                $this->mapper->setServiceLocator($this->getServiceLocator());
+            }
         }
 
         return $this->mapper;
@@ -461,7 +470,7 @@ abstract class ServiceAbstract
 
     /**
      * @param boolean $useJoin
-     * @return self
+     * @return ServiceAbstract
      */
     public function setUseJoin($useJoin)
     {
@@ -488,7 +497,7 @@ abstract class ServiceAbstract
     /**
      * Configura o cache
      *
-     * @return \Zend\Cache\Storage\Adapter
+     * @return \Zend\Cache\Storage\Adapter\Filesystem
      */
     public function getCache()
     {
@@ -508,13 +517,12 @@ abstract class ServiceAbstract
     /**
      * Define se deve usar o cache
      * @param boolean $useCache
+     * @return ServiceAbstract
      */
     public function setUseCache($useCache)
     {
         $this->useCache = $useCache;
         $this->getMapper()->setUseCache($useCache);
-
-        // Mantem a cadeia
         return $this;
     }
 
@@ -549,12 +557,36 @@ abstract class ServiceAbstract
     /**
      * @param boolean $autoCleanCache
      *
-     * @return self
+     * @return ServiceAbstract
      */
     public function setAutoCleanCache($autoCleanCache)
     {
         $this->getMapper()->setAutoCleanCache($autoCleanCache);
 
         return $this;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
+
+    /**
+     * @param ContainerInterface $serviceLocator
+     * @return ServiceAbstract
+     */
+    public function setServiceLocator(ContainerInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+
+        return $this;
+    }
+
+    public function hasServiceLocator()
+    {
+        return null !== $this->serviceLocator;
     }
 }

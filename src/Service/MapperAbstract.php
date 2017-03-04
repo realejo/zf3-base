@@ -1,6 +1,9 @@
 <?php
 namespace Realejo\Service;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
@@ -18,6 +21,21 @@ abstract class MapperAbstract
      * @var ArrayObject
      */
     protected $hydratorEntity = null;
+
+    public function get($id)
+    {
+        // TODO: Implement get() method.
+    }
+
+    public function has($id)
+    {
+        // TODO: Implement has() method.
+    }
+
+    public function build($name, array $options = null)
+    {
+        // TODO: Implement build() method.
+    }
 
     /**
      * @var ArraySerializable
@@ -94,6 +112,11 @@ abstract class MapperAbstract
      * @var boolean
      */
     protected $useCache = false;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $serviceLocator;
 
     /**
      * @var boolean
@@ -1067,6 +1090,11 @@ abstract class MapperAbstract
     public function getAdapter()
     {
         if (null === $this->adapter) {
+            if ($this->hasServiceLocator() && $this->getServiceLocator()->has(Adapter::class)) {
+                $this->adapter = $this->getServiceLocator()->get(Adapter::class);
+                return $this->adapter;
+            }
+
             $this->adapter = GlobalAdapterFeature::getStaticAdapter();
         }
 
@@ -1082,5 +1110,29 @@ abstract class MapperAbstract
     {
         $this->adapter = $adapter;
         return $this;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
+
+    /**
+     * @param ContainerInterface $serviceLocator
+     * @return MapperAbstract
+     */
+    public function setServiceLocator(ContainerInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+
+        return $this;
+    }
+
+    public function hasServiceLocator()
+    {
+        return null !== $this->serviceLocator;
     }
 }

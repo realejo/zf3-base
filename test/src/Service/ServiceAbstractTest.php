@@ -1,6 +1,8 @@
 <?php
 namespace RealejoTest\Service;
 
+use Psr\Container\ContainerInterface;
+use Realejo\Service\MapperAbstract;
 use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
 
@@ -665,17 +667,32 @@ class ServiceTest extends BaseTestCase
         $this->assertNotEmpty($select);
         $dom = new \Zend\Dom\Query($select);
 
-        $options = $dom->execute("option");
-        $this->assertCount(2, $options, " 2 opções encontradas");
+        $options = $dom->execute('option');
+        $this->assertCount(2, $options, ' 2 opções encontradas');
 
-        $this->assertNotEmpty($options->current()->nodeValue, "primeiro não é vazio 2");
-        $this->assertNotEmpty($options->current()->getAttribute('value'), "o valor do primeiro não é vazio 2");
+        $this->assertNotEmpty($options->current()->nodeValue, 'primeiro não é vazio 2');
+        $this->assertNotEmpty($options->current()->getAttribute('value'), 'o valor do primeiro não é vazio 2');
 
-        $this->assertEquals($this->defaultValues[0]['title'], $options->current()->nodeValue, "nome do segundo ok 2");
+        $this->assertEquals($this->defaultValues[0]['title'], $options->current()->nodeValue, 'nome do segundo ok 2');
         $this->assertEquals($this->defaultValues[0]['id'], $options->current()->getAttribute('value'), "valor do segundo ok 2");
 
         $options->next();
-        $this->assertEquals($this->defaultValues[1]['title'], $options->current()->nodeValue, "nome do terceiro ok 2");
-        $this->assertEquals($this->defaultValues[1]['id'], $options->current()->getAttribute('value'), "valor do terceiro ok 2");
+        $this->assertEquals($this->defaultValues[1]['title'], $options->current()->nodeValue, 'nome do terceiro ok 2');
+        $this->assertEquals($this->defaultValues[1]['id'], $options->current()->getAttribute('value'), 'valor do terceiro ok 2');
+    }
+
+    public function testServiceLocator()
+    {
+        $fakeServiceLocator = new FakeServiceLocator();
+        $service = new ServiceConcrete();
+        $service->setServiceLocator($fakeServiceLocator);
+        $this->assertInstanceOf(FakeServiceLocator::class, $service->getServiceLocator());
+        $this->assertInstanceOf(ContainerInterface::class, $service->getServiceLocator());
+
+        $mapper = $service->getMapper();
+        $this->assertInstanceOf(MapperAbstract::class, $mapper);
+        $this->assertInstanceOf(FakeServiceLocator::class, $mapper->getServiceLocator());
+        $this->assertInstanceOf(ContainerInterface::class, $mapper->getServiceLocator());
+
     }
 }
