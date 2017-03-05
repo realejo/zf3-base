@@ -351,7 +351,7 @@ abstract class MapperAbstract
                 }
                 $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
             } else {
-                throw new \LogicException("Condição inválida '$w' em " . get_class($this) . '::getSelect()');
+                throw new \LogicException("Condição inválida '$w' em " . get_class($this));
             }
         }
 
@@ -439,7 +439,7 @@ abstract class MapperAbstract
     {
         // Verifica se o código é válido
         if (empty($key)) {
-            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido");
+            throw new \InvalidArgumentException("Chave <b>'$key'</b> inválida");
         }
 
         // Verifica se há algo para alterar
@@ -528,11 +528,11 @@ abstract class MapperAbstract
     public function delete($key)
     {
         if (empty($key)) {
-            throw new \InvalidArgumentException("O código <b>'$key'</b> inválido");
+            throw new \InvalidArgumentException("Chave <b>'$key'</b> inválida");
         }
 
         if (!is_array($key) && is_array($this->getTableKey()) && count($this->getTableKey()) > 1) {
-            throw new \InvalidArgumentException('Não é possível acessar direto uma coluna usando chaves múltiplas');
+            throw new \InvalidArgumentException('Não é possível apagar um registro usando chaves múltiplas parciais');
         }
 
         // Grava os dados alterados para referencia
@@ -574,7 +574,7 @@ abstract class MapperAbstract
             return $this->update($set, $set[$this->getTableKey()]);
         }
 
-        throw new \Exception("{$this->getTableKey()} key does not exist");
+        throw new \Exception("{$this->getTableKey()} key does not exist in " . get_class($this));
     }
 
     /**
@@ -599,7 +599,7 @@ abstract class MapperAbstract
         }
 
         if (!is_array($this->getTableKey())) {
-            throw new \LogicException('Chave mal definida');
+            throw new \LogicException('Chave mal definida em ' . get_class($this));
         }
 
         $where = [];
@@ -637,7 +637,7 @@ abstract class MapperAbstract
 
         // Verifica se alguma chave foi definida
         if (empty($where)) {
-            throw new \LogicException('Nenhuma chave múltipla informada');
+            throw new \LogicException('Nenhuma chave definida em ' . get_class($this));
         }
 
         // Verifica se todas as chaves foram usadas
@@ -645,7 +645,7 @@ abstract class MapperAbstract
             && is_array($this->getTableKey())
             && count($usedKeys) !== count($this->getTableKey())
         ) {
-            throw new \LogicException('Não é permitido usar chaves parciais');
+            throw new \LogicException('Não é permitido usar chaves parciais em ' . get_class($this));
         }
 
         return '(' . implode(') AND (', $where) . ')';
@@ -885,7 +885,7 @@ abstract class MapperAbstract
     public function setTableKey($key)
     {
         if (empty($key) && !is_string($key) && !is_array($key)) {
-            throw new \InvalidArgumentException('Chave inválida em ' . get_class($this) . '::setTableKey()');
+            throw new \InvalidArgumentException('Chave inválida em ' . get_class($this));
         }
 
         $this->tableKey = $key;
@@ -950,7 +950,7 @@ abstract class MapperAbstract
     public function setOrder($order)
     {
         if (empty($order) && !is_string($order) && !is_array($order) && (!$order instanceof Expression)) {
-            throw new \InvalidArgumentException('Chave inválida em ' . get_class($this) . '::setOrder()');
+            throw new \InvalidArgumentException('Ordem inválida em ' . get_class($this));
         }
 
         $this->order = $order;
