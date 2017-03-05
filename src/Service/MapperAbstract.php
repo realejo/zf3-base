@@ -1,9 +1,7 @@
 <?php
 namespace Realejo\Service;
 
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
@@ -239,7 +237,7 @@ abstract class MapperAbstract
         if (is_numeric($where) || is_string($where)) {
             // Verifica se há chave definida
             if (empty($this->tableKey)) {
-                throw new \InvalidArgumentException('Chave não definida em ' . get_class($this) . '::fetchRow()');
+                throw new \InvalidArgumentException('Chave não definida em ' . get_class($this));
             }
 
             // Verifica se é uma chave múltipla ou com cast
@@ -787,7 +785,7 @@ abstract class MapperAbstract
     public function getTableGateway()
     {
         if (null === $this->tableName) {
-            throw new \InvalidArgumentException('Tabela não definida');
+            throw new \InvalidArgumentException('Tabela não definida em ' . get_class($this));
         }
 
         // Verifica se a tabela já foi previamente carregada
@@ -813,23 +811,23 @@ abstract class MapperAbstract
                 #TODO validar se tem os tres campos no array
 
                 if (empty($tableJoinLeft['table']) && !is_string($tableJoinLeft['table'])) {
-                    throw new \InvalidArgumentException('Tabela não definida');
+                    throw new \InvalidArgumentException('Tabela não definida em ' . get_class($this));
                 }
 
                 if (empty($tableJoinLeft['condition']) && !is_string($tableJoinLeft['condition'])) {
-                    throw new \InvalidArgumentException('Condição não definida');
+                    throw new \InvalidArgumentException('Condição não definida' . get_class($this));
                 }
 
                 if (isset($tableJoinLeft['columns']) && !empty($tableJoinLeft['columns'])
                     && !is_array($tableJoinLeft['columns'])
                 ) {
-                    throw new \InvalidArgumentException('Colunas devem ser um array');
+                    throw new \InvalidArgumentException('Colunas devem ser um array em ' . get_class($this));
                 }
 
                 if (isset($tableJoinLeft['schema']) && !empty($tableJoinLeft['schema'])
                     && !is_string($tableJoinLeft['schema'])
                 ) {
-                    throw new \InvalidArgumentException('Schema devem ser uma string');
+                    throw new \InvalidArgumentException('Schema devem ser uma string em ' . get_class($this));
                 }
 
                 $select->join(
