@@ -57,8 +57,8 @@ class DateHelper
      */
     public static function staticDiff(\DateTime $d1, \DateTime $d2, $part = null)
     {
-        $d1 = (int) $d1->getTimestamp();
-        $d2 = (int) $d2->getTimestamp();
+        $d1 = $d1->getTimestamp();
+        $d2 = $d2->getTimestamp();
 
         $diff = abs($d1 - $d2);
 
@@ -77,7 +77,7 @@ class DateHelper
                 return (int) floor($diff / 60);
             case 's':
             default:
-                return (int) $diff;
+                return $diff;
         }
     }
 
