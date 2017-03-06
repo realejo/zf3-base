@@ -78,12 +78,12 @@ class ArrayObject extends StdlibArrayObject
     }
 
     /**
-     * @param bool $mapKeys
+     * @param bool $umMapKeys
      * @return array
      */
-    public function toArray($mapKeys = true)
+    public function toArray($umMapKeys = true)
     {
-        $toArray = parent::toArray($mapKeys);
+        $toArray = parent::toArray($umMapKeys);
         if (! empty($this->getMetadata()->count())) {
             $toArray['metadata'] = $this->getMetadata()->toArray();
         }
