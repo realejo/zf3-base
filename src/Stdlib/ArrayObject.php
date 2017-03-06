@@ -11,7 +11,7 @@ class ArrayObject implements \ArrayAccess
     /**
      * @var array
      */
-    protected $deprecatedKeys = null;
+    protected $mappedKeys = null;
 
     /**
      * Define se pode usar propriedades/chaves que não estejam previamente definidas
@@ -22,18 +22,27 @@ class ArrayObject implements \ArrayAccess
 
     public function __construct($data = null)
     {
-        if (is_array($data) && ! empty($data)) {
+        if (is_array($data) && !empty($data)) {
             $this->populate($data);
         }
     }
 
-    protected function getDeprecatedKey($key)
+    /**
+     * @param $key
+     * @param bool $reverse
+     * @return mixed
+     */
+    protected function getMappedKey($key, $reverse = false)
     {
-        $map = $this->getDeprecatedMapping();
+        $map = $this->getKeyMapping();
         if (empty($map)) {
             return $key;
         }
 
+        // Verifica se é para desfazer o map
+        if ($reverse === true) {
+            $map = array_flip($map);
+        }
         if (isset($map[$key])) {
             return $map[$key];
         }
@@ -43,14 +52,18 @@ class ArrayObject implements \ArrayAccess
 
     public function populate(array $data)
     {
-        if (! empty($data)) {
+        if (!empty($data)) {
             foreach ($data as $key => $value) {
-                $this->storage[$this->getDeprecatedKey($key)] = $value;
+                $this->storage[$this->getMappedKey($key)] = $value;
             }
         }
     }
 
-    public function toArray()
+    /**
+     * @param bool $mapKeys
+     * @return array
+     */
+    public function toArray($mapKeys = true)
     {
         $toArray = [];
 
@@ -59,10 +72,13 @@ class ArrayObject implements \ArrayAccess
         }
 
         foreach ($this->storage as $key => $value) {
-            if ($value instanceof \Realejo\Stdlib\ArrayObject) {
-                $value = $value->toArray();
+            if ($value instanceof ArrayObject) {
+                $value = $value->toArray($mapKeys);
             }
 
+            if ($mapKeys === true) {
+                $key = $this->getMappedKey($key, true);
+            }
             $toArray[$key] = $value;
         }
 
@@ -85,7 +101,7 @@ class ArrayObject implements \ArrayAccess
      */
     public function offsetExists($offset)
     {
-        $offset = $this->getDeprecatedKey($offset);
+        $offset = $this->getMappedKey($offset);
         return (array_key_exists($offset, $this->storage));
     }
 
@@ -95,8 +111,8 @@ class ArrayObject implements \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        $offset = $this->getDeprecatedKey($offset);
-        if (! array_key_exists($offset, $this->storage)) {
+        $offset = $this->getMappedKey($offset);
+        if (!array_key_exists($offset, $this->storage)) {
             //throw new \Exception("Undefined index: $offset in ". var_export($this->storage, true));
             trigger_error("Undefined index: $offset");
         }
@@ -110,8 +126,8 @@ class ArrayObject implements \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        $offset = $this->getDeprecatedKey($offset);
-        if (! $this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
+        $offset = $this->getMappedKey($offset);
+        if (!$this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
             $this->storage[$offset] = $value;
         } else {
             trigger_error("Undefined index: $offset");
@@ -128,7 +144,7 @@ class ArrayObject implements \ArrayAccess
             throw new \Exception("You cannot remove a property");
         }
 
-        $offset = $this->getDeprecatedKey($offset);
+        $offset = $this->getMappedKey($offset);
         unset($this->storage[$offset]);
     }
 
@@ -161,6 +177,7 @@ class ArrayObject implements \ArrayAccess
 
     /**
      * @param string $name
+     * @return bool
      */
     public function __isset($name)
     {
@@ -170,19 +187,18 @@ class ArrayObject implements \ArrayAccess
     /**
      * @return array
      */
-    public function getDeprecatedMapping()
+    public function getKeyMapping()
     {
-        return $this->deprecatedKeys;
+        return $this->mappedKeys;
     }
 
     /**
      * @param array $deprecatedMapping
      * @return \Realejo\Stdlib\ArrayObject
      */
-    public function setDeprecatedMapping(array $deprecatedMapping = null)
+    public function setMapping(array $deprecatedMapping = null)
     {
-        $this->deprecatedKeys = $deprecatedMapping;
-
+        $this->mappedKeys = $deprecatedMapping;
         return $this;
     }
 

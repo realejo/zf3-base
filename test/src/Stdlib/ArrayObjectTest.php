@@ -207,27 +207,32 @@ class ArrayObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests ArrayObject::getMapNaming()
      */
-    public function testDeprecatedMapping()
+    public function testMapping()
     {
         $object = new ArrayObject();
-        $this->assertNull($object->getDeprecatedMapping());
-        $this->assertInstanceof(get_class($object), $object->setDeprecatedMapping(['one' => 'two']));
-        $this->assertNotNull($object->getDeprecatedMapping());
-        $this->assertEquals(['one' => 'two'], $object->getDeprecatedMapping());
+        $this->assertNull($object->getKeyMapping());
+        $this->assertInstanceof(get_class($object), $object->setMapping(['original' => 'mapped']));
+        $this->assertNotNull($object->getKeyMapping());
+        $this->assertEquals(['original' => 'mapped'], $object->getKeyMapping());
 
-        $object->populate(['one' => 'first']);
-        $this->assertTrue(isset($object->one));
-        $this->assertTrue(isset($object->one));
-        $this->assertTrue(isset($object->two));
-        $this->assertTrue(isset($object->two));
+        $object->populate(['original' => 'realValue']);
+
+        $this->assertTrue(isset($object->original), 'A chave original será mapeada para a nova');
+        $this->assertTrue(isset($object->mapped) , 'A chave mapeada está disponível');
+        $this->assertEquals('realValue', $object->original);
+        $this->assertEquals('realValue', $object->mapped);
+
+        $objectArray = $object->toArray();
+        $this->assertCount(1, $objectArray);
+        $this->assertEquals(['original'=>'realValue'], $objectArray);
 
         $object = new ArrayObject();
-        $this->assertNull($object->getDeprecatedMapping());
-        $this->assertInstanceof(get_class($object), $object->setDeprecatedMapping(['one' => 'two']));
-        $this->assertNotNull($object->getDeprecatedMapping());
-        $this->assertEquals(['one' => 'two'], $object->getDeprecatedMapping());
-        $this->assertInstanceof(get_class($object), $object->setDeprecatedMapping(null));
-        $this->assertNull($object->getDeprecatedMapping());
-        $this->assertEquals(null, $object->getDeprecatedMapping());
+        $this->assertNull($object->getKeyMapping());
+        $this->assertInstanceof(get_class($object), $object->setMapping(['one' => 'two']));
+        $this->assertNotNull($object->getKeyMapping());
+        $this->assertEquals(['one' => 'two'], $object->getKeyMapping());
+        $this->assertInstanceof(get_class($object), $object->setMapping(null));
+        $this->assertNull($object->getKeyMapping());
+        $this->assertEquals(null, $object->getKeyMapping());
     }
 }

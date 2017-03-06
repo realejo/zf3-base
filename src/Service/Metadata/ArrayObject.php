@@ -77,9 +77,13 @@ class ArrayObject extends StdlibArrayObject
         parent::populate($data);
     }
 
-    public function toArray()
+    /**
+     * @param bool $mapKeys
+     * @return array
+     */
+    public function toArray($mapKeys = true)
     {
-        $toArray = parent::toArray();
+        $toArray = parent::toArray($mapKeys);
         if (! empty($this->getMetadata()->count())) {
             $toArray['metadata'] = $this->getMetadata()->toArray();
         }
@@ -93,7 +97,7 @@ class ArrayObject extends StdlibArrayObject
      */
     public function offsetExists($offset)
     {
-        $offset = $this->getDeprecatedKey($offset);
+        $offset = $this->getMappedKey($offset);
         if (parent::offsetExists($offset)) {
             return true;
         }
@@ -107,7 +111,7 @@ class ArrayObject extends StdlibArrayObject
      */
     public function offsetGet($offset)
     {
-        $offset = $this->getDeprecatedKey($offset);
+        $offset = $this->getMappedKey($offset);
 
         if (parent::offsetExists($offset)) {
             return parent::offsetGet($offset);
@@ -126,7 +130,7 @@ class ArrayObject extends StdlibArrayObject
      */
     public function offsetSet($offset, $value)
     {
-        $offset = $this->getDeprecatedKey($offset, true);
+        $offset = $this->getMappedKey($offset, true);
 
         if (parent::offsetExists($offset)) {
             parent::offsetSet($offset, $value);
