@@ -41,12 +41,15 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(820, $dataDiffDia);
 
         $dataDiffHora = DateHelper::staticDiff($data1, $data2, 'h');
-        $this->assertEquals(19681, $dataDiffHora);
+        $this->assertEquals(19682, $dataDiffHora);
 
         $dataDiffMinuto = DateHelper::staticDiff($data1, $data2, 'i');
-        $this->assertEquals(70855198, $dataDiffMinuto);
+        $this->assertEquals(1180979, $dataDiffMinuto);
 
         $dataDiffSegundo = DateHelper::staticDiff($data1, $data2, 's');
-        $this->assertEquals(70855198, $dataDiffSegundo);
+        $this->assertEquals(70858798, $dataDiffSegundo);
+
+        $dataDiffSegundo = DateHelper::staticDiff($data1, $data2);
+        $this->assertEquals(70858798, $dataDiffSegundo);
     }
 }

@@ -42,12 +42,12 @@ class DateHelper
      * Sempre calculado a partir da diferença de segundos entre as datas
      *
      * Opções para $part
-     *         a - anos
+     *         y - anos
      *         m - meses
      *         w - semanas
      *         d - dias
      *         h - horas
-     *         n - minutos
+     *         i - minutos
      *         s - segundos (padrão)
      *
      * @param \DateTime $d1
@@ -57,13 +57,8 @@ class DateHelper
      */
     public static function staticDiff(\DateTime $d1, \DateTime $d2, $part = null)
     {
-        if ($d1 instanceof \DateTime) {
-            $d1 = $d1->getTimestamp();
-        }
-
-        if ($d2 instanceof \DateTime) {
-            $d2 = $d2->getTimestamp();
-        }
+        $d1 = (int) $d1->getTimestamp();
+        $d2 = (int) $d2->getTimestamp();
 
         $diff = abs($d1 - $d2);
 
@@ -78,7 +73,7 @@ class DateHelper
                 return (int) floor($diff / 86400); # 60*60*24
             case 'h':
                 return (int) floor($diff / 3600);  # 60*60
-            case 'n':
+            case 'i':
                 return (int) floor($diff / 60);
             case 's':
             default:
