@@ -60,10 +60,10 @@ class ArrayObject implements \ArrayAccess
     }
 
     /**
-     * @param bool $umMapKeys
+     * @param bool $unMapKeys
      * @return array
      */
-    public function toArray($umMapKeys = true)
+    public function toArray($unMapKeys = true)
     {
         $toArray = [];
 
@@ -73,10 +73,10 @@ class ArrayObject implements \ArrayAccess
 
         foreach ($this->storage as $key => $value) {
             if ($value instanceof ArrayObject) {
-                $value = $value->toArray($umMapKeys);
+                $value = $value->toArray($unMapKeys);
             }
 
-            if ($umMapKeys === true) {
+            if ($unMapKeys === true) {
                 $key = $this->getMappedKey($key, true);
             }
             $toArray[$key] = $value;
