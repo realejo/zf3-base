@@ -9,6 +9,7 @@ namespace RealejoTest\Service\Mptt;
  * @license   http://unlicense.org
  */
 use RealejoTest\BaseTestCase;
+use Realejo\Service;
 
 /**
  * Mptt test case.
@@ -72,11 +73,6 @@ class MpttTest extends BaseTestCase
 
     protected $tables = ['mptt'];
 
-    /**
-     * @var MpttServiceAbstract
-     */
-    private $Mptt;
-
     public function __construct()
     {
         $fields = ['id', 'name', 'parent_id', 'lft', 'rgt'];
@@ -111,8 +107,8 @@ class MpttTest extends BaseTestCase
     {
         // Cria a tabela sem a implementação do transversable
         $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
-        $this->assertInstanceOf(\Realejo\Service\Mptt\MpttServiceAbstract::class, $mptt);
-        $this->assertInstanceOf(\Realejo\Service\ServiceAbstract::class, $mptt);
+        $this->assertInstanceOf(Service\Mptt\MpttServiceAbstract::class, $mptt);
+        $this->assertInstanceOf(Service\ServiceAbstract::class, $mptt);
         $this->assertInstanceOf(MapperConcrete::class, $mptt->getMapper());
     }
 
@@ -124,12 +120,12 @@ class MpttTest extends BaseTestCase
     {
         // Cria a tabela sem a implementação do transversable
         $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
-        $this->assertInstanceOf(\Realejo\Service\Mptt\MpttServiceAbstract::class, $mptt);
-        $this->assertInstanceOf(\Realejo\Service\ServiceAbstract::class, $mptt);
+        $this->assertInstanceOf(Service\Mptt\MpttServiceAbstract::class, $mptt);
+        $this->assertInstanceOf(Service\ServiceAbstract::class, $mptt);
 
         $mptt = $mptt->setTraversal([]);
 
-        $this->assertInstanceOf(\Realejo\Service\Mptt\MpttServiceAbstract::class, $mptt);
+        $this->assertInstanceOf(Service\Mptt\MpttServiceAbstract::class, $mptt);
 
         // The Exception
         $mptt->setTraversal(['invalid' => 'invalid']);
@@ -163,7 +159,7 @@ class MpttTest extends BaseTestCase
      */
     public function testRebuildTreeTraversal()
     {
-        // Cria a tablea com os valores padrões
+        // Cria a tabela com os valores padrões
         $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
         $this->assertNull($mptt->getMapper()->fetchAll());
         foreach ($this->defaultRows as $row) {
@@ -203,7 +199,7 @@ class MpttTest extends BaseTestCase
      */
     public function testInsert()
     {
-        // Cria a tablea com os valores padrões
+        // Cria a tabela com os valores padrões
         $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
         $mptt->getMapper()->setOrder('id');
         $this->assertNull($mptt->getMapper()->fetchAll());

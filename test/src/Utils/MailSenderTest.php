@@ -5,11 +5,12 @@ namespace RealejoTest\Utils;
 /**
  * Version test case.
  */
+use PHPUnit\Framework\TestCase;
 use Realejo\Utils\MailSender;
 use Zend\Mime;
 use Zend\Mail;
 
-class MailSenderTest extends \PHPUnit\Framework\TestCase
+class MailSenderTest extends TestCase
 {
     /**
      * @expectedException \Exception

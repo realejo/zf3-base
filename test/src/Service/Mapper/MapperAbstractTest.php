@@ -5,7 +5,7 @@ use Realejo\Stdlib\ArrayObject;
 use Realejo\Service\MapperAbstract;
 use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
-use \Zend\Db\Sql;
+use Zend\Db\Sql;
 
 class MapperAbstractTest extends BaseTestCase
 {

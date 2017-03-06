@@ -1,13 +1,14 @@
 <?php
 namespace RealejoTest\Service\Metadata;
 
+use PHPUnit\Framework\TestCase;
 use Realejo\Service\Metadata\ArrayObject;
 use Realejo\Service\Metadata\MetadataArrayObject;
 
 /**
  * ArrayObject test case.
  */
-class ArrayObjectTest extends \PHPUnit\Framework\TestCase
+class ArrayObjectTest extends TestCase
 {
 
     /**

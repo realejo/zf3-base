@@ -1,12 +1,13 @@
 <?php
 namespace RealejoTest\Stdlib;
 
+use PHPUnit\Framework\TestCase;
 use Realejo\Stdlib\ArrayObject;
 
 /**
  * ArrayObject test case.
  */
-class ArrayObjectTest extends \PHPUnit\Framework\TestCase
+class ArrayObjectTest extends TestCase
 {
     /**
      * Tests ArrayObject->populate()

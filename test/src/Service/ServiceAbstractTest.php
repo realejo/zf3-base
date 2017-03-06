@@ -5,6 +5,7 @@ use Psr\Container\ContainerInterface;
 use Realejo\Service\MapperAbstract;
 use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
+use Zend\Dom\Query as DomQuery;
 
 class ServiceTest extends BaseTestCase
 {
@@ -342,7 +343,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id, null, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(3, $options, " 3 opções encontradas");
@@ -361,7 +362,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id, 1, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(2, $options, " 2 opções encontradas");
@@ -384,7 +385,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(5, $options, " 5 opções encontradas");
@@ -410,7 +411,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->setHtmlSelectOption('{nao_existo}')->getHtmlSelect($id);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(5, $options, " 5 opções encontradas");
@@ -442,7 +443,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->setHtmlSelectOption('{artist}')->getHtmlSelect($id);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute("#$id"), "id #$id existe");
         $this->assertCount(1, $dom->execute("select[name=\"$id\"]"), "placeholder select[name=\"$id\"] encontrado");
         $options = $dom->execute("option");
@@ -474,7 +475,7 @@ class ServiceTest extends BaseTestCase
         $this->Service->getMapper()->setOrder('id');
         $select = $this->Service->getHtmlSelect('nome_usado', null, ['placeholder' => $ph]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe');
         $this->assertCount(1, $dom->execute("select[placeholder=\"$ph\"]"), "placeholder select[placeholder=\"$ph\"] encontrado");
         $options = $dom->execute("option");
@@ -488,7 +489,7 @@ class ServiceTest extends BaseTestCase
         $this->Service->getMapper()->setOrder('id');
         $select = $this->Service->getHtmlSelect('nome_usado');
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe');
         $this->assertCount(5, $dom->execute('option'), '5 opções existem');
         $this->assertEmpty($dom->execute('option')->current()->nodeValue, "a primeira é vazia");
@@ -496,27 +497,27 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect('nome_usado', 1);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe COM valor padrão');
         $this->assertCount(4, $dom->execute('option'), '4 opções existem COM valor padrão');
 
         $select = $this->Service->getHtmlSelect('nome_usado', null, ['show-empty' => false]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe SEM valor padrão e show-empty=false');
         $this->assertCount(4, $dom->execute('option'), '4 opções existem SEM valor padrão e show-empty=false');
 
         // sem mostrar o empty
         $select = $this->Service->getHtmlSelect('nome_usado', 1, ['show-empty' => false]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe com valor padrão e show-empty=false');
         $this->assertCount(4, $dom->execute('option'), '4 opções existem com valor padrão e show-empty=false');
 
         // sem mostrar o empty
         $select = $this->Service->getHtmlSelect('nome_usado', 1, ['show-empty' => true]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute('#nome_usado'), 'id #nome_usado existe com valor padrão e show-empty=true');
         $this->assertCount(5, $dom->execute('option'), '5 opções existem com valor padrão e show-empty=true');
         $this->assertEmpty($dom->execute('option')->current()->nodeValue, "a primeira é vazia com valor padrão e show-empty=true");
@@ -530,7 +531,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->setHtmlSelectOption('{title}')->getHtmlSelect($id, 1, ['grouped' => 'artist']);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute("#$id"), "id #$id existe");
 
         $options = $dom->execute("option");
@@ -577,7 +578,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->setHtmlSelectOption('{title}')->getHtmlSelect($id, 1, ['grouped' => 'artist', 'where' => ['id' => 100]]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
         $this->assertCount(1, $dom->execute("#$id"), "id #$id existe");
 
         $this->assertCount(1, $dom->execute("option"), " nenhuma option com where id = 100");
@@ -599,7 +600,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id, null, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(3, $options, " 3 opções encontradas");
@@ -618,7 +619,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id, 1, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(2, $options, " 2 opções encontradas");
@@ -646,7 +647,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id, null, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute("option");
         $this->assertCount(3, $options, " 3 opções encontradas");
@@ -665,7 +666,7 @@ class ServiceTest extends BaseTestCase
 
         $select = $this->Service->getHtmlSelect($id, 1, ['where' => ['artist' => 'Rush']]);
         $this->assertNotEmpty($select);
-        $dom = new \Zend\Dom\Query($select);
+        $dom = new DomQuery($select);
 
         $options = $dom->execute('option');
         $this->assertCount(2, $options, ' 2 opções encontradas');

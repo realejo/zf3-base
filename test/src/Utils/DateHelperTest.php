@@ -5,9 +5,10 @@ namespace RealejoTest\Utils;
 /**
  * Version test case.
  */
+use PHPUnit\Framework\TestCase;
 use Realejo\Utils\DateHelper;
 
-class DateHelperTest extends \PHPUnit\Framework\TestCase
+class DateHelperTest extends TestCase
 {
     public function testToMysqlFromDateTimeObject()
     {

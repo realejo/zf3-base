@@ -14,11 +14,12 @@
  */
 namespace RealejoTest;
 
+use PHPUnit\Framework\TestCase;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 
-class BaseTestCase extends \PHPUnit\Framework\TestCase
+class BaseTestCase extends TestCase
 {
     /**
      * @var \Zend\Db\Adapter\Adapter
