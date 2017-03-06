@@ -3,9 +3,11 @@ namespace RealejoTest\Service;
 
 use Psr\Container\ContainerInterface;
 use Realejo\Service\MapperAbstract;
+use Realejo\Service\Metadata\MetadataService;
 use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
 use Zend\Dom\Query as DomQuery;
+use Zend\ServiceManager\ServiceManager;
 
 class ServiceTest extends BaseTestCase
 {
@@ -695,5 +697,20 @@ class ServiceTest extends BaseTestCase
         $this->assertInstanceOf(FakeServiceLocator::class, $mapper->getServiceLocator());
         $this->assertInstanceOf(ContainerInterface::class, $mapper->getServiceLocator());
 
+        $this->assertNull($service->getFromServiceLocator('\DateTime'));
+
+        $realServiceLocator = new ServiceManager();
+        $service->setServiceLocator($realServiceLocator);
+        $this->assertInstanceOf(\DateTime::class, $service->getFromServiceLocator('\DateTime'));
+
+        $service->getFromServiceLocator(MetadataService::class);
+        $this->assertTrue($service->getServiceLocator()->has(MetadataService::class));
+        $this->assertInstanceOf(MetadataService::class, $service->getServiceLocator()->get(MetadataService::class));
+        $this->assertTrue($service->getServiceLocator()->get(MetadataService::class)->hasServiceLocator());
+
+        $fakeObject = (object) ['id'=>1];
+        $service->getServiceLocator()->setService('fake', $fakeObject);
+        $this->assertTrue($service->getServiceLocator()->has('fake'));
+        $this->assertEquals($fakeObject, $service->getServiceLocator()->get('fake'));
     }
 }

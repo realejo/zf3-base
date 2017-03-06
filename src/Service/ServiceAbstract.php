@@ -3,6 +3,7 @@ namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
+use Zend\ServiceManager\ServiceManager;
 
 abstract class ServiceAbstract
 {
@@ -588,5 +589,22 @@ abstract class ServiceAbstract
     public function hasServiceLocator()
     {
         return null !== $this->serviceLocator;
+    }
+
+    public function getFromServiceLocator($class)
+    {
+        if (!$this->hasServiceLocator()) {
+            return null;
+        }
+
+        if (!$this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
+            $newService = new $class();
+            if (method_exists($newService, 'setServiceLocator')) {
+                $newService->setServiceLocator($this->getServiceLocator());
+            }
+            $this->getServiceLocator()->setService($class, $newService);
+        }
+
+        return $this->getServiceLocator()->get($class);
     }
 }
