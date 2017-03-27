@@ -289,7 +289,7 @@ abstract class ServiceAbstract
 
         // Grava a consulta no cache
         if ($this->getUseCache()) {
-            $this->getCache()->setItem($findOne, $cacheKey);
+            $this->getCache()->setItem($cacheKey, $findOne);
         }
 
         return $findOne;
@@ -332,7 +332,7 @@ abstract class ServiceAbstract
 
         // Grava a consulta no cache
         if ($this->getUseCache()) {
-            $this->getCache()->setItem($findAssoc, $cacheKey);
+            $this->getCache()->setItem($cacheKey, $findAssoc);
         }
 
         return $findAssoc;
