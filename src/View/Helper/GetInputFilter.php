@@ -32,7 +32,6 @@ class GetInputFilter extends AbstractHelper
     public function __construct(Translator $translator = null)
     {
         if (null === $translator) {
-
             $translator = new Translator();
 
             // Coloca as mensagens de tradução em Português se existir
@@ -45,7 +44,6 @@ class GetInputFilter extends AbstractHelper
 
             $this->translator = $translator;
         } else {
-
             // Define o translator padrão recebido
             $this->translator = $translator;
         }
@@ -61,7 +59,7 @@ class GetInputFilter extends AbstractHelper
      */
     private function getFormValidationFields(Form $form, $json = true)
     {
-        $result = array();
+        $result = [];
 
         foreach ($form->getElements() as $element) {
             $validators = $form->getInputFilter()->get($element->getName())->getValidatorChain()->getValidators();
@@ -129,7 +127,7 @@ class GetInputFilter extends AbstractHelper
                 }
             }
         }
-        
+
         return $json == false ? $result : json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 

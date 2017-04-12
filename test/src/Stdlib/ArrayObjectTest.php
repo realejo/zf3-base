@@ -219,13 +219,13 @@ class ArrayObjectTest extends TestCase
         $object->populate(['original' => 'realValue']);
 
         $this->assertTrue(isset($object->original), 'A chave original será mapeada para a nova');
-        $this->assertTrue(isset($object->mapped) , 'A chave mapeada está disponível');
+        $this->assertTrue(isset($object->mapped), 'A chave mapeada está disponível');
         $this->assertEquals('realValue', $object->original);
         $this->assertEquals('realValue', $object->mapped);
 
         $objectArray = $object->toArray();
         $this->assertCount(1, $objectArray);
-        $this->assertEquals(['original'=>'realValue'], $objectArray);
+        $this->assertEquals(['original' => 'realValue'], $objectArray);
 
         $object = new ArrayObject();
         $this->assertNull($object->getKeyMapping());

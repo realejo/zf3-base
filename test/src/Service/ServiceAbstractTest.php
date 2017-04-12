@@ -708,7 +708,7 @@ class ServiceTest extends BaseTestCase
         $this->assertInstanceOf(MetadataService::class, $service->getServiceLocator()->get(MetadataService::class));
         $this->assertTrue($service->getServiceLocator()->get(MetadataService::class)->hasServiceLocator());
 
-        $fakeObject = (object) ['id'=>1];
+        $fakeObject = (object) ['id' => 1];
         $service->getServiceLocator()->setService('fake', $fakeObject);
         $this->assertTrue($service->getServiceLocator()->has('fake'));
         $this->assertEquals($fakeObject, $service->getServiceLocator()->get('fake'));

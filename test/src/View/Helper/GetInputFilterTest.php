@@ -22,7 +22,7 @@ class GetInputFilterTest extends TestCase
     {
         $helper = new GetInputFilter();
         $this->assertInstanceOf('Realejo\View\Helper\GetInputFilter', $helper);
-        $this->assertInstanceOf('Zend\I18n\Translator\Translator',$helper->getTranslator());
+        $this->assertInstanceOf('Zend\I18n\Translator\Translator', $helper->getTranslator());
         $this->assertEquals('pt_BR', $helper->getTranslator()->getLocale());
     }
 

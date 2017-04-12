@@ -22,7 +22,7 @@ class ArrayObject implements \ArrayAccess
 
     public function __construct($data = null)
     {
-        if (is_array($data) && !empty($data)) {
+        if (is_array($data) && ! empty($data)) {
             $this->populate($data);
         }
     }
@@ -52,7 +52,7 @@ class ArrayObject implements \ArrayAccess
 
     public function populate(array $data)
     {
-        if (!empty($data)) {
+        if (! empty($data)) {
             foreach ($data as $key => $value) {
                 $this->storage[$this->getMappedKey($key)] = $value;
             }
@@ -112,7 +112,7 @@ class ArrayObject implements \ArrayAccess
     public function offsetGet($offset)
     {
         $offset = $this->getMappedKey($offset);
-        if (!array_key_exists($offset, $this->storage)) {
+        if (! array_key_exists($offset, $this->storage)) {
             //throw new \Exception("Undefined index: $offset in ". var_export($this->storage, true));
             trigger_error("Undefined index: $offset");
         }
@@ -127,7 +127,7 @@ class ArrayObject implements \ArrayAccess
     public function offsetSet($offset, $value)
     {
         $offset = $this->getMappedKey($offset);
-        if (!$this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
+        if (! $this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
             $this->storage[$offset] = $value;
         } else {
             trigger_error("Undefined index: $offset");
