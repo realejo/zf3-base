@@ -73,7 +73,12 @@ class MetadataServiceTest extends BaseTestCase
              ->setMetadataMappers('metadata_schema', 'metadata_value', 'fk_reference')
              ->setUseCache(true);
 
-         $this->cacheFetchAllKey = 'fetchAll'.md5(var_export(false, true) . var_export(null, true) . var_export(null, true) . var_export(null, true) . var_export(null, true));
+         $this->cacheFetchAllKey = 'fetchAll'.md5(var_export(false, true)
+                 . var_export(false, true)
+                 . var_export(null, true)
+                 . var_export(null, true)
+                 . var_export(null, true)
+                 . var_export(null, true));
 
          // Grava no cache um fetchAll ficticio
          $fetchAll = [];

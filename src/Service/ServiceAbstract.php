@@ -1,4 +1,5 @@
 <?php
+
 namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
@@ -50,9 +51,9 @@ abstract class ServiceAbstract
     /**
      * Retorna o HTML de um <select> apra usar em formulários
      *
-     * @param string $nome        Name/ID a ser usado no <select>
+     * @param string $nome Name/ID a ser usado no <select>
      * @param string $selecionado Valor pré seleiconado
-     * @param string $opts        Opções adicionais
+     * @param string $opts Opções adicionais
      *
      * Os valores de option serão os valores dos campos definidos em $htmlSelectOption
      * Aos options serão adicionados data-* de acordo com os campos definidos em $htmlSelectOptionData
@@ -88,14 +89,14 @@ abstract class ServiceAbstract
 
         // Define ao placeholder a ser usado
         $placeholder = $selectPlaceholder = (isset($opts['placeholder'])) ? $opts['placeholder'] : '';
-        if (! empty($placeholder)) {
+        if (!empty($placeholder)) {
             $selectPlaceholder = "placeholder=\"$selectPlaceholder\"";
         }
 
         $grouped = (isset($opts['grouped'])) ? $opts['grouped'] : false;
 
         // Define a chave a ser usada
-        if (isset($opts['key']) && ! empty($opts['key']) && is_string($opts['key'])) {
+        if (isset($opts['key']) && !empty($opts['key']) && is_string($opts['key'])) {
             $key = $opts['key'];
         } else {
             $key = $this->getMapper()->getTableKey(true);
@@ -104,7 +105,7 @@ abstract class ServiceAbstract
         // Monta as opções
         $options = '';
         $group = false;
-        if (! empty($findAll)) {
+        if (!empty($findAll)) {
             foreach ($findAll as $row) {
                 preg_match_all('/\{([a-z_]*)\}/', $this->htmlSelectOption, $matches);
 
@@ -149,7 +150,7 @@ abstract class ServiceAbstract
         }
 
         // Verifica se tem valor padrão
-        if (! is_null($selecionado)) {
+        if (!is_null($selecionado)) {
             $temp = str_replace(
                 "<option value=\"$selecionado\"",
                 "<option value=\"$selecionado\" selected=\"selected\"",
@@ -165,7 +166,7 @@ abstract class ServiceAbstract
         $select = "<select class=\"form-control\" name=\"$nome\" id=\"$nome\" $selectPlaceholder>";
 
         // Verifica se tem valor padrão selecionado
-        if ((empty($selecionado) || $showEmpty) && ! $neverShowEmpty) {
+        if ((empty($selecionado) || $showEmpty) && !$neverShowEmpty) {
             $select .= "<option value=\"\">$placeholder</option>";
         }
 
@@ -180,71 +181,25 @@ abstract class ServiceAbstract
     }
 
     /**
-     *
-     * @param string $htmlSelectOption
-     *
-     * @return self
-     */
-    public function setHtmlSelectOption($htmlSelectOption)
-    {
-        $this->htmlSelectOption = $htmlSelectOption;
-        return $this;
-    }
-
-    /**
-     *
-     * @return string
-     */
-    public function getHtmlSelectOption()
-    {
-        return $this->htmlSelectOption;
-    }
-
-    /**
-     *
-     * @param array|string $htmlSelectOptionData
-     *
-     * @return self
-     */
-    public function setHtmlSelectOptionData($htmlSelectOptionData)
-    {
-        $this->htmlSelectOptionData = $htmlSelectOptionData;
-        return $this;
-    }
-
-    /**
-     *
-     * @return array|string
-     */
-    public function getHtmlSelectOptionData()
-    {
-        return $this->htmlSelectOptionData;
-    }
-
-    public function getUniqueCacheKey()
-    {
-        return str_replace('\\', '_', get_class($this));
-    }
-
-    /**
      * Retorna vários registros
      *
      * @param string|array $where OPTIONAL An SQL WHERE clause
      * @param string|array $order OPTIONAL An SQL ORDER clause.
-     * @param int          $count OPTIONAL An SQL LIMIT count.
-     * @param int          $offset OPTIONAL An SQL LIMIT offset.
+     * @param int $count OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return ArrayObject[] | null
      */
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAll'.$this->getUniqueCacheKey()
-            .md5(
+        $cacheKey = 'findAll' . $this->getUniqueCacheKey()
+            . md5(
                 var_export($where, true)
                 . var_export($order, true)
                 . var_export($count, true)
                 . var_export($offset, true)
+                . var_export($this->getMapper()->getUseJoin(), true)
                 . var_export($this->getMapper()->getShowDeleted(), true)
             );
 
@@ -263,6 +218,158 @@ abstract class ServiceAbstract
         return $findAll;
     }
 
+    public function getUniqueCacheKey()
+    {
+        return str_replace('\\', '_', get_class($this));
+    }
+
+    /**
+     * @return MapperAbstract
+     * @throws \Exception
+     */
+    public function getMapper()
+    {
+        if (!isset($this->mapper)) {
+            if (!isset($this->mapperClass)) {
+                throw new \Exception('Mapper class not defined at ' . get_class($this));
+            }
+            $this->mapper = new $this->mapperClass();
+            $this->mapper->setCache($this->getCache());
+            if ($this->hasServiceLocator()) {
+                $this->mapper->setServiceLocator($this->getServiceLocator());
+            }
+        }
+
+        return $this->mapper;
+    }
+
+    /**
+     * @param MapperAbstract|string $mapper
+     * @return $this
+     * @throws \Exception
+     */
+    public function setMapper($mapper)
+    {
+        if (is_string($mapper)) {
+            $this->mapperClass = $mapper;
+            $this->mapper = null;
+        } elseif ($mapper instanceof MapperAbstract) {
+            $this->mapper = $mapper;
+            $this->mapperClass = get_class($mapper);
+        } else {
+            throw new \Exception('Mapper invalido em ' . get_class($this) . '::setMapper()');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Configura o cache
+     *
+     * @return \Zend\Cache\Storage\Adapter\Filesystem
+     */
+    public function getCache()
+    {
+        if (!isset($this->cache)) {
+            $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
+        }
+
+        return $this->cache;
+    }
+
+    public function setCache($cache)
+    {
+        $this->cache = $cache;
+        return $this;
+    }
+
+    public function hasServiceLocator()
+    {
+        return null !== $this->serviceLocator;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
+
+    /**
+     * @param ContainerInterface $serviceLocator
+     * @return ServiceAbstract
+     */
+    public function setServiceLocator(ContainerInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+
+        return $this;
+    }
+
+    /**
+     * Retorna se deve usar o cache
+     * @return boolean
+     */
+    public function getUseCache()
+    {
+        return $this->useCache;
+    }
+
+    /**
+     * Define se deve usar o cache
+     * @param boolean $useCache
+     * @return ServiceAbstract
+     */
+    public function setUseCache($useCache)
+    {
+        $this->useCache = $useCache;
+        $this->getMapper()->setUseCache($useCache);
+        return $this;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getHtmlSelectOption()
+    {
+        return $this->htmlSelectOption;
+    }
+
+    /**
+     *
+     * @param string $htmlSelectOption
+     *
+     * @return self
+     */
+    public function setHtmlSelectOption($htmlSelectOption)
+    {
+        $this->htmlSelectOption = $htmlSelectOption;
+        return $this;
+    }
+
+    /**
+     *
+     * @return array|string
+     */
+    public function getHtmlSelectOptionData()
+    {
+        return $this->htmlSelectOptionData;
+    }
+
+    /**
+     *
+     * @param array|string $htmlSelectOptionData
+     *
+     * @return self
+     */
+    public function setHtmlSelectOptionData($htmlSelectOptionData)
+    {
+        $this->htmlSelectOptionData = $htmlSelectOptionData;
+        return $this;
+    }
+
     /**
      * Retorna um registro
      *
@@ -274,9 +381,10 @@ abstract class ServiceAbstract
     {
         // Cria a assinatura da consulta
         $cacheKey = 'findOne'
-            .md5(
+            . md5(
                 var_export($where, true)
                 . var_export($order, true)
+                . var_export($this->getMapper()->getUseJoin(), true)
                 . var_export($this->getMapper()->getShowDeleted(), true)
             );
 
@@ -296,6 +404,21 @@ abstract class ServiceAbstract
     }
 
     /**
+     * Consultas especiais do service
+     *
+     * @param array $where
+     * @return array
+     */
+    public function getWhere($where)
+    {
+        return $where;
+    }
+
+    /**
+     * CONTROLE DE CACHE
+     */
+
+    /**
      * Retorna vários registros associados pela chave
      *
      * @param string|array oUsuario OPTIONAL An SQL WHERE clause
@@ -309,11 +432,12 @@ abstract class ServiceAbstract
     {
         // Cria a assinatura da consulta
         $cacheKey = 'findAssoc'
-            .md5(
+            . md5(
                 var_export($where, true)
                 . var_export($order, true)
                 . var_export($count, true)
                 . var_export($offset, true)
+                . var_export($this->getMapper()->getUseJoin(), true)
                 . var_export($this->getMapper()->getShowDeleted(), true)
             );
 
@@ -324,7 +448,7 @@ abstract class ServiceAbstract
 
         $fetchAll = $this->getMapper()->fetchAll($this->getWhere($where), $order, $count, $offset);
         $findAssoc = [];
-        if (! empty($fetchAll)) {
+        if (!empty($fetchAll)) {
             foreach ($fetchAll as $row) {
                 $findAssoc[$row[$this->getMapper()->getTableKey(true)]] = $row;
             }
@@ -341,10 +465,10 @@ abstract class ServiceAbstract
     /**
      * Retorna a consulta paginada
      *
-     * @param string|array $where  OPTIONAL An SQL WHERE clause
-     * @param string|array $order  OPTIONAL An SQL ORDER clause.
-     * @param int          $count  OPTIONAL An SQL LIMIT count.
-     * @param int          $offset OPTIONAL An SQL LIMIT offset.
+     * @param string|array $where OPTIONAL An SQL WHERE clause
+     * @param string|array $order OPTIONAL An SQL ORDER clause.
+     * @param int $count OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return \Zend\Paginator\Paginator
      */
@@ -360,7 +484,7 @@ abstract class ServiceAbstract
 
         // Verifica se deve usar o cache
         $cacheKey = 'findPaginated'
-                  .md5($select->getSqlString($this->getMapper()->getTableGateway()->getAdapter()->getPlatform()));
+            . md5($select->getSqlString($this->getMapper()->getTableGateway()->getAdapter()->getPlatform()));
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -369,7 +493,7 @@ abstract class ServiceAbstract
 
         $paginator = new HydratorPagination($select, $this->getMapper()->getTableGateway()->getAdapter());
         $paginator->setHydrator($this->getMapper()->getHydrator())
-                  ->setHydratorEntity($this->getMapper()->getHydratorEntity());
+            ->setHydratorEntity($this->getMapper()->getHydratorEntity());
         $findPaginated = new \Zend\Paginator\Paginator($paginator);
 
         // Verifica se deve usar o cache
@@ -386,14 +510,15 @@ abstract class ServiceAbstract
     }
 
     /**
-     * Consultas especiais do service
-     *
-     * @param array $where
-     * @return array
+     * @return PaginatorOptions
      */
-    public function getWhere($where)
+    public function getPaginatorOptions()
     {
-        return $where;
+        if (!isset($this->paginatorOptions)) {
+            $this->paginatorOptions = new PaginatorOptions();
+        }
+
+        return $this->paginatorOptions;
     }
 
     /**
@@ -411,7 +536,7 @@ abstract class ServiceAbstract
     /**
      * Altera um registro
      *
-     * @param  array     $set Dados do registro
+     * @param  array $set Dados do registro
      * @param  int|array $key Chave do regsitro a ser alterado
      *
      * @return int Quantidade de registro alterados
@@ -419,46 +544,6 @@ abstract class ServiceAbstract
     public function update($set, $key)
     {
         return $this->getMapper()->update($set, $key);
-    }
-
-    /**
-     * @param MapperAbstract|string $mapper
-     * @return $this
-     * @throws \Exception
-     */
-    public function setMapper($mapper)
-    {
-        if (is_string($mapper)) {
-            $this->mapperClass = $mapper;
-            $this->mapper      = null;
-        } elseif ($mapper instanceof MapperAbstract) {
-            $this->mapper      = $mapper;
-            $this->mapperClass = get_class($mapper);
-        } else {
-            throw new \Exception('Mapper invalido em ' . get_class($this) . '::setMapper()');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return MapperAbstract
-     * @throws \Exception
-     */
-    public function getMapper()
-    {
-        if (! isset($this->mapper)) {
-            if (! isset($this->mapperClass)) {
-                throw new \Exception('Mapper class not defined at ' . get_class($this));
-            }
-            $this->mapper = new $this->mapperClass();
-            $this->mapper->setCache($this->getCache());
-            if ($this->hasServiceLocator()) {
-                $this->mapper->setServiceLocator($this->getServiceLocator());
-            }
-        }
-
-        return $this->mapper;
     }
 
     /**
@@ -477,63 +562,6 @@ abstract class ServiceAbstract
     {
         $this->getMapper()->setUseJoin($useJoin);
         return $this;
-    }
-
-    /**
-     * @return PaginatorOptions
-     */
-    public function getPaginatorOptions()
-    {
-        if (! isset($this->paginatorOptions)) {
-            $this->paginatorOptions = new PaginatorOptions();
-        }
-
-        return $this->paginatorOptions;
-    }
-
-    /**
-     * CONTROLE DE CACHE
-     */
-
-    /**
-     * Configura o cache
-     *
-     * @return \Zend\Cache\Storage\Adapter\Filesystem
-     */
-    public function getCache()
-    {
-        if (! isset($this->cache)) {
-            $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
-        }
-
-        return $this->cache;
-    }
-
-    public function setCache($cache)
-    {
-        $this->cache = $cache;
-        return $this;
-    }
-
-    /**
-     * Define se deve usar o cache
-     * @param boolean $useCache
-     * @return ServiceAbstract
-     */
-    public function setUseCache($useCache)
-    {
-        $this->useCache = $useCache;
-        $this->getMapper()->setUseCache($useCache);
-        return $this;
-    }
-
-    /**
-     * Retorna se deve usar o cache
-     * @return boolean
-     */
-    public function getUseCache()
-    {
-        return $this->useCache;
     }
 
     /**
@@ -567,37 +595,13 @@ abstract class ServiceAbstract
         return $this;
     }
 
-    /**
-     * @return ContainerInterface
-     */
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
-    }
-
-    /**
-     * @param ContainerInterface $serviceLocator
-     * @return ServiceAbstract
-     */
-    public function setServiceLocator(ContainerInterface $serviceLocator)
-    {
-        $this->serviceLocator = $serviceLocator;
-
-        return $this;
-    }
-
-    public function hasServiceLocator()
-    {
-        return null !== $this->serviceLocator;
-    }
-
     public function getFromServiceLocator($class)
     {
-        if (! $this->hasServiceLocator()) {
+        if (!$this->hasServiceLocator()) {
             return null;
         }
 
-        if (! $this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
+        if (!$this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
             $newService = new $class();
             if (method_exists($newService, 'setServiceLocator')) {
                 $newService->setServiceLocator($this->getServiceLocator());
