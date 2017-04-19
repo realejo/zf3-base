@@ -87,7 +87,19 @@ class GetInputFilter extends AbstractHelper
                         $messages = $validator['instance']->getMessageTemplates();
                         $result[$element->getName()]['validators']['date']['message'] = $this->getTranslator()->translate($messages[Date::FALSEFORMAT]);
                         $result[$element->getName()]['validators']['date']['message'] = str_replace('%format%', $validator['instance']->getFormat(), $result[$element->getName()]['validators']['date']['message']);
-                        $result[$element->getName()]['validators']['date']['format'] = 'DD/MM/YYYY';
+                        if ($validator['instance']->getFormat() == 'd/m/Y') {
+                            $result[$element->getName()]['validators']['date']['format'] = 'DD/MM/YYYY';
+                        } elseif ($validator['instance']->getFormat() == 'd/m/Y H:i:s') {
+                            $result[$element->getName()]['validators']['date']['format'] = 'DD/MM/YYYY h:m:s';
+                        } elseif ($validator['instance']->getFormat() == 'd/m/Y H:i') {
+                            $result[$element->getName()]['validators']['date']['format'] = 'DD/MM/YYYY h:m';
+                        } elseif ($validator['instance']->getFormat() == 'Y-m-d') {
+                            $result[$element->getName()]['validators']['date']['format'] = 'YYYY/MM/DD';
+                        } elseif ($validator['instance']->getFormat() == 'Y-m-d H:i:s') {
+                            $result[$element->getName()]['validators']['date']['format'] = 'YYYY/MM/DD h:m:s';
+                        } else {
+                            throw new \RuntimeException('Não foi possível mapear o formato de data '.$validator['instance']->getFormat(). ' para o JS');
+                        }
                         break;
                     case $validator['instance'] instanceof EmailAddress:
                         $messages = $validator['instance']->getMessageTemplates();
