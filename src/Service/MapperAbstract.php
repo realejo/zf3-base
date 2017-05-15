@@ -119,21 +119,6 @@ abstract class MapperAbstract
         }
     }
 
-    public function get($id)
-    {
-        // TODO: Implement get() method.
-    }
-
-    public function has($id)
-    {
-        // TODO: Implement has() method.
-    }
-
-    public function build($name, array $options = null)
-    {
-        // TODO: Implement build() method.
-    }
-
     /**
      * Excluí um registro
      *
@@ -196,7 +181,7 @@ abstract class MapperAbstract
     /**
      * @param string|array
      *
-     * @return self
+     * @return MapperAbstract
      */
     public function setTableKey($key)
     {
@@ -800,6 +785,8 @@ abstract class MapperAbstract
                     && !is_string($tableJoinLeft['schema'])
                 ) {
                     throw new \InvalidArgumentException('Schema devem ser uma string em ' . get_class($this));
+                } elseif (isset($tableJoinLeft['schema'])) {
+                    $tableJoinLeft['schema'] = null;
                 }
 
                 $select->join(
