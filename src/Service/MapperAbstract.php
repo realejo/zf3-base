@@ -785,7 +785,7 @@ abstract class MapperAbstract
                     && !is_string($tableJoinLeft['schema'])
                 ) {
                     throw new \InvalidArgumentException('Schema devem ser uma string em ' . get_class($this));
-                } elseif (isset($tableJoinLeft['schema'])) {
+                } elseif (!isset($tableJoinLeft['schema'])) {
                     $tableJoinLeft['schema'] = null;
                 }
 
