@@ -307,7 +307,7 @@ abstract class MapperAbstract
 
                 $usedKeys[] = $definedKey;
             } // Verifica se a chave definida foi informada
-            elseif (is_array($key) && isset($key[$definedKey])) {
+            elseif (is_array($key) && !is_array($definedKey) && isset($key[$definedKey])) {
                 // Grava a chave como integer
                 if (is_numeric($type) || $type === self::KEY_INTEGER) {
                     $where[] = "$definedKey = {$key[$definedKey]}";
@@ -319,7 +319,22 @@ abstract class MapperAbstract
 
                 // Marca a chave com usada
                 $usedKeys[] = $definedKey;
+            } elseif (is_array($key) && is_array($definedKey)) {
+                foreach ($definedKey as $value) {
+                    // Grava a chave como integer
+                    if (is_numeric($value) || $type === self::KEY_INTEGER) {
+                        $where[] = "$value = {$key[$value]}";
+
+                        // Grava a chave como string
+                    } elseif ($type === self::KEY_STRING) {
+                        $where[] = "$value = '{$key[$value]}'";
+                    }
+                }
+
+                // Marca a chave com usada
+                $usedKeys[] = $definedKey;
             }
+
         }
 
         // Verifica se alguma chave foi definida
@@ -487,12 +502,25 @@ abstract class MapperAbstract
         if (is_array($this->getTableKey())) {
             $rightKeys = $this->getTableKey();
             $key = [];
-            foreach ($rightKeys as $k) {
-                if (isset($set[$k])) {
-                    $key[$k] = $set[$k];
+            foreach ($rightKeys as $type => $k) {
+                if (is_array($k)) {
+                    foreach ($k as $value) {
+                        // Grava a chave como integer
+                        if (is_numeric($value) || $type === self::KEY_INTEGER) {
+                            $key[$value] = $set[$value];
+
+                            // Grava a chave como string
+                        } elseif ($type === self::KEY_STRING) {
+                            $key[$value] = $set[$value];
+                        }
+                    }
                 } else {
-                    $key = false;
-                    break;
+                    if (isset($set[$k])) {
+                        $key[$k] = $set[$k];
+                    } else {
+                        $key = false;
+                        break;
+                    }
                 }
             }
         } elseif (isset($set[$this->getTableKey()])) {
@@ -914,7 +942,7 @@ abstract class MapperAbstract
      * Altera um registro
      *
      * @param array $set Dados a serem atualizados
-     * @param int $key Chave do registro a ser alterado
+     * @param int|array $key Chave do registro a ser alterado
      *
      * @return boolean
      */

@@ -934,6 +934,20 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Acesso de chave multiplica com acesso simples
      *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDeleteInvalidArrayMultiKey()
+    {
+        $this->Mapper->setTableKey([
+            MapperAbstract::KEY_INTEGER => 'id_int',
+            MapperAbstract::KEY_STRING => ['id_char', 'id_char2']
+        ]);
+        $this->Mapper->delete('A');
+    }
+
+    /**
+     * Acesso de chave multiplica com acesso simples
+     *
      * @expectedException \LogicException
      */
     public function testDeleteInvalidArraySingleKey()
@@ -1025,5 +1039,56 @@ class MapperAbstractTest extends BaseTestCase
         // Verifica se ele foi removido
         $this->assertNull($this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]), 'row1 não existe v4');
         $this->assertNotEmpty($this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]), 'row2 ainda existe v4');
+    }
+
+    /**
+     * Tests TableAdapter->update()
+     */
+    public function testUpdateArrayKey()
+    {
+        // Cria a tabela com chave string
+        $this->Mapper->setTableKey([
+            MapperConcrete::KEY_INTEGER => 'id_int',
+            MapperConcrete::KEY_STRING => ['id_char', 'artist']
+        ]);
+        $this->dropTables()->createTables(['album_array_two']);
+        $this->Mapper->setUseAllKeys(true);
+        $this->Mapper->setOrder(['id_int','id_char', 'artist']);
+
+        // Abaixo é igual ao testDelete trocando 1, 2 por A, B
+        $row1 = [
+            'id_int' => 1,
+            'id_char' => 'A',
+            'artist' => 'Rush',
+            'title' => 'Presto',
+            'deleted' => 0
+        ];
+        $row2 = [
+            'id_int' => 2,
+            'id_char' => 'B',
+            'artist'  => 'Rush',
+            'title'   => 'Moving Pictures',
+            'deleted' => 0
+        ];
+
+        $this->Mapper->insert($row1);
+        $this->Mapper->insert($row2);
+
+        // Verifica se o registro existe
+        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist'=>'Rush']);
+        $this->assertInstanceOf(ArrayObject::class, $row);
+        $this->assertEquals($row1, $row->toArray(), 'row1 existe');
+        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2, 'artist'=>'Rush']);
+        $this->assertInstanceOf(ArrayObject::class, $row);
+        $this->assertEquals($row2, $row->toArray(), 'row2 existe');
+
+
+        // atualizar o registro
+        $this->Mapper->update(['title' => 'New title'], ['id_char' => 'A', 'id_int' =>1, 'artist'=>'Rush']);
+
+        // Verifica se foi removido
+        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist'=>'Rush']);
+        $this->assertInstanceOf(ArrayObject::class, $row);
+        $this->assertEquals('New title', $row['title'], 'row1 atualizado ');
     }
 }
