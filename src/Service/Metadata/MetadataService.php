@@ -74,8 +74,8 @@ class MetadataService extends ServiceAbstract
                 continue;
             }
 
-            // Determina a consulta de acordo com o tipo
-            switch ($schema[$id]['tipo']) {
+            // Determina a consulta de acordo com o type
+            switch ($schema[$id]['type']) {
                 case self::TEXT:
                     $cast = 'STRING';
                     $field = 'value_text';
@@ -217,8 +217,11 @@ class MetadataService extends ServiceAbstract
         }
 
         $schema = $this->getSchema();
-        $getValues = [];
+        if (null === $schema) {
+            return $fetchAll;
+        }
 
+        $getValues = [];
         if (! empty($fetchAll)) {
             foreach ($fetchAll as $row) {
                 $getValues[$schema[$row['fk_info']]['nick']] = $this->getCurrentValue($schema[$row['fk_info']], $row);
@@ -361,21 +364,21 @@ class MetadataService extends ServiceAbstract
             return null;
         }
 
-        if ($schema['tipo'] == self::BOOLEAN) {
+        if ($schema['type'] == self::BOOLEAN) {
             if ($value === null || $value === '') {
                 return null;
             }
             return ($value) ? 1 : 0;
         }
 
-        if ($schema['tipo'] == self::INTEGER) {
+        if ($schema['type'] == self::INTEGER) {
             if ($value === null || $value === '') {
                 return null;
             }
             return (int) $value;
         }
 
-        if ($schema['tipo'] == self::DECIMAL) {
+        if ($schema['type'] == self::DECIMAL) {
             if ($value === null || $value === '') {
                 return null;
             }
@@ -386,14 +389,14 @@ class MetadataService extends ServiceAbstract
             return $value;
         }
 
-        if ($schema['tipo'] == self::TEXT) {
+        if ($schema['type'] == self::TEXT) {
             if ($value === null || $value === '') {
                 return null;
             }
             return $value;
         }
 
-        if ($schema['tipo'] == self::DATE) {
+        if ($schema['type'] == self::DATE) {
             // Remove qualquer hora se houver
             $value = explode(' ', $value);
             $value = array_shift($value);
@@ -402,11 +405,11 @@ class MetadataService extends ServiceAbstract
             }
         }
 
-        if ($schema['tipo'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y H:i:s', $value)) {
+        if ($schema['type'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y H:i:s', $value)) {
             return \DateTime::createFromFormat('d/m/Y H:i:s', $value)->format('Y-m-d H:i:s');
         }
 
-        if ($schema['tipo'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y', $value)) {
+        if ($schema['type'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y', $value)) {
             return \DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d 00:00:00');
         }
 
@@ -415,23 +418,23 @@ class MetadataService extends ServiceAbstract
 
     protected function getCorrectSetKey($schema)
     {
-        if ($schema['tipo'] == self::INTEGER) {
+        if ($schema['type'] == self::INTEGER) {
             return 'value_integer';
         }
 
-        if ($schema['tipo'] == self::BOOLEAN) {
+        if ($schema['type'] == self::BOOLEAN) {
             return 'value_boolean';
         }
 
-        if ($schema['tipo'] == self::DATE) {
+        if ($schema['type'] == self::DATE) {
             return 'value_date';
         }
 
-        if ($schema['tipo'] == self::DATETIME) {
+        if ($schema['type'] == self::DATETIME) {
             return 'value_datetime';
         }
 
-        if ($schema['tipo'] == self::DECIMAL) {
+        if ($schema['type'] == self::DECIMAL) {
             return 'value_decimal';
         }
 
@@ -440,27 +443,27 @@ class MetadataService extends ServiceAbstract
 
     protected function getCurrentValue($schema, $value)
     {
-        if ($schema['tipo'] == self::TEXT) {
+        if ($schema['type'] == self::TEXT) {
             return $value['value_text'];
         }
 
-        if ($schema['tipo'] == self::INTEGER) {
+        if ($schema['type'] == self::INTEGER) {
             return $value['value_integer'];
         }
 
-        if ($schema['tipo'] == self::BOOLEAN) {
+        if ($schema['type'] == self::BOOLEAN) {
             return $value['value_boolean'];
         }
 
-        if ($schema['tipo'] == self::DATE) {
+        if ($schema['type'] == self::DATE) {
             return $value['value_date'];
         }
 
-        if ($schema['tipo'] == self::DATETIME) {
+        if ($schema['type'] == self::DATETIME) {
             return $value['value_datetime'];
         }
 
-        if ($schema['tipo'] == self::DECIMAL) {
+        if ($schema['type'] == self::DECIMAL) {
             return $value['value_decimal'];
         }
 
@@ -522,6 +525,10 @@ class MetadataService extends ServiceAbstract
         if (is_string($this->mapperSchema)) {
             $this->mapperSchema = new MetadataMapper($this->mapperSchema, 'fk_info');
             $this->mapperSchema->setCache($this->getCache());
+
+            if ($this->hasServiceLocator()) {
+                $this->mapperSchema->setServiceLocator($this->getServiceLocator());
+            }
         }
 
         return $this->mapperSchema;
@@ -532,6 +539,10 @@ class MetadataService extends ServiceAbstract
         if (is_string($this->mapperValue)) {
             $this->mapperValue = new MetadataMapper($this->mapperValue, ['fk_info', $this->referenceKey]);
             $this->mapperValue->setCache($this->getCache());
+
+            if ($this->hasServiceLocator()) {
+                $this->mapperValue->setServiceLocator($this->getServiceLocator());
+            }
         }
 
         return $this->mapperValue;

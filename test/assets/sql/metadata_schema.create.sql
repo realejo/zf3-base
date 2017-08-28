@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS  `metadata_schema` (
   `id_info` tinyint(1) unsigned NOT NULL AUTO_INCREMENT,
-  `nome` varchar(45) NOT NULL,
+  `name` varchar(45) NOT NULL,
   `nick` varchar(30) NOT NULL,
-  `descricao` varchar(255) DEFAULT NULL,
-  `ativo` tinyint(1) NOT NULL DEFAULT '0',
-  `ordem` tinyint(3) NOT NULL DEFAULT '0',
-  `tipo` char(1) NOT NULL DEFAULT 'T',
-  `obrigatorio` tinyint(1) NOT NULL DEFAULT '0',
+  `description` varchar(255) DEFAULT NULL,
+  `available` tinyint(1) NOT NULL DEFAULT '0',
+  `order` tinyint(3) NOT NULL DEFAULT '0',
+  `type` char(1) NOT NULL DEFAULT 'T',
+  `required` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_info`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

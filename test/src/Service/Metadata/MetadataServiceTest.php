@@ -22,33 +22,33 @@ class MetadataServiceTest extends BaseTestCase
     private $schema = [
         [
             'id_info' => 123,
-            'tipo' => MetadataService::BOOLEAN,
+            'type' => MetadataService::BOOLEAN,
             'nick' => 'bool'
         ],
         [
             'id_info' => 321,
-            'tipo' => MetadataService::DATE,
+            'type' => MetadataService::DATE,
             'nick' => 'date'
         ],
         [
             'id_info' => 159,
-            'tipo' => MetadataService::DATETIME,
+            'type' => MetadataService::DATETIME,
             'nick' => 'datetime'
         ],
         [
             'id_info' => 753,
-            'tipo' => MetadataService::DECIMAL,
+            'type' => MetadataService::DECIMAL,
             'nick' => 'decimal'
         ],
         [
             'id_info' => 78,
-            'tipo' => MetadataService::INTEGER,
+            'type' => MetadataService::INTEGER,
             'nick' => 'integer'
         ]
         ,
         [
             'id_info' => 456,
-            'tipo' => MetadataService::TEXT,
+            'type' => MetadataService::TEXT,
             'nick' => 'text'
         ]
     ];
@@ -146,12 +146,12 @@ class MetadataServiceTest extends BaseTestCase
         $method = $reflection->getMethod('getCorrectSetKey');
         $method->setAccessible(true);
 
-        $this->assertEquals('value_boolean', $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN]]));
-        $this->assertEquals('value_date', $method->invokeArgs($service, [['tipo' => MetadataService::DATE]]));
-        $this->assertEquals('value_datetime', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME]]));
-        $this->assertEquals('value_decimal', $method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL]]));
-        $this->assertEquals('value_integer', $method->invokeArgs($service, [['tipo' => MetadataService::INTEGER]]));
-        $this->assertEquals('value_text', $method->invokeArgs($service, [['tipo' => MetadataService::TEXT]]));
+        $this->assertEquals('value_boolean', $method->invokeArgs($service, [['type' => MetadataService::BOOLEAN]]));
+        $this->assertEquals('value_date', $method->invokeArgs($service, [['type' => MetadataService::DATE]]));
+        $this->assertEquals('value_datetime', $method->invokeArgs($service, [['type' => MetadataService::DATETIME]]));
+        $this->assertEquals('value_decimal', $method->invokeArgs($service, [['type' => MetadataService::DECIMAL]]));
+        $this->assertEquals('value_integer', $method->invokeArgs($service, [['type' => MetadataService::INTEGER]]));
+        $this->assertEquals('value_text', $method->invokeArgs($service, [['type' => MetadataService::TEXT]]));
     }
 
     /**
@@ -164,32 +164,32 @@ class MetadataServiceTest extends BaseTestCase
         $method = $reflection->getMethod('getCorrectSetValue');
         $method->setAccessible(true);
 
-        $this->assertEquals(1, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], 1]));
-        $this->assertEquals(1, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], true]));
-        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], 0]));
-        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], false]));
+        $this->assertEquals(1, $method->invokeArgs($service, [['type' => MetadataService::BOOLEAN], 1]));
+        $this->assertEquals(1, $method->invokeArgs($service, [['type' => MetadataService::BOOLEAN], true]));
+        $this->assertEquals(0, $method->invokeArgs($service, [['type' => MetadataService::BOOLEAN], 0]));
+        $this->assertEquals(0, $method->invokeArgs($service, [['type' => MetadataService::BOOLEAN], false]));
 
-        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], null]));
-        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::BOOLEAN], '']));
+        $this->assertNull($method->invokeArgs($service, [['type' => MetadataService::BOOLEAN], null]));
+        $this->assertEquals(0, $method->invokeArgs($service, [['type' => MetadataService::BOOLEAN], '']));
 
-        $this->assertEquals('2016-12-10', $method->invokeArgs($service, [['tipo' => MetadataService::DATE], '10/12/2016']));
-        $this->assertEquals('2016-12-10', $method->invokeArgs($service, [['tipo' => MetadataService::DATE], '10/12/2016 14:25:24']));
-        $this->assertEquals('0', $method->invokeArgs($service, [['tipo' => MetadataService::DATE], '0']));
-        $this->assertNull(null, $method->invokeArgs($service, [['tipo' => MetadataService::DATE], null]));
+        $this->assertEquals('2016-12-10', $method->invokeArgs($service, [['type' => MetadataService::DATE], '10/12/2016']));
+        $this->assertEquals('2016-12-10', $method->invokeArgs($service, [['type' => MetadataService::DATE], '10/12/2016 14:25:24']));
+        $this->assertEquals('0', $method->invokeArgs($service, [['type' => MetadataService::DATE], '0']));
+        $this->assertNull(null, $method->invokeArgs($service, [['type' => MetadataService::DATE], null]));
 
-        $this->assertEquals('value_datetime', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME], 'value_datetime']));
-        $this->assertEquals('2016-12-10 00:00:00', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME], '10/12/2016']));
-        $this->assertEquals('2016-12-10 13:13:12', $method->invokeArgs($service, [['tipo' => MetadataService::DATETIME], '10/12/2016 13:13:12']));
+        $this->assertEquals('value_datetime', $method->invokeArgs($service, [['type' => MetadataService::DATETIME], 'value_datetime']));
+        $this->assertEquals('2016-12-10 00:00:00', $method->invokeArgs($service, [['type' => MetadataService::DATETIME], '10/12/2016']));
+        $this->assertEquals('2016-12-10 13:13:12', $method->invokeArgs($service, [['type' => MetadataService::DATETIME], '10/12/2016 13:13:12']));
 
-        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL], 'value_decimal']));
-        $this->assertEquals('0', $method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL], 'value_decimal']));
-        $this->assertEquals(0, $method->invokeArgs($service, [['tipo' => MetadataService::INTEGER], 'value_integer']));
-        $this->assertEquals('0', $method->invokeArgs($service, [['tipo' => MetadataService::INTEGER], 'value_integer']));
-        $this->assertEquals('value_text', $method->invokeArgs($service, [['tipo' => MetadataService::TEXT], 'value_text']));
+        $this->assertEquals(0, $method->invokeArgs($service, [['type' => MetadataService::DECIMAL], 'value_decimal']));
+        $this->assertEquals('0', $method->invokeArgs($service, [['type' => MetadataService::DECIMAL], 'value_decimal']));
+        $this->assertEquals(0, $method->invokeArgs($service, [['type' => MetadataService::INTEGER], 'value_integer']));
+        $this->assertEquals('0', $method->invokeArgs($service, [['type' => MetadataService::INTEGER], 'value_integer']));
+        $this->assertEquals('value_text', $method->invokeArgs($service, [['type' => MetadataService::TEXT], 'value_text']));
 
-        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::DECIMAL], null]));
-        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::INTEGER], null]));
-        $this->assertNull($method->invokeArgs($service, [['tipo' => MetadataService::TEXT], null]));
+        $this->assertNull($method->invokeArgs($service, [['type' => MetadataService::DECIMAL], null]));
+        $this->assertNull($method->invokeArgs($service, [['type' => MetadataService::INTEGER], null]));
+        $this->assertNull($method->invokeArgs($service, [['type' => MetadataService::TEXT], null]));
     }
 
     /**
@@ -376,17 +376,17 @@ class MetadataServiceTest extends BaseTestCase
 
         /*  array(
          'cd_info' => 321,
-         'tipo' => MetadataService::DATE,
+         'type' => MetadataService::DATE,
          'nick' => 'date'
          ),
          array(
          'cd_info' => 159,
-         'tipo' => MetadataService::DATETIME,
+         'type' => MetadataService::DATETIME,
          'nick' => 'datetime'
          ),
          array(
          'cd_info' => 753,
-         'tipo' => MetadataService::DECIMAL,
+         'type' => MetadataService::DECIMAL,
          'nick' => 'decimal'
          ),
          ) */
