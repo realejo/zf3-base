@@ -773,7 +773,12 @@ abstract class MapperAbstract
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
                 }
-                $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
+                
+                if (is_null($w)){
+                    $select->where(new \Zend\Db\Sql\Predicate\IsNull($id));
+                } else {
+                    $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
+                }
             } else {
                 throw new \LogicException("Condição inválida '$w' em " . get_class($this));
             }

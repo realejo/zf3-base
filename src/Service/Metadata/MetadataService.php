@@ -41,6 +41,9 @@ class MetadataService extends ServiceAbstract
         }
 
         $schema = $this->getSchemaByKeyNames();
+        if (empty($schema)) {
+            return parent::getWhere($where);
+        }
 
         // Verifica se tem a chave de metadata
         $metadata  = [];
