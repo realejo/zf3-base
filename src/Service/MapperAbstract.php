@@ -814,21 +814,17 @@ abstract class MapperAbstract
                     throw new \InvalidArgumentException('Colunas devem ser um array em ' . get_class($this));
                 }
 
-                if ((isset($tableJoinLeft['schema'])
-                        && !empty($tableJoinLeft['schema'])
-                        && !is_string($tableJoinLeft['schema']))
-                    ||
-                    (isset($tableJoinLeft['type'])
-                        && !empty($tableJoinLeft['type'])
-                        && !is_string($tableJoinLeft['type']))
-                ) {
-                    throw new \InvalidArgumentException('Type/Schema devem ser uma string');
-
-                } elseif (!isset($tableJoinLeft['schema']) && !isset($tableJoinLeft['type'])) {
-                    $tableJoinLeft['type'] = null;
-
-                } elseif (isset($tableJoinLeft['schema']) && !isset($tableJoinLeft['type'])) {
+                if (array_key_exists('schema', $tableJoinLeft)) {
+                    //trigger_error('Schema não pode ser usado. Use type.', E_USER_DEPRECATED );
                     $tableJoinLeft['type'] = $tableJoinLeft['schema'];
+                }
+
+                if (isset($tableJoinLeft['type']) && !empty($tableJoinLeft['type'])
+                    && !is_string($tableJoinLeft['type'])
+                ) {
+                    throw new \InvalidArgumentException('Type devem ser uma string em ' . get_class($this));
+                } elseif (!isset($tableJoinLeft['type'])) {
+                    $tableJoinLeft['type'] = null;
                 }
 
                 $select->join(
