@@ -205,8 +205,8 @@ class MetadataServiceTest extends BaseTestCase
         $this->assertEquals('schemaTable', $service->getMapperSchema()->getTableName());
         $this->assertInstanceOf(MetadataMapper::class, $service->getMapperValue());
         $this->assertEquals('valuesTable', $service->getMapperValue()->getTableName());
-        $this->assertEquals(['fk_info', 'foreignKeyName'], $service->getMapperValue()->getTableKey());
-        $this->assertEquals('fk_info', $service->getMapperValue()->getTableKey(true));
+        $this->assertEquals(['id_info', 'foreignKeyName'], $service->getMapperValue()->getTableKey());
+        $this->assertEquals('id_info', $service->getMapperValue()->getTableKey(true));
     }
 
     public function testCache()

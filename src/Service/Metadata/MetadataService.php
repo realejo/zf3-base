@@ -288,7 +288,7 @@ class MetadataService extends ServiceAbstract
             // $currentValues pode ser vazio quando o PDV for novo
             if (! empty($currentValues) && array_key_exists($schema['nick'], $currentValues)) {
                 $whereKey = [
-                    'fk_info' => $schema['fk_info'],
+                    'fk_info' => $schema['id_info'],
                     $this->referenceKey => $foreignKey
                 ];
                 if ($setMetadataValue !== $currentValues[$schema['nick']]) {
@@ -308,7 +308,7 @@ class MetadataService extends ServiceAbstract
             } elseif (! is_null($setMetadataValue)) {
                 $this->getMapperValue()
                      ->insert([
-                         'fk_info'           => $schema['fk_info'],
+                         'fk_info'           => $schema['id_info'],
                          $this->referenceKey => $foreignKey,
                          $setMetadataKey     => $setMetadataValue
                      ]);
@@ -526,7 +526,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperSchema()
     {
         if (is_string($this->mapperSchema)) {
-            $this->mapperSchema = new MetadataMapper($this->mapperSchema, 'fk_info');
+            $this->mapperSchema = new MetadataMapper($this->mapperSchema, 'id_info');
             $this->mapperSchema->setCache($this->getCache());
 
             if ($this->hasServiceLocator()) {
@@ -540,7 +540,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperValue()
     {
         if (is_string($this->mapperValue)) {
-            $this->mapperValue = new MetadataMapper($this->mapperValue, ['fk_info', $this->referenceKey]);
+            $this->mapperValue = new MetadataMapper($this->mapperValue, ['id_info', $this->referenceKey]);
             $this->mapperValue->setCache($this->getCache());
 
             if ($this->hasServiceLocator()) {
