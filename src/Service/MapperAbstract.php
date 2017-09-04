@@ -773,8 +773,8 @@ abstract class MapperAbstract
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
                 }
-                
-                if (is_null($w)){
+
+                if (is_null($w)) {
                     $select->where(new \Zend\Db\Sql\Predicate\IsNull($id));
                 } else {
                     $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
@@ -814,19 +814,28 @@ abstract class MapperAbstract
                     throw new \InvalidArgumentException('Colunas devem ser um array em ' . get_class($this));
                 }
 
-                if (isset($tableJoinLeft['schema']) && !empty($tableJoinLeft['schema'])
-                    && !is_string($tableJoinLeft['schema'])
+                if ((isset($tableJoinLeft['schema'])
+                        && !empty($tableJoinLeft['schema'])
+                        && !is_string($tableJoinLeft['schema']))
+                    ||
+                    (isset($tableJoinLeft['type'])
+                        && !empty($tableJoinLeft['type'])
+                        && !is_string($tableJoinLeft['type']))
                 ) {
-                    throw new \InvalidArgumentException('Schema devem ser uma string em ' . get_class($this));
-                } elseif (!isset($tableJoinLeft['schema'])) {
-                    $tableJoinLeft['schema'] = null;
+                    throw new \InvalidArgumentException('Type/Schema devem ser uma string');
+
+                } elseif (!isset($tableJoinLeft['schema']) && !isset($tableJoinLeft['type'])) {
+                    $tableJoinLeft['type'] = null;
+
+                } elseif (isset($tableJoinLeft['schema']) && !isset($tableJoinLeft['type'])) {
+                    $tableJoinLeft['type'] = $tableJoinLeft['schema'];
                 }
 
                 $select->join(
                     $tableJoinLeft['table'],
                     $tableJoinLeft['condition'],
                     $tableJoinLeft['columns'],
-                    $tableJoinLeft['schema']
+                    $tableJoinLeft['type']
                 );
             }
         }
@@ -1029,6 +1038,28 @@ abstract class MapperAbstract
         return $return;
     }
 
+    private function array_diff_assoc_recursive($array1, $array2)
+    {
+        $difference = array();
+        foreach ($array1 as $key => $value) {
+            if (is_array($value)) {
+                if (!isset($array2[$key]) || !is_array($array2[$key])) {
+                    $difference[$key] = $value;
+                } else {
+                    $new_diff = self::array_diff_assoc_recursive($value, $array2[$key]);
+                    if (!empty($new_diff)) {
+                        $difference[$key] = $new_diff;
+                    }
+                }
+            } else {
+                if (!array_key_exists($key, $array2) || $array2[$key] !== $value) {
+                    $difference[$key] = $value;
+                }
+            }
+        }
+        return $difference;
+    }
+
     /**
      *
      * @return array
@@ -1136,23 +1167,5 @@ abstract class MapperAbstract
         $this->order = $order;
 
         return $this;
-    }
-
-    private function array_diff_assoc_recursive($array1, $array2) {
-        $difference=array();
-        foreach($array1 as $key => $value) {
-            if( is_array($value) ) {
-                if( !isset($array2[$key]) || !is_array($array2[$key]) ) {
-                    $difference[$key] = $value;
-                } else {
-                    $new_diff = self::array_diff_assoc_recursive($value, $array2[$key]);
-                    if( !empty($new_diff) )
-                        $difference[$key] = $new_diff;
-                }
-            } else if( !array_key_exists($key,$array2) || $array2[$key] !== $value ) {
-                $difference[$key] = $value;
-            }
-        }
-        return $difference;
     }
 }
