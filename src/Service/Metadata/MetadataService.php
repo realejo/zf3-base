@@ -526,7 +526,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperSchema()
     {
         if (is_string($this->mapperSchema)) {
-            $this->mapperSchema = new MetadataMapper($this->mapperSchema, 'id_info');
+            $this->mapperSchema = new MetadataMapper($this->mapperSchema, 'fk_info');
             $this->mapperSchema->setCache($this->getCache());
 
             if ($this->hasServiceLocator()) {
@@ -540,7 +540,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperValue()
     {
         if (is_string($this->mapperValue)) {
-            $this->mapperValue = new MetadataMapper($this->mapperValue, ['id_info', $this->referenceKey]);
+            $this->mapperValue = new MetadataMapper($this->mapperValue, ['fk_info', $this->referenceKey]);
             $this->mapperValue->setCache($this->getCache());
 
             if ($this->hasServiceLocator()) {
