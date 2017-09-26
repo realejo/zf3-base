@@ -34,6 +34,10 @@ class MetadataService extends ServiceAbstract
 
     protected $lastSaveMetadataLog;
 
+    protected $infoKeyName = 'id_info';
+
+    protected $infoForeignKeyName = 'fk_info';
+
     public function getWhere($where)
     {
         if (empty($where) || ! is_array($where)) {
@@ -116,17 +120,17 @@ class MetadataService extends ServiceAbstract
             // Faz a busca pelo campo
             if (is_null($value)) {
                 $where[] = new Expression(
-                    "EXISTS (SELECT * FROM $valueTable WHERE fk_info={$schema[$id]['id_info']} " .
+                    "EXISTS (SELECT * FROM $valueTable WHERE fk_info={$schema[$id][$this->infoKeyName]} " .
                             "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
                             "AND $field IS NULL) " .
                     "OR NOT EXISTS (SELECT * FROM $valueTable " .
-                                    "WHERE fk_info={$schema[$id]['id_info']} " .
+                                    "WHERE fk_info={$schema[$id][$this->infoKeyName]} " .
                     "AND $mapperTable.$mapperKey=$valueTable.$referenceKey)"
                 );
             } else {
                 $where[] = new Expression($this->quoteInto(
                     "EXISTS (SELECT * FROM $valueTable " .
-                    "WHERE fk_info={$schema[$id]['id_info']} " .
+                    "WHERE fk_info={$schema[$id][$this->infoKeyName]} " .
                         "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
                         "AND $field = ?)",
                     $value,
@@ -196,7 +200,7 @@ class MetadataService extends ServiceAbstract
         if (! empty($fetchAll)) {
             $schema = [];
             foreach ($fetchAll as $row) {
-                $schema[$row['id_info']] = $row->toArray();
+                $schema[$row[$this->infoKeyName]] = $row->toArray();
             }
         }
 
@@ -227,7 +231,7 @@ class MetadataService extends ServiceAbstract
         $getValues = [];
         if (! empty($fetchAll)) {
             foreach ($fetchAll as $row) {
-                $getValues[$schema[$row['fk_info']]['nick']] = $this->getCurrentValue($schema[$row['fk_info']], $row);
+                $getValues[$schema[$row[$this->infoForeignKeyName]]['nick']] = $this->getCurrentValue($schema[$row[$this->infoForeignKeyName]], $row);
             }
         }
 
@@ -288,7 +292,7 @@ class MetadataService extends ServiceAbstract
             // $currentValues pode ser vazio quando o PDV for novo
             if (! empty($currentValues) && array_key_exists($schema['nick'], $currentValues)) {
                 $whereKey = [
-                    'fk_info' => $schema['id_info'],
+                    $this->infoForeignKeyName => $schema[$this->infoKeyName],
                     $this->referenceKey => $foreignKey
                 ];
                 if ($setMetadataValue !== $currentValues[$schema['nick']]) {
@@ -308,7 +312,7 @@ class MetadataService extends ServiceAbstract
             } elseif (! is_null($setMetadataValue)) {
                 $this->getMapperValue()
                      ->insert([
-                         'fk_info'           => $schema['id_info'],
+                         $this->infoForeignKeyName           => $schema[$this->infoKeyName],
                          $this->referenceKey => $foreignKey,
                          $setMetadataKey     => $setMetadataValue
                      ]);
@@ -526,7 +530,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperSchema()
     {
         if (is_string($this->mapperSchema)) {
-            $this->mapperSchema = new MetadataMapper($this->mapperSchema, 'fk_info');
+            $this->mapperSchema = new MetadataMapper($this->mapperSchema, $this->infoForeignKeyName);
             $this->mapperSchema->setCache($this->getCache());
 
             if ($this->hasServiceLocator()) {
@@ -540,7 +544,7 @@ class MetadataService extends ServiceAbstract
     public function getMapperValue()
     {
         if (is_string($this->mapperValue)) {
-            $this->mapperValue = new MetadataMapper($this->mapperValue, ['fk_info', $this->referenceKey]);
+            $this->mapperValue = new MetadataMapper($this->mapperValue, [$this->infoForeignKeyName, $this->referenceKey]);
             $this->mapperValue->setCache($this->getCache());
 
             if ($this->hasServiceLocator()) {
