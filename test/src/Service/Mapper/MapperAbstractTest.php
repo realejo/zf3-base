@@ -279,7 +279,7 @@ class MapperAbstractTest extends BaseTestCase
         $this->Mapper->setShowDeleted(true)->setUseDeleted(false);
         $this->assertCount(4, $this->Mapper->fetchAll(), 'showDeleted=true, useDeleted=false');
 
-        // Marca pra não mostar os removidos e usar o campo deleted
+        // Marca pra não mostrar os removidos e usar o campo deleted
         $this->Mapper->setShowDeleted(false)->setUseDeleted(true);
         $this->assertCount(3, $this->Mapper->fetchAll(), 'showDeleted=false, useDeleted=true');
 

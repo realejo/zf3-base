@@ -10,6 +10,7 @@ use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\ArraySerializable;
+use Zend\Db\Sql\Predicate;
 
 abstract class MapperAbstract
 {
@@ -693,7 +694,7 @@ abstract class MapperAbstract
      *
      * @return \Zend\Db\Sql\Select
      */
-    public function getSelect($where = null, $order = null, $count = null, $offset = null)
+    public function getSelect(array $where = null, $order = null, $count = null, $offset = null)
     {
         // Retorna o select para a tabela
         $select = $this->getTableSelect();
@@ -721,13 +722,6 @@ abstract class MapperAbstract
             $select->offset($offset);
         }
 
-        // Checks $where is not null
-        if (empty($where)) {
-            if ($this->getUseDeleted() && !$this->getShowDeleted()) {
-                $where = new Expression($this->getTableGateway()->getTable() . 'deleted = 0');
-            }
-        }
-
         // Verifica se é um array para fazer o processamento abaixo
         if (!is_array($where)) {
             $where = (empty($where)) ? [] : [$where];
@@ -744,44 +738,52 @@ abstract class MapperAbstract
         // processa as clausulas
         foreach ($where as $id => $w) {
             // \Zend\Db\Sql\Expression
-            if ($w instanceof Expression) {
-                $select->where($w);
+            if (is_numeric($id) && $w instanceof Expression) {
+                $select->where(new Predicate\Expression("(" . $w->getExpression() . ")"));
+                continue;
+            }
 
-                // Checks is deleted
-            } elseif ($id === 'deleted' && $w === false) {
+            // Checks is deleted
+            if ($id === 'deleted' && $w === false) {
                 $select->where("{$this->getTableGateway()->getTable()}.deleted=0");
-                unset($where['deleted']);
+                continue;
             } elseif ($id === 'deleted' && $w === true) {
                 $select->where("{$this->getTableGateway()->getTable()}.deleted=1");
-                unset($where['deleted']);
-            } elseif ((is_numeric($id) && $w === 'ativo') || ($id === 'ativo' && $w === true)) {
+                continue;
+            }
+
+            if ((is_numeric($id) && $w === 'ativo') || ($id === 'ativo' && $w === true)) {
                 $select->where("{$this->getTableGateway()->getTable()}.ativo=1");
-                unset($where['ativo']);
+                continue;
             } elseif ($id === 'ativo' && $w === false) {
                 $select->where("{$this->getTableGateway()->getTable()}.ativo=0");
-                unset($where['ativo']);
+                continue;
+            }
 
-                // Valor numerico
-            } elseif (!is_numeric($id) && is_numeric($w)) {
+            // Valor numerico
+            if (!is_numeric($id) && is_numeric($w)) {
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
                 }
-                $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
+                $select->where(new Predicate\Operator($id, '=', $w));
+                continue;
+            }
 
                 // Texto e Data
-            } elseif (!is_numeric($id)) {
+            if (!is_numeric($id)) {
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
                 }
 
                 if (is_null($w)) {
-                    $select->where(new \Zend\Db\Sql\Predicate\IsNull($id));
+                    $select->where(new Predicate\IsNull($id));
                 } else {
-                    $select->where(new \Zend\Db\Sql\Predicate\Operator($id, '=', $w));
+                    $select->where(new Predicate\Operator($id, '=', $w));
                 }
-            } else {
-                throw new \LogicException("Condição inválida '$w' em " . get_class($this));
+                continue;
             }
+
+            throw new \LogicException("Condição inválida '$w' em " . get_class($this));
         }
 
         return $select;
