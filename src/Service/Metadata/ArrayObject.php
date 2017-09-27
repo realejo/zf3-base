@@ -66,14 +66,14 @@ class ArrayObject extends StdlibArrayObject
 
     public function populate(array $data)
     {
-        if (isset($data[$this->metadatakeyName])) {
-            if (is_string($data[$this->metadatakeyName])) {
-                $data[$this->metadatakeyName] = json_decode($data[$this->metadatakeyName], true);
+        if (isset($data[$this->metadataKeyName])) {
+            if (is_string($data[$this->metadataKeyName])) {
+                $data[$this->metadataKeyName] = json_decode($data[$this->metadataKeyName], true);
             }
-            if (! empty($data[$this->metadatakeyName])) {
-                $this->setMetadata($data[$this->metadatakeyName]);
+            if (! empty($data[$this->metadataKeyName])) {
+                $this->setMetadata($data[$this->metadataKeyName]);
             }
-            unset($data[$this->metadatakeyName]);
+            unset($data[$this->metadataKeyName]);
         }
 
         parent::populate($data);
@@ -87,7 +87,7 @@ class ArrayObject extends StdlibArrayObject
     {
         $toArray = parent::toArray($unMapKeys);
         if (! empty($this->getMetadata()->count())) {
-            $toArray[$this->metadatakeyName] = $this->getMetadata()->toArray();
+            $toArray[$this->metadataKeyName] = $this->getMetadata()->toArray();
         }
 
         return $toArray;
