@@ -704,7 +704,7 @@ abstract class MapperAbstract
 
             // Grava a consulta no cache
             if ($this->getUseCache()) {
-                $this->getCache()->setItem($cacheKey, $fetchAll);
+                $this->getCache()->setItem($cacheKey, $hydrateResultSet);
             }
 
             return $hydrateResultSet;
