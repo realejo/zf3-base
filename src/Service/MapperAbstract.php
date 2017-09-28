@@ -5,12 +5,14 @@ namespace Realejo\Service;
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\ArraySerializable;
 use Zend\Db\Sql\Predicate;
+use ArrayIterator;
 
 abstract class MapperAbstract
 {
@@ -21,74 +23,93 @@ abstract class MapperAbstract
      * @var ArrayObject
      */
     protected $hydratorEntity = null;
+
     /**
      * @var ArraySerializable
      */
     protected $hydrator = null;
+
+    /**
+     * @var bool
+     */
+    protected $useHydrateResultSet = false;
+
     /**
      * Nome da tabela a ser usada
      * @var string
      */
     protected $tableName;
+
     /**
      * @var TableGateway
      */
     protected $tableGateway;
+
     /**
      * Define o nome da chave
      * @var string|array
      */
     protected $tableKey;
+
     /**
      * Join lefts que devem ser usados no mapper
      *
      * @var array
      */
     protected $tableJoinLeft = false;
+
     /**
      * Join lefts que devem ser usados no mapper
      *
      * @var boolean
      */
     protected $useJoin = false;
+
     /**
      * Define se deve usar todas as chaves para os operações de update e delete
      *
      * @var boolean
      */
     protected $useAllKeys = true;
+
     /**
      * Define a ordem padrão a ser usada na consultas
      *
      * @var string|array
      */
     protected $order;
+
     /**
      * Define o adapter a ser usado
      *
      * @var Adapter
      */
     protected $adapter;
+
     /**
      * Define se deve remover os registros ou apenas marcar como removido
      *
      * @var boolean
      */
     protected $useDeleted = false;
+
     /**
      * Define se deve mostrar os registros marcados como removido
      *
      * @var boolean
      */
     protected $showDeleted = false;
+
     /**
      * @var boolean
      */
     protected $useCache = false;
+
     /**
      * @var ContainerInterface
      */
     protected $serviceLocator;
+
     /**
      * @var boolean
      */
@@ -574,7 +595,7 @@ abstract class MapperAbstract
      * Recupera um registro
      *
      * @param mixed $where condições para localizar o registro
-     * @param null $order
+     * @param string|array $order
      *
      * @return null|ArrayObject
      */
@@ -602,16 +623,20 @@ abstract class MapperAbstract
         // Recupera o registro
         $fetchRow = $this->fetchAll($where, $order, 1);
 
-        // Retorna o registro se algum foi encontrado
+        if ($this->useHydrateResultSet) {
+            return (!empty($fetchRow)) ? $fetchRow->current() : null;
+        }
+
         return (!empty($fetchRow)) ? $fetchRow[0] : null;
     }
 
     /**
-     * @param null $where
-     * @param null $order
-     * @param null $count
-     * @param null $offset
-     * @return ArrayObject[]
+     * @param array $where condições para localizar o registro
+     * @param array|string $order
+     * @param integer $count
+     * @param integer $offset
+     *
+     * @return ArrayObject[]|HydratingResultSet
      */
     public function fetchAll($where = null, $order = null, $count = null, $offset = null)
     {
@@ -671,6 +696,19 @@ abstract class MapperAbstract
             return $fetchAll;
         }
         $hydratorEntity = $this->getHydratorEntity();
+
+
+        if ($this->useHydrateResultSet) {
+            $hydrateResultSet = new HydratingResultSet($hydrator, new $hydratorEntity());
+            $hydrateResultSet->initialize(new ArrayIterator($fetchAll));
+
+            // Grava a consulta no cache
+            if ($this->getUseCache()) {
+                $this->getCache()->setItem($cacheKey, $fetchAll);
+            }
+
+            return $hydrateResultSet;
+        }
 
         foreach ($fetchAll as $id => $row) {
             $fetchAll[$id] = $hydrator->hydrate($row, new $hydratorEntity);
@@ -769,7 +807,7 @@ abstract class MapperAbstract
                 continue;
             }
 
-                // Texto e Data
+            // Texto e Data
             if (!is_numeric($id)) {
                 if (strpos($id, '.') === false) {
                     $id = "{$this->tableName}.$id";
@@ -1166,4 +1204,23 @@ abstract class MapperAbstract
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isUseHydrateResultSet()
+    {
+        return $this->useHydrateResultSet;
+    }
+
+    /**
+     * @param bool $useHydrateResultSet
+     * @return MapperAbstract
+     */
+    public function setUseHydrateResultSet($useHydrateResultSet)
+    {
+        $this->useHydrateResultSet = $useHydrateResultSet;
+        return $this;
+    }
+
 }

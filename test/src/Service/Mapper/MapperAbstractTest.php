@@ -5,6 +5,7 @@ use Realejo\Stdlib\ArrayObject;
 use Realejo\Service\MapperAbstract;
 use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql;
 
 class MapperAbstractTest extends BaseTestCase
@@ -270,6 +271,8 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchAll()
     {
+        $this->assertFalse($this->Mapper->isUseHydrateResultSet());
+
          // O padrão é não usar o campo deleted
         $this->Mapper->setOrder('id');
         $albuns = $this->Mapper->fetchAll();
@@ -319,7 +322,7 @@ class MapperAbstractTest extends BaseTestCase
         // Apaga qualquer cache
         $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
 
-        // Define exibir os deletados
+        // Define exibir os removidos
         $this->Mapper->setShowDeleted(true);
 
         // Liga o cache
@@ -338,7 +341,94 @@ class MapperAbstractTest extends BaseTestCase
         $this->assertTrue($this->Mapper->getCache()->flush(), 'limpa o cache');
         $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
 
-        // Define não exibir os deletados
+        // Define não exibir os removidos
+        $this->Mapper->setShowDeleted(false);
+        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros com showDeleted=false');
+
+        // Apaga um registro "sem o cache saber"
+        $this->Mapper->getTableGateway()->delete("id=10");
+        $this->Mapper->setShowDeleted(true);
+        $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
+        $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
+        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros 4');
+    }
+
+    /**
+     * Tests Base->fetchAll()
+     */
+    public function testFetchAllHydrateResultSet()
+    {
+        $this->Mapper->setUseHydrateResultSet(true);
+        $this->assertTrue($this->Mapper->isUseHydrateResultSet());
+
+        // O padrão é não usar o campo deleted
+        $this->Mapper->setOrder('id');
+        $albuns = $this->Mapper->fetchAll();
+        $this->assertCount(4, $albuns, 'showDeleted=false, useDeleted=false');
+
+        // Marca para mostrar os removidos e não usar o campo deleted
+        $this->Mapper->setShowDeleted(true)->setUseDeleted(false);
+        $this->assertCount(4, $this->Mapper->fetchAll(), 'showDeleted=true, useDeleted=false');
+
+        // Marca pra não mostrar os removidos e usar o campo deleted
+        $this->Mapper->setShowDeleted(false)->setUseDeleted(true);
+        $this->assertCount(3, $this->Mapper->fetchAll(), 'showDeleted=false, useDeleted=true');
+
+        // Marca pra mostrar os removidos e usar o campo deleted
+        $this->Mapper->setShowDeleted(true)->setUseDeleted(true);
+        $albuns = $this->Mapper->fetchAll();
+        $this->assertCount(4, $albuns, 'showDeleted=true, useDeleted=true');
+
+        // Marca não mostrar os removios
+        $this->Mapper->setUseDeleted(true)->setShowDeleted(false);
+
+        $albuns = $this->defaultValues;
+        unset($albuns[3]); // remove o deleted=1
+
+        $fetchAll = $this->Mapper->fetchAll();
+        $this->assertInstanceOf(HydratingResultSet::class, $fetchAll);
+        $fetchAll = $fetchAll->toArray();
+        $this->assertEquals($albuns, $fetchAll);
+
+        // Marca mostrar os removidos
+        $this->Mapper->setShowDeleted(true);
+
+        $fetchAll = $this->Mapper->fetchAll();
+        $this->assertInstanceOf(HydratingResultSet::class, $fetchAll);
+        $fetchAll = $fetchAll->toArray();
+
+        $this->assertEquals($this->defaultValues, $fetchAll);
+        $this->assertCount(4, $this->Mapper->fetchAll());
+        $this->Mapper->setShowDeleted(false);
+        $this->assertCount(3, $this->Mapper->fetchAll());
+
+        // Verifica o where
+        $this->assertCount(2, $this->Mapper->fetchAll(['artist' => $albuns[0]['artist']]));
+        $this->assertNull($this->Mapper->fetchAll(['artist' => $this->defaultValues[3]['artist']]));
+
+        // Apaga qualquer cache
+        $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
+
+        // Define exibir os removidos
+        $this->Mapper->setShowDeleted(true);
+
+        // Liga o cache
+        $this->Mapper->setUseCache(true);
+        $fetchAll = $this->Mapper->fetchAll();
+        $this->assertInstanceOf(HydratingResultSet::class, $fetchAll);
+        $fetchAll = $fetchAll->toArray();
+
+        $this->assertEquals($this->defaultValues, $fetchAll, 'fetchAll está igual ao defaultValues');
+        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros');
+
+        // Grava um registro "sem o cache saber"
+        $this->Mapper->getTableGateway()->insert(['id' => 10, 'artist' => 'nao existo por enquanto', 'title' => 'bla bla', 'deleted' => 0]);
+
+        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros depois do insert "sem o cache saber"');
+        $this->assertTrue($this->Mapper->getCache()->flush(), 'limpa o cache');
+        $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
+
+        // Define não exibir os removidos
         $this->Mapper->setShowDeleted(false);
         $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros com showDeleted=false');
 
@@ -355,6 +445,35 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchRow()
     {
+        $this->assertFalse($this->Mapper->isUseHydrateResultSet());
+
+        // Marca pra usar o campo deleted
+        $this->Mapper->setUseDeleted(true);
+        $this->Mapper->setOrder('id');
+
+        // Verifica os itens que existem
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(1));
+        $this->assertEquals($this->defaultValues[0], $this->Mapper->fetchRow(1)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(2));
+        $this->assertEquals($this->defaultValues[1], $this->Mapper->fetchRow(2)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(3));
+        $this->assertEquals($this->defaultValues[2], $this->Mapper->fetchRow(3)->toArray());
+
+        // Verifica o item removido
+        $this->Mapper->setShowDeleted(true);
+        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(4));
+        $this->assertEquals($this->defaultValues[3], $this->Mapper->fetchRow(4)->toArray());
+        $this->Mapper->setShowDeleted(false);
+    }
+
+    /**
+     * Tests Base->fetchRow()
+     */
+    public function testFetchRowHydrateResultaSet()
+    {
+        $this->Mapper->setUseHydrateResultSet(true);
+        $this->assertTrue($this->Mapper->isUseHydrateResultSet());
+
         // Marca pra usar o campo deleted
         $this->Mapper->setUseDeleted(true);
         $this->Mapper->setOrder('id');
