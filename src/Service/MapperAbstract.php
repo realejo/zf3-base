@@ -777,7 +777,11 @@ abstract class MapperAbstract
         foreach ($where as $id => $w) {
             // \Zend\Db\Sql\Expression
             if (is_numeric($id) && $w instanceof Expression) {
-                $select->where(new Predicate\Expression("(" . $w->getExpression() . ")"));
+                if (!$w instanceof Predicate\Expression) {
+                    $select->where(new Predicate\Expression($w->getExpression()));
+                } else {
+                    $select->where($w);
+                }
                 continue;
             }
 
