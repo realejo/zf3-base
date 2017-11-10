@@ -104,21 +104,6 @@ class ArrayObject implements \ArrayAccess
                 $key = $this->getMappedKey($key, true);
             }
 
-            // desfaz datetime
-            if ($value instanceof \DateTime) {
-                $value = $value->format('Y-m-d H:i:s');
-            }
-
-            // desfaz o json
-            if (in_array($key, $this->jsonKeys) && $value instanceof \stdClass) {
-                $value = json_encode($value, JSON_OBJECT_AS_ARRAY);
-            }
-
-            // desfaz boolean e int
-            if (is_bool($value) || is_numeric($value)) {
-                $value = (int) $value;
-            }
-            
             $toArray[$key] = $value;
         }
 
@@ -132,7 +117,32 @@ class ArrayObject implements \ArrayAccess
 
     public function getArrayCopy()
     {
-        return $this->toArray();
+        $toArray = $this->toArray(true);
+
+        if (empty($toArray)) {
+            return $toArray;
+        }
+
+        foreach ($toArray as $key => $value) {
+            // desfaz datetime
+            if ($value instanceof \DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
+
+            // desfaz o json
+            if (in_array($key, $this->jsonKeys) && ($value instanceof \stdClass || is_array($value))) {
+                $value = json_encode($value, JSON_OBJECT_AS_ARRAY);
+            }
+
+            // desfaz boolean e int
+            if (is_bool($value) || is_numeric($value)) {
+                $value = (int) $value;
+            }
+
+            $toArray[$key] = $value;
+        }
+
+        return $toArray;
     }
 
     /**
