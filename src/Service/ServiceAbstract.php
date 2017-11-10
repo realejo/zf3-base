@@ -5,6 +5,8 @@ namespace Realejo\Service;
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
 use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
+use Zend\Paginator\Paginator;
 use Zend\ServiceManager\ServiceManager;
 
 abstract class ServiceAbstract
@@ -194,7 +196,11 @@ abstract class ServiceAbstract
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAll' . $this->getCacheKey(func_get_args());
+        $cacheKey = 'findAll'
+            . $this->getUniqueCacheKey()
+            . md5($this->getMapper()->getSelect()->getSqlString(
+                $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
+            ));
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -373,7 +379,11 @@ abstract class ServiceAbstract
     public function findOne($where = null, $order = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findOne' . $this->getCacheKey(func_get_args());
+        $cacheKey = 'findOne'
+            . $this->getUniqueCacheKey()
+            . md5($this->getMapper()->getSelect()->getSqlString(
+                $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
+            ));
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -418,7 +428,11 @@ abstract class ServiceAbstract
     public function findAssoc($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAssoc' . $this->getCacheKey(func_get_args());
+        $cacheKey = 'findAssoc'
+            . $this->getUniqueCacheKey()
+            . md5($this->getMapper()->getSelect()->getSqlString(
+                $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
+            ));
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -449,12 +463,12 @@ abstract class ServiceAbstract
      * @param int $count OPTIONAL An SQL LIMIT count.
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
-     * @return \Zend\Paginator\Paginator
+     * @return Paginator
      */
     public function findPaginated($where = null, $order = null, $count = null, $offset = null)
     {
         // Define a consulta
-        if ($where instanceof \Zend\Db\Sql\Select) {
+        if ($where instanceof Select) {
             $select = $where;
         } else {
             $select = $this->getMapper()->getSelect($this->getWhere($where), $order, $count, $offset);
@@ -463,6 +477,7 @@ abstract class ServiceAbstract
 
         // Verifica se deve usar o cache
         $cacheKey = 'findPaginated'
+            . $this->getUniqueCacheKey()
             . md5($select->getSqlString($this->getMapper()->getTableGateway()->getAdapter()->getPlatform()));
 
         // Verifica se tem no cache
@@ -473,7 +488,7 @@ abstract class ServiceAbstract
         $paginator = new HydratorPagination($select, $this->getMapper()->getTableGateway()->getAdapter());
         $paginator->setHydrator($this->getMapper()->getHydrator())
             ->setHydratorEntity($this->getMapper()->getHydratorEntity());
-        $findPaginated = new \Zend\Paginator\Paginator($paginator);
+        $findPaginated = new Paginator($paginator);
 
         // Verifica se deve usar o cache
         if ($this->getUseCache()) {
@@ -559,7 +574,7 @@ abstract class ServiceAbstract
      */
     public function getAutoCleanCache()
     {
-        return $this->getMapper()->autoCleanCache();
+        return $this->getMapper()->getAutoCleanCache();
     }
 
     /**
@@ -589,32 +604,5 @@ abstract class ServiceAbstract
         }
 
         return $this->getServiceLocator()->get($class);
-    }
-
-    private function getCacheKey($args)
-    {
-        $cacheKey = '';
-
-        foreach ($args as $id => $arg) {
-            if (is_array($arg)) {
-                foreach ($arg as $key => $value) {
-                    if ($value instanceof Expression) {
-                        $value = $value->getExpression();
-                    } elseif ($value instanceof \DateTime) {
-                        $value = $value->format('Y-m-d H:i:s.n');
-                    } else {
-                        $value = var_export($value, true);
-                    }
-                    $cacheKey .= "$key:$value;";
-                }
-            } else {
-                $cacheKey .= "a$id:" . var_export($arg, true) . ';';
-            }
-        }
-
-        $cacheKey .= 'join:' . var_export($this->getMapper()->getUseJoin(), true) . ';';
-        $cacheKey .= 'deleted:' . var_export($this->getMapper()->getUseJoin(), true);
-
-        return $this->getUniqueCacheKey() . md5($cacheKey);
     }
 }

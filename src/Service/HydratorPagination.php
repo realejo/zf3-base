@@ -31,7 +31,7 @@ class HydratorPagination extends \Zend\Paginator\Adapter\DbSelect
 
     /**
      * @param \Zend\Hydrator\ArraySerializable $hydrator
-     * @return \Realejo\Mapper\MapperPagination
+     * @return \Realejo\Service\HydratorPagination
      */
     public function setHydrator(\Zend\Hydrator\ArraySerializable $hydrator = null)
     {
@@ -54,7 +54,7 @@ class HydratorPagination extends \Zend\Paginator\Adapter\DbSelect
 
     /**
      * @param \Realejo\Stdlib\ArrayObject $hydrator
-     * @return \Realejo\Mapper\MapperPagination
+     * @return \Realejo\Service\HydratorPagination
      */
     public function setHydratorEntity(\Realejo\Stdlib\ArrayObject $hydratorEntity = null)
     {
