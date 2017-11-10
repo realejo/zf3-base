@@ -64,6 +64,8 @@ class ArrayObject implements \ArrayAccess
     {
         $useDateKeys = (is_array($this->dateKeys) && !empty($this->dateKeys));
         $useJsonKeys = (is_array($this->jsonKeys) && !empty($this->jsonKeys));
+        $useIntKeys = (is_array($this->intKeys) && !empty($this->intKeys));
+        $useBooleanKeys = (is_array($this->booleanKeys) && !empty($this->booleanKeys));
 
         if (! empty($data)) {
             foreach ($data as $key => $value) {
@@ -71,6 +73,10 @@ class ArrayObject implements \ArrayAccess
                     $value = new \DateTime($value);
                 } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
                     $value = Json::decode($value);
+                } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
+                    $value = (int) $value;
+                } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && !empty($value)) {
+                    $value = (boolean) $value;
                 }
                 $this->storage[$this->getMappedKey($key)] = $value;
             }
@@ -97,6 +103,22 @@ class ArrayObject implements \ArrayAccess
             if ($unMapKeys === true) {
                 $key = $this->getMappedKey($key, true);
             }
+
+            // desfaz datetime
+            if ($value instanceof \DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
+
+            // desfaz o json
+            if (in_array($key, $this->jsonKeys) && $value instanceof \stdClass) {
+                $value = json_encode($value, JSON_OBJECT_AS_ARRAY);
+            }
+
+            // desfaz boolean e int
+            if (is_bool($value) || is_numeric($value)) {
+                $value = (int) $value;
+            }
+            
             $toArray[$key] = $value;
         }
 
@@ -110,7 +132,6 @@ class ArrayObject implements \ArrayAccess
 
     public function getArrayCopy()
     {
-        // desfaz os json, datetime e boolean
         return $this->toArray();
     }
 

@@ -236,4 +236,42 @@ class ArrayObjectTest extends TestCase
         $this->assertNull($object->getKeyMapping());
         $this->assertEquals(null, $object->getKeyMapping());
     }
+
+    /**
+     * Test with typed keys
+     */
+    public function testPopulateWithTypedKeys()
+    {
+        $object = new ArrayObjectTypedKeys();
+        $this->assertNotNull($object->toArray());
+        $this->assertEmpty($object->toArray());
+        $this->assertEquals([], $object->toArray());
+
+        $this->assertNull($object->populate(['one' => 'first']));
+
+        // populate as it comes from database
+        $object = new ArrayObjectTypedKeys([
+            'booleanKey' => '1',
+            'jsonKey' => json_encode(['key'=>'value']),
+            'datetimeKey' => '2010-01-01 00:00:00',
+            'intKey' => '1'
+        ]);
+
+        // check keys
+        $this->assertTrue($object->booleanKey === true);
+        $stdClass = new \stdClass();
+        $stdClass->key = 'value';
+        $this->assertEquals($stdClass, $object->jsonKey);
+        $this->assertEquals($stdClass->key, $object->jsonKey->key);
+        $this->assertEquals((array) $stdClass, (array) $object->jsonKey);
+        $this->assertEquals(new \DateTime('2010-01-01'), $object->datetimeKey);
+        $this->assertTrue($object->intKey === 1);
+
+        // get the array as it will be inserted on database
+        $objectArray = $object->getArrayCopy();
+        $this->assertEquals(1, $objectArray['booleanKey']);
+        $this->assertEquals(json_encode(['key'=>'value'], JSON_OBJECT_AS_ARRAY), $objectArray['jsonKey']);
+        $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
+        $this->assertEquals(1, $objectArray['intKey']);
+    }
 }
