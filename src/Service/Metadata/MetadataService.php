@@ -489,6 +489,7 @@ class MetadataService extends ServiceAbstract
         $this->useCache = $useCache;
         $this->getMapperSchema()->setUseCache($useCache);
         $this->getMapperValue()->setUseCache($useCache);
+        $this->getMapper()->setUseCache($useCache);
 
         // Mantem a cadeia
         return $this;
