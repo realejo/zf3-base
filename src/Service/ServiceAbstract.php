@@ -4,6 +4,7 @@ namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
+use Zend\Db\Sql\Expression;
 use Zend\ServiceManager\ServiceManager;
 
 abstract class ServiceAbstract
@@ -193,15 +194,7 @@ abstract class ServiceAbstract
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAll' . $this->getUniqueCacheKey()
-            . md5(
-                var_export($where, true)
-                . var_export($order, true)
-                . var_export($count, true)
-                . var_export($offset, true)
-                . var_export($this->getMapper()->getUseJoin(), true)
-                . var_export($this->getMapper()->getShowDeleted(), true)
-            );
+        $cacheKey = 'findAll' . $this->getCacheKey(func_get_args());
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -380,20 +373,14 @@ abstract class ServiceAbstract
     public function findOne($where = null, $order = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findOne'
-            . md5(
-                var_export($where, true)
-                . var_export($order, true)
-                . var_export($this->getMapper()->getUseJoin(), true)
-                . var_export($this->getMapper()->getShowDeleted(), true)
-            );
+        $cacheKey = 'findOne' . $this->getCacheKey(func_get_args());
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
             return $this->getCache()->getItem($cacheKey);
         }
 
-        $findOne = $this->getMapper()->fetchRow($this->getWhere($where), $order, 1);
+        $findOne = $this->getMapper()->fetchRow($this->getWhere($where), $order);
 
         // Grava a consulta no cache
         if ($this->getUseCache()) {
@@ -421,25 +408,17 @@ abstract class ServiceAbstract
     /**
      * Retorna vários registros associados pela chave
      *
-     * @param string|array oUsuario OPTIONAL An SQL WHERE clause
-     * @param string|array oUsuario OPTIONAL An SQL ORDER clause.
-     * @param int          oUsuario OPTIONAL An SQL LIMIT count.
-     * @param int          oUsuario OPTIONAL An SQL LIMIT offset.
+     * @param string|array $where OPTIONAL An SQL WHERE clause
+     * @param string|array $order OPTIONAL An SQL ORDER clause.
+     * @param int $count OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return ArrayObject[] | null
      */
     public function findAssoc($where = null, $order = null, $count = null, $offset = null)
     {
         // Cria a assinatura da consulta
-        $cacheKey = 'findAssoc'
-            . md5(
-                var_export($where, true)
-                . var_export($order, true)
-                . var_export($count, true)
-                . var_export($offset, true)
-                . var_export($this->getMapper()->getUseJoin(), true)
-                . var_export($this->getMapper()->getShowDeleted(), true)
-            );
+        $cacheKey = 'findAssoc' . $this->getCacheKey(func_get_args());
 
         // Verifica se tem no cache
         if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
@@ -610,5 +589,32 @@ abstract class ServiceAbstract
         }
 
         return $this->getServiceLocator()->get($class);
+    }
+
+    private function getCacheKey($args)
+    {
+        $cacheKey = '';
+
+        foreach ($args as $id => $arg) {
+            if (is_array($arg)) {
+                foreach ($arg as $key => $value) {
+                    if ($value instanceof Expression) {
+                        $value = $value->getExpression();
+                    } elseif ($value instanceof \DateTime) {
+                        $value = $value->format('Y-m-d H:i:s.n');
+                    } else {
+                        $value = var_export($value, true);
+                    }
+                    $cacheKey .= "$key:$value;";
+                }
+            } else {
+                $cacheKey .= "a$id:" . var_export($arg, true) . ';';
+            }
+        }
+
+        $cacheKey .= 'join:' . var_export($this->getMapper()->getUseJoin(), true) . ';';
+        $cacheKey .= 'deleted:' . var_export($this->getMapper()->getUseJoin(), true);
+
+        return $this->getUniqueCacheKey() . md5($cacheKey);
     }
 }
