@@ -213,10 +213,12 @@ class MetadataServiceTest extends BaseTestCase
     {
         $service = new MetadataService();
         $this->assertInstanceOf(MetadataService::class, $service->setMetadataMappers('tableone', 'tablesecond', 'keyname'));
+        $service->setMapper(MetadataMapperReference::class);
 
         $this->assertFalse($service->getUseCache());
         $this->assertFalse($service->getMapperSchema()->getUseCache());
         $this->assertFalse($service->getMapperValue()->getUseCache());
+        $this->assertFalse($service->getMapper()->getUseCache());
 
         $this->assertInstanceOf(MetadataService::class, $service->setUseCache(true));
         $this->assertTrue($service->getUseCache());
