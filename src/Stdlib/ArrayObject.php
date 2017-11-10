@@ -1,6 +1,8 @@
 <?php
 namespace Realejo\Stdlib;
 
+use Zend\Json\Json;
+
 class ArrayObject implements \ArrayAccess
 {
     /**
@@ -20,6 +22,14 @@ class ArrayObject implements \ArrayAccess
      */
     protected $lockedKeys = true;
 
+    protected $intKeys = [];
+
+    protected $booleanKeys = [];
+
+    protected $dateKeys = [];
+
+    protected $jsonKeys = [];
+
     public function __construct($data = null)
     {
         if (is_array($data) && ! empty($data)) {
@@ -32,7 +42,7 @@ class ArrayObject implements \ArrayAccess
      * @param bool $reverse
      * @return mixed
      */
-    protected function getMappedKey($key, $reverse = false)
+        protected function getMappedKey($key, $reverse = false)
     {
         $map = $this->getKeyMapping();
         if (empty($map)) {
@@ -52,8 +62,16 @@ class ArrayObject implements \ArrayAccess
 
     public function populate(array $data)
     {
+        $useDateKeys = (is_array($this->dateKeys) && !empty($this->dateKeys));
+        $useJsonKeys = (is_array($this->jsonKeys) && !empty($this->jsonKeys));
+
         if (! empty($data)) {
             foreach ($data as $key => $value) {
+                if ($useDateKeys && in_array($key, $this->dateKeys) && !empty($value)) {
+                    $value = new \DateTime($value);
+                } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
+                    $value = Json::decode($value);
+                }
                 $this->storage[$this->getMappedKey($key)] = $value;
             }
         }
@@ -92,6 +110,7 @@ class ArrayObject implements \ArrayAccess
 
     public function getArrayCopy()
     {
+        // desfaz os json, datetime e boolean
         return $this->toArray();
     }
 
@@ -113,7 +132,6 @@ class ArrayObject implements \ArrayAccess
     {
         $offset = $this->getMappedKey($offset);
         if (! array_key_exists($offset, $this->storage)) {
-            //throw new \Exception("Undefined index: $offset in ". var_export($this->storage, true));
             trigger_error("Undefined index: $offset");
         }
 
@@ -194,7 +212,7 @@ class ArrayObject implements \ArrayAccess
 
     /**
      * @param array $deprecatedMapping
-     * @return \Realejo\Stdlib\ArrayObject
+     * @return ArrayObject
      */
     public function setMapping(array $deprecatedMapping = null)
     {
@@ -212,7 +230,7 @@ class ArrayObject implements \ArrayAccess
 
     /**
      * @param boolean $lockedKeys
-     * @return \Realejo\Stdlib\ArrayObject
+     * @return ArrayObject
      */
     public function setLockedKeys($lockedKeys)
     {

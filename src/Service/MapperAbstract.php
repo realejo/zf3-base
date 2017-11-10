@@ -859,7 +859,7 @@ abstract class MapperAbstract
                 }
 
                 if (array_key_exists('schema', $tableJoinLeft)) {
-                    //trigger_error('Schema não pode ser usado. Use type.', E_USER_DEPRECATED );
+                    trigger_error('Schema não pode ser usado. Use type.', E_USER_DEPRECATED );
                     $tableJoinLeft['type'] = $tableJoinLeft['schema'];
                 }
 
