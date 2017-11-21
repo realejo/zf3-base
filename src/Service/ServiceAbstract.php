@@ -198,7 +198,7 @@ abstract class ServiceAbstract
         // Cria a assinatura da consulta
         $cacheKey = 'findAll'
             . $this->getUniqueCacheKey()
-            . md5($this->getMapper()->getSelect()->getSqlString(
+            . md5($this->getMapper()->getSelect($this->getWhere($where), $order, $count, $offset)->getSqlString(
                 $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
             ));
 
@@ -381,7 +381,7 @@ abstract class ServiceAbstract
         // Cria a assinatura da consulta
         $cacheKey = 'findOne'
             . $this->getUniqueCacheKey()
-            . md5($this->getMapper()->getSelect()->getSqlString(
+            . md5($this->getMapper()->getSelect($this->getWhere($where), $order)->getSqlString(
                 $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
             ));
 
@@ -408,6 +408,25 @@ abstract class ServiceAbstract
      */
     public function getWhere($where)
     {
+        // Define se é a chave da tabela, assim como é verificado no Mapper::fetchRow()
+        if (is_numeric($where) || is_string($where)) {
+            // Verifica se há chave definida
+            if (empty($this->getMapper()->getTableKey())) {
+                throw new \InvalidArgumentException('Chave não definida em ' . get_class($this));
+            }
+
+            // Verifica se é uma chave múltipla ou com cast
+            if (is_array($this->getMapper()->getTableKey())) {
+                // Verifica se é uma chave simples com cast
+                if (count($this->getMapper()->getTableKey()) != 1) {
+                    throw new \InvalidArgumentException('Não é possível acessar chaves múltiplas informando apenas uma');
+                }
+                $where = [$this->getMapper()->getTableKey(true) => $where];
+            } else {
+                $where = [$this->getMapper()->getTableKey() => $where];
+            }
+        }
+
         return $where;
     }
 
@@ -430,7 +449,7 @@ abstract class ServiceAbstract
         // Cria a assinatura da consulta
         $cacheKey = 'findAssoc'
             . $this->getUniqueCacheKey()
-            . md5($this->getMapper()->getSelect()->getSqlString(
+            . md5($this->getMapper()->getSelect($this->getWhere($where), $order, $count, $offset)->getSqlString(
                 $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
             ));
 
