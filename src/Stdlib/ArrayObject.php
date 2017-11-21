@@ -135,7 +135,7 @@ class ArrayObject implements \ArrayAccess
             }
 
             // desfaz boolean e int
-            if (is_bool($value) || is_numeric($value)) {
+            if (is_bool($value) || is_int($value)) {
                 $value = (int) $value;
             }
 
