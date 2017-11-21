@@ -378,36 +378,8 @@ abstract class ServiceAbstract
      */
     public function findOne($where = null, $order = null)
     {
-        // Cria a assinatura da consulta
-        $cacheKey = 'findOne'
-            . $this->getUniqueCacheKey()
-            . md5($this->getMapper()->getSelect($this->getWhere($where), $order)->getSqlString(
-                $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
-            ));
+        $where = $this->getWhere($where);
 
-        // Verifica se tem no cache
-        if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
-            return $this->getCache()->getItem($cacheKey);
-        }
-
-        $findOne = $this->getMapper()->fetchRow($this->getWhere($where), $order);
-
-        // Grava a consulta no cache
-        if ($this->getUseCache()) {
-            $this->getCache()->setItem($cacheKey, $findOne);
-        }
-
-        return $findOne;
-    }
-
-    /**
-     * Consultas especiais do service
-     *
-     * @param array $where
-     * @return array
-     */
-    public function getWhere($where)
-    {
         // Define se é a chave da tabela, assim como é verificado no Mapper::fetchRow()
         if (is_numeric($where) || is_string($where)) {
             // Verifica se há chave definida
@@ -427,6 +399,36 @@ abstract class ServiceAbstract
             }
         }
 
+        // Cria a assinatura da consulta
+        $cacheKey = 'findOne'
+            . $this->getUniqueCacheKey()
+            . md5($this->getMapper()->getSelect($where, $order)->getSqlString(
+                $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
+            ));
+
+        // Verifica se tem no cache
+        if ($this->getUseCache() && $this->getCache()->hasItem($cacheKey)) {
+            return $this->getCache()->getItem($cacheKey);
+        }
+
+        $findOne = $this->getMapper()->fetchRow($where, $order);
+
+        // Grava a consulta no cache
+        if ($this->getUseCache()) {
+            $this->getCache()->setItem($cacheKey, $findOne);
+        }
+
+        return $findOne;
+    }
+
+    /**
+     * Consultas especiais do service
+     *
+     * @param array $where
+     * @return array
+     */
+    public function getWhere($where)
+    {
         return $where;
     }
 
