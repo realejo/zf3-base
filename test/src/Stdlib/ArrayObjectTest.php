@@ -252,7 +252,7 @@ class ArrayObjectTest extends TestCase
         // populate as it comes from database
         $object = new ArrayObjectTypedKeys([
             'booleanKey' => '1',
-            'jsonKey' => json_encode(['key'=>'value']),
+            'jsonKey' => json_encode(['key' => 'value']),
             'datetimeKey' => '2010-01-01 00:00:00',
             'intKey' => '1'
         ]);
@@ -270,7 +270,7 @@ class ArrayObjectTest extends TestCase
         // get the array as it will be inserted on database
         $objectArray = $object->getArrayCopy();
         $this->assertEquals(1, $objectArray['booleanKey']);
-        $this->assertEquals(json_encode(['key'=>'value'], JSON_OBJECT_AS_ARRAY), $objectArray['jsonKey']);
+        $this->assertEquals(json_encode(['key' => 'value'], JSON_OBJECT_AS_ARRAY), $objectArray['jsonKey']);
         $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
         $this->assertEquals(1, $objectArray['intKey']);
     }

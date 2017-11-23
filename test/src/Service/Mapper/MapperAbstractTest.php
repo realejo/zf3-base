@@ -1194,19 +1194,19 @@ class MapperAbstractTest extends BaseTestCase
         $this->Mapper->insert($row2);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist'=>'Rush']);
+        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2, 'artist'=>'Rush']);
+        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2, 'artist' => 'Rush']);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
 
         // atualizar o registro
-        $this->Mapper->update(['title' => 'New title'], ['id_char' => 'A', 'id_int' =>1, 'artist'=>'Rush']);
+        $this->Mapper->update(['title' => 'New title'], ['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
 
         // Verifica se foi removido
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist'=>'Rush']);
+        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals('New title', $row['title'], 'row1 atualizado ');
     }

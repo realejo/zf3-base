@@ -42,7 +42,7 @@ class ArrayObject implements \ArrayAccess
      * @param bool $reverse
      * @return mixed
      */
-        protected function getMappedKey($key, $reverse = false)
+    protected function getMappedKey($key, $reverse = false)
     {
         $map = $this->getKeyMapping();
         if (empty($map)) {
@@ -62,20 +62,20 @@ class ArrayObject implements \ArrayAccess
 
     public function populate(array $data)
     {
-        $useDateKeys = (is_array($this->dateKeys) && !empty($this->dateKeys));
-        $useJsonKeys = (is_array($this->jsonKeys) && !empty($this->jsonKeys));
-        $useIntKeys = (is_array($this->intKeys) && !empty($this->intKeys));
-        $useBooleanKeys = (is_array($this->booleanKeys) && !empty($this->booleanKeys));
+        $useDateKeys = (is_array($this->dateKeys) && ! empty($this->dateKeys));
+        $useJsonKeys = (is_array($this->jsonKeys) && ! empty($this->jsonKeys));
+        $useIntKeys = (is_array($this->intKeys) && ! empty($this->intKeys));
+        $useBooleanKeys = (is_array($this->booleanKeys) && ! empty($this->booleanKeys));
 
         if (! empty($data)) {
             foreach ($data as $key => $value) {
-                if ($useDateKeys && in_array($key, $this->dateKeys) && !empty($value)) {
+                if ($useDateKeys && in_array($key, $this->dateKeys) && ! empty($value)) {
                     $value = new \DateTime($value);
-                } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
+                } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && ! empty($value)) {
                     $value = Json::decode($value);
-                } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
+                } elseif ($useIntKeys && in_array($key, $this->intKeys) && ! empty($value)) {
                     $value = (int) $value;
-                } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && !empty($value)) {
+                } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && ! empty($value)) {
                     $value = (boolean) $value;
                 }
                 $this->storage[$this->getMappedKey($key)] = $value;

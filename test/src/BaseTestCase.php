@@ -113,7 +113,6 @@ class BaseTestCase extends TestCase
     private function getSqlFile($file, $sqlAction)
     {
         if ($sqlAction === self::SQL_CREATE) {
-
             // Procura primeiro na pasta do modulo caso queria substituir a do geral
             if (strpos(TEST_ROOT, '/modules') !== false) {
                 $modulePath = substr(TEST_ROOT, 0, strpos(TEST_ROOT, '/modules'));
@@ -125,7 +124,7 @@ class BaseTestCase extends TestCase
             $paths[] = TEST_ROOT . "/assets/sql/$file.sql";
             $paths[] = TEST_ROOT . "/assets/sql/$file.create.sql";
 
-            foreach($paths as $path) {
+            foreach ($paths as $path) {
                 if (file_exists($path)) {
                     return $path;
                 }
@@ -146,7 +145,7 @@ class BaseTestCase extends TestCase
                 TEST_ROOT . "/assets/sql/$file.drop.sql"
             ];
 
-            foreach($paths as $path) {
+            foreach ($paths as $path) {
                 if (file_exists($path)) {
                     return $path;
                 }
@@ -176,7 +175,6 @@ class BaseTestCase extends TestCase
         }
 
         if (! empty($tables)) {
-
             // Desabilita os indices e constrains para não dar erro
             // ao apagar uma tabela com foreign key
             // No mundo real isso é inviável, mas nos teste podemos
