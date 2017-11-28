@@ -39,7 +39,7 @@ trait ServiceLocatorTrait
     public function getFromServiceLocator($class)
     {
         if (! $this->hasServiceLocator()) {
-            return new ServiceManager();
+            $this->setServiceLocator(new ServiceManager());
         }
 
         if (! $this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
