@@ -4,9 +4,8 @@ namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
-use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
-use Zend\Paginator\Paginator;
+use Realejo\MvcUtils\Paginator;
 use Zend\ServiceManager\ServiceManager;
 
 abstract class ServiceAbstract

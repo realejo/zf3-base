@@ -713,4 +713,72 @@ class ServiceTest extends BaseTestCase
         $this->assertTrue($service->getServiceLocator()->has('fake'));
         $this->assertEquals($fakeObject, $service->getServiceLocator()->get('fake'));
     }
+
+    /**
+     * Tests Base->findPaginated()
+     */
+    public function testFindPaginated()
+    {
+        $this->Service->getMapper()->setOrder('id');
+        $albuns = $this->Service->findPaginated();
+        $this->assertInstanceOf(\Realejo\MvcUtils\Paginator::class, $albuns);
+        $this->assertCount(4, $albuns->getCurrentItems());
+
+        $this->assertFalse($this->Service->getUseCache());
+
+        // Liga o cache
+        $this->Service->setUseCache(true);
+        $this->assertTrue($this->Service->getUseCache());
+
+        // Verifica o paginator com o padrão
+        $paginator = $this->Service->findPaginated();
+
+        // verifica se vai utilizar o mesmo cache id quando realizar a mesma consulta, pois estava criando novo id e nunca
+        // utilizando o cache no paginator
+        $oldId = $this->Service->getCache()->getIterator()->key();
+        $fetchAll = $this->Service->setUseCache(true)->findPaginated();
+        $this->assertEquals($oldId, $this->Service->getCache()->getIterator()->key());
+        // Apaga qualquer cache
+        $this->assertTrue($this->Service->getCache()->flush(), 'apaga o cache');
+
+        $temp = [];
+        foreach ($paginator->getIterator() as $p) {
+            $temp[] = $p->getArrayCopy();
+        }
+
+        $findAll = $this->Service->findAll();
+        foreach ($findAll as $id => $row) {
+            $findAll[$id] = $row->toArray();
+        }
+        $paginator = json_encode($temp);
+        $this->assertEquals(json_encode($findAll), $paginator, 'retorno do paginator é igual');
+
+        // Verifica o paginator alterando o paginator
+        $this->Service->getPaginatorOptions()
+            ->setPageRange(2)
+            ->setCurrentPageNumber(1)
+            ->setItemCountPerPage(2);
+        $paginator = $this->Service->findPaginated();
+
+        $temp = [];
+        foreach ($paginator->getCurrentItems() as $p) {
+            $temp[] = $p->getArrayCopy();
+        }
+        $paginator = json_encode($temp);
+
+        $this->assertNotEquals(json_encode($this->defaultValues), $paginator);
+        $fetchAll = $this->Service->findPaginated(null, null, 2);
+        $temp = [];
+        foreach ($fetchAll as $p) {
+            $temp[] = $p->toArray();
+        }
+        $fetchAll = $temp;
+        $this->assertEquals(json_encode($fetchAll), $paginator);
+
+        // verifica se vai utilizar o mesmo cache id quando realizar a mesma consulta, pois estava criando nova e nunca
+        // utilizando o cache no paginator
+        $oldId = $this->Service->getCache()->getIterator()->key();
+        $fetchAll = $this->Service->setUseCache(true)->findPaginated(null, null, 2);
+        $this->assertEquals($oldId, $this->Service->getCache()->getIterator()->key());
+    }
 }
