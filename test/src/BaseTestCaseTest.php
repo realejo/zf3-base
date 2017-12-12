@@ -42,14 +42,6 @@ class BaseTestCaseTest extends TestCase
     }
 
     /**
-     * Constructs the test case.
-     */
-    public function __construct()
-    {
-        // TODO Auto-generated constructor
-    }
-
-    /**
      * Tests DbAdapter->getAdapter()
      */
     public function testGetAdapter()

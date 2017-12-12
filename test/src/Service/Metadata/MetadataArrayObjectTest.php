@@ -121,7 +121,7 @@ class MetadataArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testGetKeyNonExisting()
     {
@@ -130,7 +130,7 @@ class MetadataArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testGetPropertyNonExisting()
     {
@@ -139,7 +139,7 @@ class MetadataArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testSetKeyNonExisting()
     {
@@ -148,7 +148,7 @@ class MetadataArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testSetPropertyNonExisting()
     {
@@ -157,7 +157,7 @@ class MetadataArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testUnsetKeyNonExisting()
     {
@@ -166,7 +166,7 @@ class MetadataArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testUnsetPropertyNonExisting()
     {

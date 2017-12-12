@@ -144,7 +144,7 @@ class ArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testGetKeyNonExisting()
     {
@@ -154,7 +154,7 @@ class ArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testGetPropertyNonExisting()
     {
@@ -164,7 +164,7 @@ class ArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testGetKeyNonExistingWithNoLockedKeys()
     {
@@ -176,7 +176,7 @@ class ArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testGetPropertyNonExistingWithNoLockedKeys()
     {
@@ -187,7 +187,7 @@ class ArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testSetKeyNonExisting()
     {
@@ -197,7 +197,7 @@ class ArrayObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testSetPropertyNonExisting()
     {

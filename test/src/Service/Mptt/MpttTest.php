@@ -73,8 +73,13 @@ class MpttTest extends BaseTestCase
 
     protected $tables = ['mptt'];
 
-    public function __construct()
+    /**
+     * Prepares the environment before running a test.
+     */
+    protected function setUp()
     {
+        parent::setUp();
+
         $fields = ['id', 'name', 'parent_id', 'lft', 'rgt'];
         foreach ($this->idOrderedTree as $values) {
             $row = array_combine($fields, $values);
@@ -88,14 +93,6 @@ class MpttTest extends BaseTestCase
             $row = array_combine($fields, $values);
             $this->nameOrderedRows[] = $row;
         }
-    }
-
-    /**
-     * Prepares the environment before running a test.
-     */
-    protected function setUp()
-    {
-        parent::setUp();
 
         $this->dropTables()->createTables();
     }
