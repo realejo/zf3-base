@@ -15,9 +15,8 @@ class Paginator extends \Zend\Paginator\Paginator
     protected function _getCacheInternalId()
     {
         return md5(
-            json_encode(
-                get_object_vars($this->getAdapter())
-            ) . $this->getItemCountPerPage()
+            serialize($this->getAdapter())
+            . $this->getItemCountPerPage()
         );
     }
 }
