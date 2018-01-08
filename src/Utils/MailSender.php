@@ -447,6 +447,26 @@ class MailSender
     }
 
     /**
+     * Remove o final do sender substituindo por *
+     *
+     * Ex: contato@realejo.com.br => co*****@realejo.com.br
+     *
+     * @param string $email
+     * @return bool|string
+     */
+    public static function maskEmail($email)
+    {
+        if (!empty($email)) {
+            $explode = explode('@', $email);
+            $email = substr($explode[0], 0, 2);
+            $email .= str_repeat('*', strlen($explode[0])-2);
+            $email .= '@' . $explode[1];
+        }
+
+        return $email;
+    }
+
+    /**
      * Extrai um texto de um HTML com quebras de linhas
      *
      * @param string $html HTML para ser transformado em TXT
