@@ -614,7 +614,7 @@ class MetadataServiceTest extends BaseTestCase
 
     private function getSqlSchemaString($idInfo)
     {
-        return "SELECT * FROM metadata_value WHERE fk_info=$idInfo AND tblreference.id_reference=metadata_value.fk_reference";
+        return "SELECT * FROM metadata_value WHERE metadata_value.fk_info=$idInfo AND tblreference.id_reference=metadata_value.fk_reference";
     }
 
     /**

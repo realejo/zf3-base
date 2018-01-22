@@ -120,17 +120,17 @@ class MetadataService extends ServiceAbstract
             // Faz a busca pelo campo
             if (is_null($value)) {
                 $where[] = new Expression(
-                    "EXISTS (SELECT * FROM $valueTable WHERE fk_info={$schema[$id][$this->infoKeyName]} " .
+                    "EXISTS (SELECT * FROM $valueTable WHERE $valueTable.{$this->infoForeignKeyName}={$schema[$id][$this->infoKeyName]} " .
                             "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
                             "AND $field IS NULL) " .
                     "OR NOT EXISTS (SELECT * FROM $valueTable " .
-                                    "WHERE fk_info={$schema[$id][$this->infoKeyName]} " .
+                                    "WHERE $valueTable.{$this->infoForeignKeyName}={$schema[$id][$this->infoKeyName]} " .
                     "AND $mapperTable.$mapperKey=$valueTable.$referenceKey)"
                 );
             } else {
                 $where[] = new Expression($this->quoteInto(
                     "EXISTS (SELECT * FROM $valueTable " .
-                    "WHERE fk_info={$schema[$id][$this->infoKeyName]} " .
+                    "WHERE $valueTable.{$this->infoForeignKeyName}={$schema[$id][$this->infoKeyName]} " .
                         "AND $mapperTable.$mapperKey=$valueTable.$referenceKey " .
                         "AND $field = ?)",
                     $value,
