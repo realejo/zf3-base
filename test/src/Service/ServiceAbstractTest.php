@@ -721,7 +721,7 @@ class ServiceTest extends BaseTestCase
     {
         $this->Service->getMapper()->setOrder('id');
         $albuns = $this->Service->findPaginated();
-        $this->assertInstanceOf(\Realejo\MvcUtils\Paginator::class, $albuns);
+        $this->assertInstanceOf(\Realejo\Paginator\Paginator::class, $albuns);
         $this->assertCount(4, $albuns->getCurrentItems());
 
         $this->assertFalse($this->Service->getUseCache());

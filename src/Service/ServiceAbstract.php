@@ -5,7 +5,7 @@ namespace Realejo\Service;
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
 use Zend\Db\Sql\Select;
-use Realejo\MvcUtils\Paginator;
+use Realejo\Paginator\Paginator;
 use Zend\ServiceManager\ServiceManager;
 
 abstract class ServiceAbstract
@@ -318,6 +318,7 @@ abstract class ServiceAbstract
      * Define se deve usar o cache
      * @param boolean $useCache
      * @return ServiceAbstract
+     * @throws \Exception
      */
     public function setUseCache($useCache)
     {
@@ -374,6 +375,8 @@ abstract class ServiceAbstract
      * @param string|array $where OPTIONAL An SQL WHERE clause
      * @param string|array $order OPTIONAL An SQL ORDER clause.
      * @return null|ArrayObject
+     * @throws \Exception
+     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function findOne($where = null, $order = null)
     {
@@ -444,6 +447,8 @@ abstract class ServiceAbstract
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return ArrayObject[] | null
+     * @throws \Exception
+     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function findAssoc($where = null, $order = null, $count = null, $offset = null)
     {
@@ -484,6 +489,8 @@ abstract class ServiceAbstract
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return Paginator
+     * @throws \Exception
+     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function findPaginated($where = null, $order = null, $count = null, $offset = null)
     {
