@@ -20,12 +20,24 @@ class Paginator extends \Zend\Paginator\Paginator
 
         if ($adapter instanceof DbSelect) {
             $reflection = new \ReflectionObject($adapter);
+
+            /**
+             * @var  $select \Zend\Db\Sql\Select
+             */
             $property = $reflection->getProperty('select');
             $property->setAccessible(true);
             $select = $property->getValue($adapter);
+
+            /**
+             * @var  $sql \Zend\Db\Sql\Sql
+             */
+            $property = $reflection->getProperty('sql');
+            $property->setAccessible(true);
+            $sql = $property->getValue($adapter);
+
             return md5(
                 $reflection->getName()
-                . hash('sha512', $select->getSQLString())
+                . hash('sha512', $select->getSQLString($sql->getAdapter()->getPlatform()))
                 . $this->getItemCountPerPage()
             );
         }

@@ -1,6 +1,6 @@
 {
   "name" : "realejo/zf3-base",
-  "description" : "Biblioteca com models comuns utilizados nos projetos ZF3.",
+  "description" : "Biblioteca com classes comuns utilizadas nos projetos ZF3.",
   "type" : "library",
   "homepage" : "http://realejo.com.br",
   "license" : "BSD-3-Clause",
