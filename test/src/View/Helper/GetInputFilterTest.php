@@ -5,7 +5,6 @@ namespace RealejoTest\View\Helper;
 /**
  * Version test case.
  */
-use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Realejo\View\Helper\GetInputFilter;
 use Zend\Form\Element\Text;
