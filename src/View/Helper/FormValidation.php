@@ -1,6 +1,6 @@
 <?php
 
-namespace Store\View\Helper;
+namespace Realejo\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 

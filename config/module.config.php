@@ -20,5 +20,8 @@ return [
         'factories' => [
             View\Helper\ApplicationConfig::class => ApplicationConfigFactory::class
         ],
+        'invokables' => [
+            'formValidation' => View\Helper\FormValidation::class,
+        ],
     ],
 ];
