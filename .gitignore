@@ -10,4 +10,4 @@ composer.lock
 nbproject
 tmp/
 /composer.phar
-vendor/*
+/vendor/

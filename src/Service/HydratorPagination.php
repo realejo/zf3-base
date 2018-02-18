@@ -8,18 +8,18 @@ use Zend\Paginator\Adapter\DbSelect;
 class HydratorPagination extends DbSelect
 {
     /**
-     * @var \Realejo\Stdlib\ArrayObject
+     * @var ArrayObject
      */
     protected $hydratorEntity = null;
 
     /**
-     * @var \Zend\Hydrator\ArraySerializable
+     * @var ArraySerializable
      */
     protected $hydrator = null;
 
     /**
      *
-     * @return \Zend\Hydrator\ArraySerializable
+     * @return ArraySerializable
      */
     public function getHydrator()
     {
@@ -31,17 +31,17 @@ class HydratorPagination extends DbSelect
     }
 
     /**
-     * @param \Zend\Hydrator\ArraySerializable $hydrator
-     * @return \Realejo\Service\HydratorPagination
+     * @param ArraySerializable $hydrator
+     * @return HydratorPagination
      */
-    public function setHydrator(\Zend\Hydrator\ArraySerializable $hydrator = null)
+    public function setHydrator(ArraySerializable $hydrator = null)
     {
         $this->hydrator = $hydrator;
         return $this;
     }
 
     /**
-     * @return \Realejo\Stdlib\ArrayObject
+     * @return ArrayObject
      */
     public function getHydratorEntity()
     {
@@ -54,10 +54,10 @@ class HydratorPagination extends DbSelect
     }
 
     /**
-     * @param \Realejo\Stdlib\ArrayObject $hydrator
-     * @return \Realejo\Service\HydratorPagination
+     * @param ArrayObject|null $hydratorEntity
+     * @return HydratorPagination
      */
-    public function setHydratorEntity(\Realejo\Stdlib\ArrayObject $hydratorEntity = null)
+    public function setHydratorEntity(ArrayObject $hydratorEntity = null)
     {
         $this->hydratorEntity = $hydratorEntity;
         return $this;

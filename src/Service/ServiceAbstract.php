@@ -28,7 +28,7 @@ abstract class ServiceAbstract
     protected $useCache = false;
 
     /**
-     * @var Cache
+     * @var \Zend\Cache\Storage\Adapter\Filesystem
      */
     protected $cache;
 
@@ -192,6 +192,7 @@ abstract class ServiceAbstract
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return ArrayObject[] | null
+     * @throws \Exception
      */
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
@@ -265,7 +266,7 @@ abstract class ServiceAbstract
     /**
      * Configura o cache
      *
-     * @return Cache
+     * @return \Zend\Cache\Storage\Adapter\Filesystem
      */
     public function getCache()
     {
