@@ -11,8 +11,9 @@
 namespace Realejo\Paginator;
 
 use Zend\Paginator\Adapter\DbSelect;
+use Zend\Paginator\Paginator as ZendPaginator;
 
-class Paginator extends \Zend\Paginator\Paginator
+class Paginator extends ZendPaginator
 {
     protected function _getCacheInternalId()
     {

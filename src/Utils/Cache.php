@@ -16,7 +16,7 @@ class Cache
 {
     /**
      *
-     * @var \Zend\Cache\StorageFactory
+     * @var \Zend\Cache\Storage\Adapter\Filesystem
      */
     private $cache;
 
@@ -105,14 +105,15 @@ class Cache
         return realpath($cachePath);
     }
 
-     /**
-      * Retorna a pasta de cache para o model baseado no nome da classe
-      * Se a pasta não existir ela será criada
-      *
-      * @param string $class Nome da classe a ser usada
-      *
-      * @return string
-      */
+    /**
+     * Retorna a pasta de cache para o model baseado no nome da classe
+     * Se a pasta não existir ela será criada
+     *
+     * @param string $class Nome da classe a ser usada
+     *
+     * @return string
+     * @throws \Exception
+     */
     public static function getCachePath($class = '')
     {
         // Define a pasta de cache

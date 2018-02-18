@@ -9,18 +9,15 @@ use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 
-/**
- * Class GetAccessControlControllerPluginFactory
- * @package RealejoAdmin\View\Helper\Factory
- */
 class ApplicationConfigFactory implements FactoryInterface
 {
     /**
      * Create an object
      *
      * @param  ContainerInterface $container
-     * @param  string             $requestedName
-     * @param  null|array         $options
+     * @param  string $requestedName
+     * @param  null|array $options
+     * @return ApplicationConfig
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

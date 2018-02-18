@@ -3,8 +3,9 @@ namespace Realejo\Service;
 
 use Zend\Hydrator\ArraySerializable;
 use Realejo\Stdlib\ArrayObject;
+use Zend\Paginator\Adapter\DbSelect;
 
-class HydratorPagination extends \Zend\Paginator\Adapter\DbSelect
+class HydratorPagination extends DbSelect
 {
     /**
      * @var \Realejo\Stdlib\ArrayObject

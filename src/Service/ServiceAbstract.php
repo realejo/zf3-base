@@ -4,6 +4,7 @@ namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
+use Realejo\Utils\Cache;
 use Zend\Db\Sql\Select;
 use Realejo\Paginator\Paginator;
 use Zend\ServiceManager\ServiceManager;
@@ -27,7 +28,7 @@ abstract class ServiceAbstract
     protected $useCache = false;
 
     /**
-     * @var \Zend\Cache\Service\StorageCacheFactory
+     * @var Cache
      */
     protected $cache;
 
@@ -264,12 +265,12 @@ abstract class ServiceAbstract
     /**
      * Configura o cache
      *
-     * @return \Zend\Cache\Storage\Adapter\Filesystem
+     * @return Cache
      */
     public function getCache()
     {
         if (! isset($this->cache)) {
-            $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
+            $this->cache = Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
         }
 
         return $this->cache;

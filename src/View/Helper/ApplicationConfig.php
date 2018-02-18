@@ -2,9 +2,16 @@
 
 namespace Realejo\View\Helper;
 
-class ApplicationConfig extends \Zend\View\Helper\AbstractHelper
+use Zend\View\Helper\AbstractHelper;
+
+class ApplicationConfig extends AbstractHelper
 {
-    public function __construct($config)
+    /**
+     * @var array
+     */
+    private $config;
+
+    public function __construct(array $config)
     {
         $this->config = $config;
     }
