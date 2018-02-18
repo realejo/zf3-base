@@ -5,8 +5,10 @@ namespace Realejo\Service;
 use Psr\Container\ContainerInterface;
 use Realejo\Stdlib\ArrayObject;
 use Realejo\Utils\Cache;
-use Zend\Db\Sql\Select;
 use Realejo\Paginator\Paginator;
+use Zend\Db\ResultSet\HydratingResultSet;
+use Zend\Db\Sql\Select;
+use Zend\Paginator\Adapter\DbSelect;
 use Zend\ServiceManager\ServiceManager;
 
 abstract class ServiceAbstract
@@ -503,7 +505,6 @@ abstract class ServiceAbstract
             $select = $this->getMapper()->getSelect($this->getWhere($where), $order, $count, $offset);
         }
 
-
         // Verifica se deve usar o cache
         $cacheKey = 'findPaginated'
             . $this->getUniqueCacheKey()
@@ -514,10 +515,10 @@ abstract class ServiceAbstract
             return $this->getCache()->getItem($cacheKey);
         }
 
-        $paginator = new HydratorPagination($select, $this->getMapper()->getTableGateway()->getAdapter());
-        $paginator->setHydrator($this->getMapper()->getHydrator())
-            ->setHydratorEntity($this->getMapper()->getHydratorEntity());
-        $findPaginated = new Paginator($paginator);
+        $resultSet = new HydratingResultSet($this->getMapper()->getHydrator(), $this->getMapper()->getHydratorEntity());
+        $adapter = new DbSelect($select, $this->getMapper()->getTableGateway()->getAdapter(), $resultSet);
+
+        $findPaginated = new Paginator($adapter);
 
         // Verifica se deve usar o cache
         if ($this->getUseCache()) {

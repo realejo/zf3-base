@@ -5,6 +5,10 @@ use Zend\Hydrator\ArraySerializable;
 use Realejo\Stdlib\ArrayObject;
 use Zend\Paginator\Adapter\DbSelect;
 
+/**
+ * Class HydratorPagination
+ * @deprecated passamos a usar o HydratingResultSet
+ */
 class HydratorPagination extends DbSelect
 {
     /**
