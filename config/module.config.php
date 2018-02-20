@@ -22,6 +22,7 @@ return [
         ],
         'invokables' => [
             'formValidation' => View\Helper\FormValidation::class,
+            'getInputFilter' => View\Helper\GetInputFilter::class,
         ],
     ],
 ];
