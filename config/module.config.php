@@ -11,6 +11,17 @@ return [
                 'css' => false,
                 'js' => false
             ],
+            'ckeditor' => [
+                'js' => false,
+                'customConfig' => false,
+                'ckfinder' => [
+                    # needs to be defined
+                    #filebrowserBrowseUrl
+                    #filebrowserImageBrowseUrl
+                    #filebrowserUploadUrl
+                    #filebrowserImageUploadUrls
+                ]
+            ],
         ]
     ],
     'view_helpers' => [
@@ -23,6 +34,9 @@ return [
         'invokables' => [
             'formValidation' => View\Helper\FormValidation::class,
             'getInputFilter' => View\Helper\GetInputFilter::class,
+            'CKEditor' => View\Helper\CKEditor::class,
+            'formatDate' => View\Helper\FormatDate::class,
+            'text' => View\Helper\Text::class,
         ],
     ],
 ];
