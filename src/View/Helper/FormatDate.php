@@ -2,7 +2,7 @@
 /**
  * @see https://gist.github.com/mcaskill/02636e5970be1bb22270#file-function-date-format-conversion-php
  */
-namespace Cms\View\Helper;
+namespace Realejo\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 

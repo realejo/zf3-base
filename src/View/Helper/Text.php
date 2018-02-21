@@ -3,7 +3,7 @@
  * @see https://github.com/cakephp/cakephp/blob/ec23730aff39a2ca1230c2f34cbff92a96a44a75/src/Utility/Text.php
  * @link http://book.cakephp.org/3.0/en/views/helpers/text.html#truncating-text
  */
-namespace Cms\View\Helper;
+namespace Realejo\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
