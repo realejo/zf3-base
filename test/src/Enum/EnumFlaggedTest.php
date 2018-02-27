@@ -29,12 +29,30 @@ class EnumFlaggedTest extends TestCase
         $this->assertNull($enum->getName('2'));
         $this->assertNull($enum->getName('4'));
 
+        $this->assertNull($enum->getValueName());
+        $this->assertNull($enum->getValueName('Z'));
+        $this->assertNull($enum->getValueName(8));
+        $this->assertEquals('x', $enum->getValueName(1));
+        $this->assertEquals('w', $enum->getValueName(2));
+        $this->assertEquals('r', $enum->getValueName(4));
+        $this->assertNull($enum->getValueName('1'));
+        $this->assertNull($enum->getValueName('2'));
+        $this->assertNull($enum->getValueName('4'));
+
+
         $this->assertEquals('x/w', $enum->getName(1 + 2));
         $this->assertEquals('xw', $enum->getName(1 + 2, ''));
         $this->assertEquals([
             1 => 'x',
             2 => 'w',
         ], $enum->getName(1 + 2, false));
+
+        $this->assertEquals('x/w', $enum->getValueName(1 + 2));
+        $this->assertEquals('xw', $enum->getValueName(1 + 2, ''));
+        $this->assertEquals([
+            1 => 'x',
+            2 => 'w',
+        ], $enum->getValueName(1 + 2, false));
 
     }
 
@@ -72,6 +90,7 @@ class EnumFlaggedTest extends TestCase
         $enum = new EnumFlaggedConcreteEmpty();
         $this->assertEquals([], $enum->getDescriptions());
         $this->assertNull($enum->getDescription());
+        $this->assertNull($enum->getValueDescription());
 
         $enum = new EnumFlaggedConcrete();
         $this->assertEquals([
@@ -89,12 +108,30 @@ class EnumFlaggedTest extends TestCase
         $this->assertNull($enum->getDescription('2'));
         $this->assertNull($enum->getDescription('4'));
 
+        $this->assertNull($enum->getValueDescription());
+        $this->assertNull($enum->getValueDescription('Z'));
+        $this->assertNull($enum->getValueDescription(8));
+        $this->assertEquals('execute', $enum->getValueDescription(1));
+        $this->assertEquals('w', $enum->getValueDescription(2));
+        $this->assertEquals('r', $enum->getValueDescription(4));
+        $this->assertNull($enum->getValueDescription('1'));
+        $this->assertNull($enum->getValueDescription('2'));
+        $this->assertNull($enum->getValueDescription('4'));
+
+
         $this->assertEquals('execute/w', $enum->getDescription(1 + 2));
         $this->assertEquals('executew', $enum->getDescription(1 + 2, ''));
         $this->assertEquals([
             1 => 'execute',
             2 => 'w',
         ], $enum->getDescription(1 + 2, false));
+
+        $this->assertEquals('execute/w', $enum->getValueDescription(1 + 2));
+        $this->assertEquals('executew', $enum->getValueDescription(1 + 2, ''));
+        $this->assertEquals([
+            1 => 'execute',
+            2 => 'w',
+        ], $enum->getValueDescription(1 + 2, false));
 
     }
 
@@ -203,29 +240,37 @@ class EnumFlaggedTest extends TestCase
         $this->assertEquals(EnumFlaggedConcrete::EXECUTE, $enum->getValue());
         $this->assertEquals('x', $enum->getName($enum->getValue()));
         $this->assertEquals('execute', $enum->getDescription($enum->getValue()));
-        $this->assertEquals('x', $enum->getName());
-        $this->assertEquals('execute', $enum->getDescription());
+        $this->assertEquals('x', $enum->getValueName());
+        $this->assertEquals('execute', $enum->getValueDescription());
+        $this->assertNull($enum->getName());
+        $this->assertNull($enum->getDescription());
 
         $enum = new EnumFlaggedConcrete(EnumFlaggedConcrete::WRITE);
         $this->assertEquals(EnumFlaggedConcrete::WRITE, $enum->getValue());
         $this->assertEquals('w', $enum->getName($enum->getValue()));
         $this->assertEquals('w', $enum->getDescription($enum->getValue()));
-        $this->assertEquals('w', $enum->getName());
-        $this->assertEquals('w', $enum->getDescription());
+        $this->assertEquals('w', $enum->getValueName());
+        $this->assertEquals('w', $enum->getValueDescription());
+        $this->assertNull($enum->getName());
+        $this->assertNull($enum->getDescription());
 
         $enum = new EnumFlaggedConcrete(EnumFlaggedConcrete::READ);
         $this->assertEquals(EnumFlaggedConcrete::READ, $enum->getValue());
         $this->assertEquals('r', $enum->getName($enum->getValue()));
         $this->assertEquals('r', $enum->getDescription($enum->getValue()));
-        $this->assertEquals('r', $enum->getName());
-        $this->assertEquals('r', $enum->getDescription());
+        $this->assertEquals('r', $enum->getValueName());
+        $this->assertEquals('r', $enum->getValueDescription());
+        $this->assertNull($enum->getName());
+        $this->assertNull($enum->getDescription());
 
         $enum = new EnumFlaggedConcrete(EnumFlaggedConcrete::READ + EnumFlaggedConcrete::WRITE);
         $this->assertEquals(6, $enum->getValue());
         $this->assertEquals('w/r', $enum->getName($enum->getValue()));
         $this->assertEquals('w/r', $enum->getDescription($enum->getValue()));
-        $this->assertEquals('w/r', $enum->getName());
-        $this->assertEquals('w/r', $enum->getDescription());
+        $this->assertEquals('w/r', $enum->getValueName());
+        $this->assertEquals('w/r', $enum->getValueDescription());
+        $this->assertNull($enum->getName());
+        $this->assertNull($enum->getDescription());
     }
 
     public function testIsHas()
@@ -262,8 +307,8 @@ class EnumFlaggedTest extends TestCase
         $this->assertFalse($enum->has(5));
         $this->assertFalse($enum->has(7));
 
-        $enum = new EnumFlaggedConcrete(EnumFlaggedConcrete::READ+EnumFlaggedConcrete::WRITE);
-        $this->assertEquals(EnumFlaggedConcrete::READ+EnumFlaggedConcrete::WRITE, $enum->getValue());
+        $enum = new EnumFlaggedConcrete(EnumFlaggedConcrete::READ + EnumFlaggedConcrete::WRITE);
+        $this->assertEquals(EnumFlaggedConcrete::READ + EnumFlaggedConcrete::WRITE, $enum->getValue());
         $this->assertFalse($enum->is(0));
         $this->assertTrue($enum->is(6));
         $this->assertFalse($enum->is('6'));
@@ -281,5 +326,22 @@ class EnumFlaggedTest extends TestCase
         $this->assertFalse($enum->has(5));
         $this->assertFalse($enum->has(7));
         $this->assertFalse($enum->has(8));
+    }
+
+    public function testValue()
+    {
+        $empty = new EnumFlaggedConcrete();
+        $this->assertEquals(0, $empty->getValue());
+        $this->assertNull($empty->getValueName());
+        $this->assertNull($empty->getValueDescription());
+
+        $write = new EnumFlaggedConcrete(EnumFlaggedConcrete::WRITE);
+        $this->assertEquals(EnumFlaggedConcrete::WRITE, $write->getValue());
+
+        $read = new EnumFlaggedConcrete(EnumFlaggedConcrete::READ);
+        $this->assertEquals(EnumFlaggedConcrete::READ, $read->getValue());
+
+        $this->assertNotEquals(EnumFlaggedConcrete::READ, $write->getValue());
+        $this->assertNotEquals(EnumFlaggedConcrete::WRITE, $read->getValue());
     }
 }

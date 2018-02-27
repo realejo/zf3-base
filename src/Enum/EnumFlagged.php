@@ -26,10 +26,6 @@ abstract class EnumFlagged extends Enum
      */
     public static function getName($value = null, $join = '/')
     {
-        if ($value === null && self::$value !== null) {
-            $value = self::$value;
-        }
-
         if (!is_int($value)) {
             return null;
         }
@@ -64,10 +60,6 @@ abstract class EnumFlagged extends Enum
      */
     public static function getDescription($value = null, $join = '/')
     {
-        if ($value === null && self::$value !== null) {
-            $value = self::$value;
-        }
-
         if (!is_int($value)) {
             return null;
         }
@@ -90,6 +82,38 @@ abstract class EnumFlagged extends Enum
         }
 
         return implode($join, $description);
+    }
+
+    /**
+     * Return the name os the constant
+     *
+     * @param null $value
+     * @param string $join
+     * @return string|array
+     */
+    public function getValueName($value = null, $join = '/')
+    {
+        if ($value === null && $this->value !== null) {
+            $value = $this->value;
+        }
+
+        return $this->getName($value, $join);
+    }
+
+    /**
+     * Return the name os the constant
+     *
+     * @param null $value
+     * @param string $join
+     * @return string|array
+     */
+    public function getValueDescription($value = null, $join = '/')
+    {
+        if ($value === null && $this->value !== null) {
+            $value = $this->value;
+        }
+
+        return $this->getDescription($value, $join);
     }
 
     public function __construct($value = 0)
@@ -125,10 +149,11 @@ abstract class EnumFlagged extends Enum
             return false;
         }
 
-        if ($value === 0 && self::$value === 0) {
+        if ($value === 0 && $this->value === 0) {
             return true;
         }
 
-        return ((self::$value & $value) === $value);
+        return (($this->value & $value) === $value);
     }
 }
+

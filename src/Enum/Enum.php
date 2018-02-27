@@ -27,7 +27,7 @@ abstract class Enum
 {
     protected static $constDescription = [];
 
-    protected static $value;
+    protected $value;
 
     /**
      * Return the const values with it's names
@@ -75,6 +75,36 @@ abstract class Enum
     }
 
     /**
+     * Return the name os the constant
+     *
+     * @param null $value
+     * @return string|array
+     */
+    public function getValueName($value = null)
+    {
+        if ($value === null && $this->value !== null) {
+            $value = $this->value;
+        }
+
+        return $this->getName($value);
+    }
+
+    /**
+     * Return the name os the constant
+     *
+     * @param null $value
+     * @return string|array
+     */
+    public function getValueDescription($value = null)
+    {
+        if ($value === null && $this->value !== null) {
+            $value = $this->value;
+        }
+
+        return $this->getDescription($value);
+    }
+
+    /**
      * Descrição dos status
      *
      * @param null $value
@@ -104,16 +134,16 @@ abstract class Enum
             throw new InvalidArgumentException("Value '$value' is not valid.");
         }
 
-        self::$value = $value;
+        $this->value = $value;
     }
 
     public function getValue()
     {
-        return self::$value;
+        return $this->value;
     }
 
     public function is($value): bool
     {
-        return ($value === self::$value);
+        return ($value === $this->value);
     }
 }
