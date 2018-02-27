@@ -12,9 +12,8 @@ namespace Realejo\Enum;
  *  self::CONST => name
  * ];
  *
- * @link      http://bitbucket.org/bffc-bobs/bobs-fa
- * @copyright Copyright (c) 2018 Realejo (http://realejo.com.br)
- * @license   proprietary
+ * @link      https://github.com/realejo/zf3-base
+ * @copyright Copyright (c) 2018 Realejo (https://realejo.com.br)
  */
 abstract class EnumFlagged extends Enum
 {

@@ -20,9 +20,8 @@ use InvalidArgumentException;
  *
  * It fails if the const is NULL or BOOLEAN
  *
- * @link      http://bitbucket.org/bffc-bobs/bobs-fa
- * @copyright Copyright (c) 2018 Realejo (http://realejo.com.br)
- * @license   proprietary
+ * @link      https://github.com/realejo/zf3-base
+ * @copyright Copyright (c) 2018 Realejo (https://realejo.com.br)
  */
 abstract class Enum
 {

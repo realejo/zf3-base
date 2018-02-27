@@ -37,6 +37,9 @@ return [
             'CKEditor' => View\Helper\CKEditor::class,
             'formatDate' => View\Helper\FormatDate::class,
             'text' => View\Helper\Text::class,
+            'frmEnumChecked' => View\Helper\FrmEnumChecked::class,
+            'frmEnumCheckbox' => View\Helper\FrmEnumCheckbox::class,
+            'frmEnumSelect' => View\Helper\FrmEnumSelect::class,
         ],
     ],
 ];
