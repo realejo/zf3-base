@@ -29,7 +29,7 @@ class FrmEnumSelect extends AbstractHelper
      * @param array $options
      * @return string
      */
-    public function frmEnumSelect(Enum $enum, $name, $options = [])
+    public function __invoke(Enum $enum, $name, $options = [])
     {
         // Recupera os registros
         $names = $enum::getNames();

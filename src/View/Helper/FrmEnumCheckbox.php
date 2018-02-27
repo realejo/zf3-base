@@ -30,7 +30,7 @@ class FrmEnumCheckbox extends AbstractHelper
      * @param array $options
      * @return string
      */
-    public function frmEnumCheckbox(Enum $enum, $name, $options = [])
+    public function __invoke(Enum $enum, $name, $options = [])
     {
         // Recupera os registros
         $names = $enum::getNames();
