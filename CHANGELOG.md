@@ -4,12 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2018-02-27
+### Changed
+- Fixed `getValueName()` and `getValueDescriptio()` methods in Enum` and `EnumFlagged`; 
+- `__invoke()` method in view helpers `frmEnumChecked`, `frmEnumCheckbox` and `frmEnumSelect`. 
+
 ## [2.1.0] - 2018-02-27
 ### Added
-- `Enum` and `EnumFlagged`. It also has 3 view helpers `frmEnumChecked` to display the chosen options. 
+- `Enum` and `EnumFlagged`;
+- View helpers `frmEnumChecked` to display the chosen options. 
 `frmEnumCheckbox` and `frmEnumSelect` to use in forms. 
 ### Removed
-- drop support for PHP 5.6 
+- drop support for PHP 5.6. 
 
 ## [2.0.2] - 2018-02-21
 ### Added
