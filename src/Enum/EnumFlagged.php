@@ -1,0 +1,135 @@
+<?php
+
+namespace Realejo\Enum;
+
+/**
+ * Enum class
+ *
+ * Extends Enum class to use bitwise values
+ *
+ * static protected $constDescription = [
+ *  self::CONST => [name, description],
+ *  self::CONST => name
+ * ];
+ *
+ * @link      http://bitbucket.org/bffc-bobs/bobs-fa
+ * @copyright Copyright (c) 2018 Realejo (http://realejo.com.br)
+ * @license   proprietary
+ */
+abstract class EnumFlagged extends Enum
+{
+    /**
+     * Return the name os the constant
+     *
+     * @param null $value
+     * @param string $join
+     * @return string|array
+     */
+    public static function getName($value = null, $join = '/')
+    {
+        if ($value === null && self::$value !== null) {
+            $value = self::$value;
+        }
+
+        if (!is_int($value)) {
+            return null;
+        }
+
+        $names = self::getNames();
+
+        $name = [];
+        foreach ($names as $k => $v) {
+            if ($value & $k) {
+                $name[$k] = $v;
+            }
+        }
+
+        if ($join === false) {
+            return $name;
+        }
+
+        if (empty($name)) {
+            return null;
+        }
+
+        return implode($join, $name);
+
+    }
+
+    /**
+     * Descrição dos status
+     *
+     * @param null $value
+     * @param string $join
+     * @return string|array|null
+     */
+    public static function getDescription($value = null, $join = '/')
+    {
+        if ($value === null && self::$value !== null) {
+            $value = self::$value;
+        }
+
+        if (!is_int($value)) {
+            return null;
+        }
+
+        $descriptions = self::getDescriptions();
+
+        $description = [];
+        foreach ($descriptions as $k => $v) {
+            if ($value & $k) {
+                $description[$k] = $v;
+            }
+        }
+
+        if ($join === false) {
+            return $description;
+        }
+
+        if (empty($description)) {
+            return null;
+        }
+
+        return implode($join, $description);
+    }
+
+    public function __construct($value = 0)
+    {
+        if ($value === '' || $value === null) {
+            $value = 0;
+        }
+        return parent::__construct($value);
+    }
+
+    public static function isValid($value): bool
+    {
+        if (!is_int($value)) {
+            return false;
+        }
+
+        // ZERO is not a const but it's valid because default flagged is ZERO
+        if ($value === 0) {
+            return true;
+        }
+
+        $const = self::getNames();
+        if (empty($const)) {
+            return false;
+        }
+        $maxFlaggedValue = array_sum($const) * 2 - 1;
+        return ($value > $maxFlaggedValue);
+    }
+
+    public function has($value): bool
+    {
+        if (!is_int($value)) {
+            return false;
+        }
+
+        if ($value === 0 && self::$value === 0) {
+            return true;
+        }
+
+        return ((self::$value & $value) === $value);
+    }
+}
