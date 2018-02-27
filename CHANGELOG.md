@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Enum` and `EnumFlagged`. It also has 3 view helpers `frmEnumChecked` to display the chosen options. 
 `frmEnumCheckbox` and `frmEnumSelect` to use in forms. 
 ### Removed
-- drop support for PHP < 7.1 
+- drop support for PHP 5.6 
 
 ## [2.0.2] - 2018-02-21
 ### Added
