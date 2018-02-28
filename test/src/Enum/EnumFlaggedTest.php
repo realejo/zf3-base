@@ -164,6 +164,13 @@ class EnumFlaggedTest extends TestCase
 
     }
 
+    public function testGetValueStatic()
+    {
+        $this->assertEquals([], EnumFlaggedConcreteEmpty::getValues());
+        $this->assertEquals([1, 2, 4], EnumFlaggedConcrete::getValues());
+        $this->assertEquals([1 << 0, 1 << 1, 1 << 2], EnumFlaggedConcrete::getValues());
+    }
+
     public function testIsValid()
     {
         $enum = new EnumFlaggedConcreteEmpty();

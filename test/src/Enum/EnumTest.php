@@ -218,6 +218,12 @@ class EnumTest extends TestCase
         $this->assertNull($enum->getDescription());
     }
 
+    public function testGetValueStatic()
+    {
+        $this->assertEquals([], EnumConcreteEmpty::getValues());
+        $this->assertEquals(['S', 'X', 666, 999], EnumConcrete::getValues());
+    }
+
     public function testIs()
     {
         $enum = new EnumConcrete(EnumConcrete::STRING1);

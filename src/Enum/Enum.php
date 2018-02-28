@@ -58,6 +58,16 @@ abstract class Enum
     }
 
     /**
+     * Return the const values
+     *
+     * @return array
+     */
+    public static function getValues(): array
+    {
+        return array_keys(static::getNames());
+    }
+
+    /**
      * Return the name os the constant
      *
      * @param null $value
