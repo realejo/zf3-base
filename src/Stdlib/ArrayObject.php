@@ -1,6 +1,7 @@
 <?php
 namespace Realejo\Stdlib;
 
+use Realejo\Enum\Enum;
 use Zend\Json\Json;
 
 class ArrayObject implements \ArrayAccess
@@ -29,6 +30,8 @@ class ArrayObject implements \ArrayAccess
     protected $dateKeys = [];
 
     protected $jsonKeys = [];
+
+    protected $enumKeys = [];
 
     public function __construct($data = null)
     {
@@ -66,6 +69,7 @@ class ArrayObject implements \ArrayAccess
         $useJsonKeys = (is_array($this->jsonKeys) && ! empty($this->jsonKeys));
         $useIntKeys = (is_array($this->intKeys) && ! empty($this->intKeys));
         $useBooleanKeys = (is_array($this->booleanKeys) && ! empty($this->booleanKeys));
+        $useEnumKeys = (is_array($this->enumKeys) && !empty($this->enumKeys));
 
         if (! empty($data)) {
             foreach ($data as $key => $value) {
@@ -77,6 +81,8 @@ class ArrayObject implements \ArrayAccess
                     $value = (int) $value;
                 } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && ! empty($value)) {
                     $value = (boolean) $value;
+                } elseif ($useEnumKeys && array_key_exists($key, $this->enumKeys) && ! empty($value)) {
+                    $value = new $this->enumKeys[$key]($value);
                 }
                 $this->storage[$this->getMappedKey($key)] = $value;
             }
@@ -132,6 +138,11 @@ class ArrayObject implements \ArrayAccess
             // desfaz o json
             if (in_array($key, $this->jsonKeys) && ($value instanceof \stdClass || is_array($value))) {
                 $value = json_encode($value, JSON_OBJECT_AS_ARRAY);
+            }
+
+            // desfaz o enum
+            if ($value instanceof Enum) {
+                $value = $value->getValue();
             }
 
             // desfaz boolean e int

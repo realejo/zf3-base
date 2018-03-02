@@ -1,8 +1,11 @@
 <?php
+
 namespace RealejoTest\Stdlib;
 
 use PHPUnit\Framework\TestCase;
 use Realejo\Stdlib\ArrayObject;
+use RealejoTest\Enum\EnumConcrete;
+use RealejoTest\Enum\EnumFlaggedConcrete;
 
 /**
  * ArrayObject test case.
@@ -38,7 +41,7 @@ class ArrayObjectTest extends TestCase
         $this->assertEquals('second', $object->two);
         $this->assertEquals('second', $object['two']);
 
-        $stdClass = (object) ['three' => 'third'];
+        $stdClass = (object)['three' => 'third'];
         $object = new ArrayObject(['two' => $stdClass]);
         $this->assertNotNull($object->toArray());
         $this->assertNotEmpty($object->toArray());
@@ -100,7 +103,7 @@ class ArrayObjectTest extends TestCase
         $this->assertFalse(isset($object->two));
         $this->assertFalse(isset($object['two']));
 
-        $stdClass = (object) ['three' => 'third'];
+        $stdClass = (object)['three' => 'third'];
 
         $object['two'] = $stdClass;
         $this->assertNotNull($object->toArray());
@@ -254,7 +257,9 @@ class ArrayObjectTest extends TestCase
             'booleanKey' => '1',
             'jsonKey' => json_encode(['key' => 'value']),
             'datetimeKey' => '2010-01-01 00:00:00',
-            'intKey' => '1'
+            'intKey' => '1',
+            'enum' => EnumConcrete::STRING1,
+            'enumFlagged' => EnumFlaggedConcrete::WRITE
         ]);
 
         // check keys
@@ -263,9 +268,17 @@ class ArrayObjectTest extends TestCase
         $stdClass->key = 'value';
         $this->assertEquals($stdClass, $object->jsonKey);
         $this->assertEquals($stdClass->key, $object->jsonKey->key);
-        $this->assertEquals((array) $stdClass, (array) $object->jsonKey);
+        $this->assertEquals((array)$stdClass, (array)$object->jsonKey);
         $this->assertEquals(new \DateTime('2010-01-01'), $object->datetimeKey);
         $this->assertTrue($object->intKey === 1);
+
+        $this->assertInstanceOf(EnumConcrete::class, $object->enum);
+        $this->assertEquals(EnumConcrete::STRING1, $object->enum->getValue());
+        $this->assertTrue($object->enum->is(EnumConcrete::STRING1));
+
+        $this->assertInstanceOf(EnumFlaggedConcrete::class, $object->enumFlagged);
+        $this->assertEquals(EnumFlaggedConcrete::WRITE, $object->enumFlagged->getValue());
+        $this->assertTrue($object->enumFlagged->is(EnumFlaggedConcrete::WRITE));
 
         // get the array as it will be inserted on database
         $objectArray = $object->getArrayCopy();
@@ -273,5 +286,7 @@ class ArrayObjectTest extends TestCase
         $this->assertEquals(json_encode(['key' => 'value'], JSON_OBJECT_AS_ARRAY), $objectArray['jsonKey']);
         $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
         $this->assertEquals(1, $objectArray['intKey']);
+        $this->assertEquals('S', $objectArray['enum']);
+        $this->assertEquals(2, $objectArray['enumFlagged']);
     }
 }
