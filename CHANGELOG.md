@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.3] - 2018-03-02
+### Added
+- `ArrayObject`: now it populates enum values.
+
+
 ## [2.1.2] - 2018-02-28
 ### Added
 - `Enum::getValues()` returns an array with the constant values.
