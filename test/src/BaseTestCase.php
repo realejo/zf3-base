@@ -40,7 +40,7 @@ class BaseTestCase extends TestCase
      */
     public static function setUpBeforeClass()
     {
-        // Apaga todo o conteúdo do ApplICATION DATA
+        // Apaga todo o conteúdo do APPLICATION_DATA
         $oTemp = new self();
         $oTemp->clearApplicationData();
     }
@@ -50,7 +50,7 @@ class BaseTestCase extends TestCase
      */
     public static function tearDownAfterClass()
     {
-        // Apaga todo o conteúdo do ApplICATION DATA
+        // Apaga todo o conteúdo do APPLICATION_DATA
         $oTemp = new self();
         $oTemp->clearApplicationData();
     }
@@ -298,7 +298,7 @@ class BaseTestCase extends TestCase
             $this->fail('Só é possível executar rrmdir() em testing');
         }
 
-        // Não deixa apagar fora do APPLICATION DATA
+        // Não deixa apagar fora do APPLICATION_DATA
         if (strpos($dir, APPLICATION_DATA) === false || empty(APPLICATION_DATA)) {
             $this->fail('Não é possível apagar fora do APPLICATION_DATA');
         }
