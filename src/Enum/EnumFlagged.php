@@ -135,12 +135,12 @@ abstract class EnumFlagged extends Enum
             return true;
         }
 
-        $const = self::getNames();
+        $const = self::getValues();
         if (empty($const)) {
             return false;
         }
-        $maxFlaggedValue = array_sum($const) * 2 - 1;
-        return ($value > $maxFlaggedValue);
+        $maxFlaggedValue = max($const) * 2 - 1;
+        return ($value <= $maxFlaggedValue);
     }
 
     public function has($value): bool

@@ -198,9 +198,9 @@ class EnumFlaggedTest extends TestCase
         $this->assertFalse($enum->isValid('3'));
         $this->assertFalse($enum->isValid(3.0));
 
-        $this->assertTrue($enum->isValid(8));
-        $this->assertFalse($enum->isValid('8'));
-        $this->assertFalse($enum->isValid(8.0));
+        $this->assertTrue($enum->isValid(7));
+        $this->assertFalse($enum->isValid('7'));
+        $this->assertFalse($enum->isValid(7.0));
     }
 
     public function testIsValidStatic()
@@ -228,9 +228,24 @@ class EnumFlaggedTest extends TestCase
         $this->assertFalse(EnumFlaggedConcrete::isValid('3'));
         $this->assertFalse(EnumFlaggedConcrete::isValid(3.0));
 
-        $this->assertTrue(EnumFlaggedConcrete::isValid(8));
+        $this->assertTrue(EnumFlaggedConcrete::isValid(7));
+        $this->assertFalse(EnumFlaggedConcrete::isValid('7'));
+        $this->assertFalse(EnumFlaggedConcrete::isValid(7.0));
+
+        $this->assertFalse(EnumFlaggedConcrete::isValid(8));
         $this->assertFalse(EnumFlaggedConcrete::isValid('8'));
         $this->assertFalse(EnumFlaggedConcrete::isValid(8.0));
+
+        $this->assertTrue(EnumFlaggedConcrete::isValid(EnumFlaggedConcrete::READ));
+        $this->assertTrue(EnumFlaggedConcrete::isValid(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue(EnumFlaggedConcrete::isValid(EnumFlaggedConcrete::EXECUTE));
+
+        $this->assertTrue(EnumFlaggedConcrete::isValid(
+            EnumFlaggedConcrete::READ | EnumFlaggedConcrete::WRITE | EnumFlaggedConcrete::EXECUTE
+        ));
+        $this->assertFalse(EnumFlaggedConcrete::isValid(
+            (EnumFlaggedConcrete::READ | EnumFlaggedConcrete::WRITE | EnumFlaggedConcrete::EXECUTE)+1
+        ));
     }
 
     public function testGetValue()
