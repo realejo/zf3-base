@@ -46,7 +46,7 @@ class FrmEnumCheckbox extends AbstractHelper
 
         // Monta as opções
         $checkbox = [];
-        if (!empty($names)) {
+        if (! empty($names)) {
             foreach ($names as $v => $n) {
                 if ($enum instanceof EnumFlagged) {
                     $checked = ($enum->has($v)) ? 'checked="checked"' : '';
@@ -65,14 +65,13 @@ class FrmEnumCheckbox extends AbstractHelper
 
         if (isset($options['cols'])) {
             $countCheckbox = count($checkbox);
-            $slice = ceil($countCheckbox/$options['cols']);
+            $slice = ceil($countCheckbox / $options['cols']);
             $columns = [];
-            $columnSize = round(12/$options['cols']);
-            for ($c=1;$c<=$options['cols'];$c++) {
+            $columnSize = round(12 / $options['cols']);
+            for ($c = 1; $c <= $options['cols']; $c++) {
                 $columns[$c] = "<div class=\"col-xs-$columnSize\">"
-                        . implode('' , array_slice($checkbox, ($c-1)*$slice, $slice))
+                        . implode('', array_slice($checkbox, ($c - 1) * $slice, $slice))
                     .'</div>';
-
             }
             return '<div class="row">' . implode('', $columns) . '</div>';
         }

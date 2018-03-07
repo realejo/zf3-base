@@ -20,5 +20,4 @@ class ApplicationConfig extends AbstractHelper
     {
         return $this->config;
     }
-
 }

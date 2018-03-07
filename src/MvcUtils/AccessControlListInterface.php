@@ -1,6 +1,7 @@
 <?php
 
 namespace Realejo\MvcUtils;
+
 /**
  * Describes the interface of a module that exposes access control list to admin.
  */

@@ -43,7 +43,7 @@ class FrmEnumChecked extends AbstractHelper
 
         // Monta as opções
         $values = [];
-        if (!empty($names)) {
+        if (! empty($names)) {
             foreach ($names as $v => $n) {
                 if ($enum instanceof EnumFlagged) {
                     $checked = ($enum->has($v)) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>';
@@ -57,14 +57,13 @@ class FrmEnumChecked extends AbstractHelper
 
         if (isset($options['cols'])) {
             $countValues = count($values);
-            $slice = ceil($countValues/$options['cols']);
+            $slice = ceil($countValues / $options['cols']);
             $columns = [];
-            $columnSize = round(12/$options['cols']);
-            for ($c=1;$c<=$options['cols'];$c++) {
+            $columnSize = round(12 / $options['cols']);
+            for ($c = 1; $c <= $options['cols']; $c++) {
                 $columns[$c] = "<div class=\"col-xs-$columnSize\">"
-                        . implode('' , array_slice($values, ($c-1)*$slice, $slice))
+                        . implode('', array_slice($values, ($c - 1) * $slice, $slice))
                     .'</div>';
-
             }
             return '<div class="row">' . implode('', $columns) . '</div>';
         }

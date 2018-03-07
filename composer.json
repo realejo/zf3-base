@@ -24,6 +24,7 @@
     "zendframework/zend-i18n-resources": "^2.5"
   },
   "require-dev" : {
+    "friendsofphp/php-cs-fixer": "2.*",
     "squizlabs/php_codesniffer": "^2.8",
     "phpunit/phpunit" : "^6.5",
     "zendframework/zend-dom": "~2.6.0"

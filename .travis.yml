@@ -10,9 +10,17 @@ php:
 # optionally specify a list of environments, for example to test different RDBMS
 env:
   - TRAVIS=true
+  - EXECUTE_CS_CHECK=true
+  - EXECUTE_TEST_COVERALLS=true
 
 before_script:
-  - composer install
+  - composer install --no-interaction --ignore-platform-reqs
   - mysql -e 'create database IF NOT EXISTS test';
 
-script: composer test
+script:
+- if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/phpunit --coverage-clover clover.xml ; fi
+- if [[ "$EXECUTE_TEST_COVERALLS" != true ]]; then composer test ; fi
+- if [[ "$EXECUTE_CS_CHECK" == true ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run ; fi
+
+after_script:
+  - if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/coveralls --root_dir src --config ../.coveralls.yml ; fi

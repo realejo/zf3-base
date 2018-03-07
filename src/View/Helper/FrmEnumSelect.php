@@ -47,14 +47,14 @@ class FrmEnumSelect extends AbstractHelper
 
         // Defines the correct holder
         $placeholder = $selectPlaceholder = $options['placeholder'] ?? '';
-        if (!empty($placeholder)) {
+        if (! empty($placeholder)) {
             $selectPlaceholder = "placeholder=\"$selectPlaceholder\"";
         }
 
         // Monta as opções
         $options = '';
         if (! empty($names)) {
-            foreach ($names as $v=>$n) {
+            foreach ($names as $v => $n) {
                 $selected = ($enum->is($v)) ? 'selected="selected"' : '';
                 $options .= "<option value=\"$v\" $selected>$n</option>";
             }
@@ -66,7 +66,7 @@ class FrmEnumSelect extends AbstractHelper
         $select = "<select class=\"form-control\" name=\"$name\" id=\"$name\" $selectPlaceholder>";
 
         // Verifica se tem valor padrão selecionado
-        if ((!$hasSelected || $showEmpty) && !$neverShowEmpty) {
+        if ((! $hasSelected || $showEmpty) && ! $neverShowEmpty) {
             $select .= "<option value=\"\">$placeholder</option>";
         }
 

@@ -456,10 +456,10 @@ class MailSender
      */
     public static function maskEmail($email)
     {
-        if (!empty($email)) {
+        if (! empty($email)) {
             $explode = explode('@', $email);
             $email = substr($explode[0], 0, 2);
-            $email .= str_repeat('*', strlen($explode[0])-2);
+            $email .= str_repeat('*', strlen($explode[0]) - 2);
             $email .= '@' . $explode[1];
         }
 

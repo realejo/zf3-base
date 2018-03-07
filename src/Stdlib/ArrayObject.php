@@ -69,7 +69,7 @@ class ArrayObject implements \ArrayAccess
         $useJsonKeys = (is_array($this->jsonKeys) && ! empty($this->jsonKeys));
         $useIntKeys = (is_array($this->intKeys) && ! empty($this->intKeys));
         $useBooleanKeys = (is_array($this->booleanKeys) && ! empty($this->booleanKeys));
-        $useEnumKeys = (is_array($this->enumKeys) && !empty($this->enumKeys));
+        $useEnumKeys = (is_array($this->enumKeys) && ! empty($this->enumKeys));
 
         if (! empty($data)) {
             foreach ($data as $key => $value) {

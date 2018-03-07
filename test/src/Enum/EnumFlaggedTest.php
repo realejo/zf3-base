@@ -53,7 +53,6 @@ class EnumFlaggedTest extends TestCase
             1 => 'x',
             2 => 'w',
         ], $enum->getValueName(1 | 2, false));
-
     }
 
     public function testGetNameStatic()
@@ -82,7 +81,6 @@ class EnumFlaggedTest extends TestCase
             1 => 'x',
             2 => 'w',
         ], EnumFlaggedConcrete::getName(1 | 2, false));
-
     }
 
     public function testGetDescription()
@@ -132,7 +130,6 @@ class EnumFlaggedTest extends TestCase
             1 => 'execute',
             2 => 'w',
         ], $enum->getValueDescription(1 | 2, false));
-
     }
 
     public function testGetDescriptionStatic()
@@ -161,7 +158,6 @@ class EnumFlaggedTest extends TestCase
             1 => 'execute',
             2 => 'w',
         ], EnumFlaggedConcrete::getDescription(1 | 2, false));
-
     }
 
     public function testGetValueStatic()
@@ -244,7 +240,7 @@ class EnumFlaggedTest extends TestCase
             EnumFlaggedConcrete::READ | EnumFlaggedConcrete::WRITE | EnumFlaggedConcrete::EXECUTE
         ));
         $this->assertFalse(EnumFlaggedConcrete::isValid(
-            (EnumFlaggedConcrete::READ | EnumFlaggedConcrete::WRITE | EnumFlaggedConcrete::EXECUTE)+1
+            (EnumFlaggedConcrete::READ | EnumFlaggedConcrete::WRITE | EnumFlaggedConcrete::EXECUTE) + 1
         ));
     }
 
