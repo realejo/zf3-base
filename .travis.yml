@@ -13,9 +13,14 @@ env:
   - EXECUTE_CS_CHECK=true
   - EXECUTE_TEST_COVERALLS=true
 
+before_install:
+  - composer self-update
+
 before_script:
   - composer install --no-interaction --ignore-platform-reqs
   - mysql -e 'create database IF NOT EXISTS test';
+  - if [[ "$EXECUTE_CS_CHECK" == true ]]; then phpcs --config-set ignore_errors_on_exit 1 ; fi
+  - if [[ "$EXECUTE_CS_CHECK" == true ]]; then phpcs --config-set ignore_warnings_on_exit 1 ; fi
 
 script:
 - if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/phpunit --coverage-clover clover.xml ; fi
