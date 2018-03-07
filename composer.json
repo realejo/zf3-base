@@ -41,7 +41,7 @@
   },
   "scripts": {
     "cs-check": "phpcs",
-    "cs-fix": "phpcbf",
+    "cs-fix": "phpcbf fix -v --diff --dry-run",
     "test": "phpunit"
   }
 }

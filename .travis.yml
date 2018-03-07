@@ -20,7 +20,7 @@ before_script:
 script:
 - if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/phpunit --coverage-clover clover.xml ; fi
 - if [[ "$EXECUTE_TEST_COVERALLS" != true ]]; then composer test ; fi
-- if [[ "$EXECUTE_CS_CHECK" == true ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run ; fi
+- if [[ "$EXECUTE_CS_CHECK" == true ]]; then composer cs-fix  ; fi
 
 after_script:
   - if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/coveralls --root_dir src --config ../.coveralls.yml ; fi
