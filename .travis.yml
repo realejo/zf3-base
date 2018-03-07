@@ -19,13 +19,11 @@ before_install:
 before_script:
   - composer install --no-interaction --ignore-platform-reqs
   - mysql -e 'create database IF NOT EXISTS test';
-  - if [[ "$EXECUTE_CS_CHECK" == true ]]; then phpcs --config-set ignore_errors_on_exit 1 ; fi
-  - if [[ "$EXECUTE_CS_CHECK" == true ]]; then phpcs --config-set ignore_warnings_on_exit 1 ; fi
 
 script:
 - if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/phpunit --coverage-clover clover.xml ; fi
 - if [[ "$EXECUTE_TEST_COVERALLS" != true ]]; then composer test ; fi
-- if [[ "$EXECUTE_CS_CHECK" == true ]]; then composer cs-check  ; fi
+- if [[ "$EXECUTE_CS_CHECK" == true ]]; then composer cs-check-travis  ; fi
 
 after_script:
   - if [[ "$EXECUTE_TEST_COVERALLS" == true ]]; then ./vendor/bin/coveralls --root_dir src --config ../.coveralls.yml ; fi

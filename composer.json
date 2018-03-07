@@ -42,6 +42,7 @@
   "scripts": {
     "cs-check": "phpcs",
     "cs-fix": "phpcbf fix -v --diff --dry-run",
-    "test": "phpunit"
+    "test": "phpunit",
+    "cs-check-travis": "phpcs --config-set ignore_errors_on_exit 1;phpcs --config-set ignore_warnings_on_exit 1; phpcs"
   }
 }
