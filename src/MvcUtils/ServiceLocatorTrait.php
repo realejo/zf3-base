@@ -39,7 +39,7 @@ trait ServiceLocatorTrait
     public function getFromServiceLocator($class)
     {
         if (! $this->hasServiceLocator()) {
-            $this->setServiceLocator(new ServiceManager());
+            throw new \RuntimeException('Service locator not defined');
         }
 
         if (! $this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
