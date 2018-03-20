@@ -194,7 +194,6 @@ abstract class ServiceAbstract
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return ArrayObject[] | null
-     * @throws \Exception
      */
     public function findAll($where = null, $order = null, $count = null, $offset = null)
     {
@@ -227,13 +226,12 @@ abstract class ServiceAbstract
 
     /**
      * @return MapperAbstract
-     * @throws \Exception
      */
     public function getMapper()
     {
         if (! isset($this->mapper)) {
             if (! isset($this->mapperClass)) {
-                throw new \Exception('Mapper class not defined at ' . get_class($this));
+                throw new \RuntimeException('Mapper class not defined at ' . get_class($this));
             }
             $this->mapper = new $this->mapperClass();
             $this->mapper->setCache($this->getCache());
@@ -248,7 +246,6 @@ abstract class ServiceAbstract
     /**
      * @param MapperAbstract|string $mapper
      * @return $this
-     * @throws \Exception
      */
     public function setMapper($mapper)
     {
@@ -259,7 +256,7 @@ abstract class ServiceAbstract
             $this->mapper = $mapper;
             $this->mapperClass = get_class($mapper);
         } else {
-            throw new \Exception('Mapper invalido em ' . get_class($this) . '::setMapper()');
+            throw new \InvalidArgumentException('Mapper invalido em ' . get_class($this) . '::setMapper()');
         }
 
         return $this;
@@ -322,7 +319,6 @@ abstract class ServiceAbstract
      * Define se deve usar o cache
      * @param boolean $useCache
      * @return ServiceAbstract
-     * @throws \Exception
      */
     public function setUseCache($useCache)
     {
@@ -379,8 +375,6 @@ abstract class ServiceAbstract
      * @param string|array $where OPTIONAL An SQL WHERE clause
      * @param string|array $order OPTIONAL An SQL ORDER clause.
      * @return null|ArrayObject
-     * @throws \Exception
-     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function findOne($where = null, $order = null)
     {
@@ -451,8 +445,6 @@ abstract class ServiceAbstract
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return ArrayObject[] | null
-     * @throws \Exception
-     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function findAssoc($where = null, $order = null, $count = null, $offset = null)
     {
@@ -493,8 +485,6 @@ abstract class ServiceAbstract
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
      * @return Paginator
-     * @throws \Exception
-     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function findPaginated($where = null, $order = null, $count = null, $offset = null)
     {

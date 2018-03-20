@@ -1,4 +1,5 @@
 <?php
+
 namespace Realejo\Service\Metadata;
 
 class MetadataArrayObject implements \ArrayAccess, \Countable
@@ -15,7 +16,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
 
     public function __construct(array $data = null)
     {
-        if (! empty($data)) {
+        if (!empty($data)) {
             $this->populate($data);
         }
     }
@@ -28,7 +29,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
     public function populate(array $data)
     {
         // remove as chaves vazias
-        if (! empty($data)) {
+        if (!empty($data)) {
             foreach ($data as $key => $value) {
                 if (is_null($value)) {
                     $this->nullKeys .= $key . ':';
@@ -56,7 +57,7 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
     public function addMetadata($metadata)
     {
         // remove as chaves vazias
-        if (! empty($metadata)) {
+        if (!empty($metadata)) {
             foreach ($metadata as $key => $value) {
                 if (is_null($value)) {
                     $this->nullKeys .= $key . ':';
@@ -68,10 +69,6 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetExists()
-     */
     public function offsetExists($offset)
     {
         if (array_key_exists($offset, $this->storage)) {
@@ -85,10 +82,6 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetGet()
-     */
     public function offsetGet($offset)
     {
         if (array_key_exists($offset, $this->storage)) {
@@ -102,10 +95,6 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
         trigger_error("Undefined index: $offset");
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetSet()
-     */
     public function offsetSet($offset, $value)
     {
         if (array_key_exists($offset, $this->storage)) {
@@ -127,10 +116,6 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
         trigger_error("Undefined index: $offset");
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetUnset()
-     */
     public function offsetUnset($offset)
     {
         if ($this->offsetExists($offset)) {
@@ -142,17 +127,12 @@ class MetadataArrayObject implements \ArrayAccess, \Countable
         trigger_error("Undefined index: $offset");
     }
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
     public function __get($name)
     {
         return $this->offsetGet($name);
     }
 
     /**
-     *
      * @param string $name
      * @param mixed $value
      */

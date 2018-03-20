@@ -194,14 +194,10 @@ class ArrayObject implements \ArrayAccess
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetUnset()
-     */
     public function offsetUnset($offset)
     {
         if ($this->getLockedKeys()) {
-            throw new \Exception("You cannot remove a property");
+            throw new \RuntimeException("You cannot remove a property");
         }
 
         $offset = $this->getMappedKey($offset);

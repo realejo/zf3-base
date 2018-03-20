@@ -93,10 +93,6 @@ class ArrayObject extends StdlibArrayObject
         return $toArray;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetExists()
-     */
     public function offsetExists($offset)
     {
         $offset = $this->getMappedKey($offset);
@@ -107,10 +103,6 @@ class ArrayObject extends StdlibArrayObject
         return $this->hasMetadata($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetGet()
-     */
     public function offsetGet($offset)
     {
         $offset = $this->getMappedKey($offset);
@@ -126,10 +118,6 @@ class ArrayObject extends StdlibArrayObject
         trigger_error("Undefined index: $offset");
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetSet()
-     */
     public function offsetSet($offset, $value)
     {
         $offset = $this->getMappedKey($offset, true);
@@ -154,10 +142,6 @@ class ArrayObject extends StdlibArrayObject
         trigger_error("Undefined index: $offset");
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetUnset()
-     */
     public function offsetUnset($offset)
     {
         if (parent::offsetExists($offset)) {
@@ -170,6 +154,6 @@ class ArrayObject extends StdlibArrayObject
             return;
         }
 
-        throw new \Exception("You cannot remove a property");
+        throw new \RuntimeException("You cannot remove a property");
     }
 }

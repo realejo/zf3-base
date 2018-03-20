@@ -78,7 +78,10 @@ class HydratorPagination extends DbSelect
         $hydratorEntity = $this->getHydratorEntity();
 
         foreach ($fetchAll as $id => $row) {
-            $fetchAll[$id] = $hydrator->hydrate($row->getArrayCopy(), new $hydratorEntity);
+            if ($row instanceof ArrayObject) {
+                $row = $row->getArrayCopy();
+            }
+            $fetchAll[$id] = $hydrator->hydrate($row, new $hydratorEntity);
         }
 
         return $fetchAll;

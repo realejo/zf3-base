@@ -83,13 +83,12 @@ class Cache
     /**
      * Retorna a pasta raiz de todos os caches
      * @return string
-     * @throws \Exception
      */
     public static function getCacheRoot()
     {
         // Verifica se a pasta de cache existe
         if (defined('APPLICATION_DATA') === false) {
-            throw new \Exception('A pasta raiz do data não está definido em APPLICATION_DATA');
+            throw new \RuntimeException('A pasta raiz do data não está definido em APPLICATION_DATA');
         }
 
         $cachePath = APPLICATION_DATA . '/cache';
@@ -112,7 +111,6 @@ class Cache
      * @param string $class Nome da classe a ser usada
      *
      * @return string
-     * @throws \Exception
      */
     public static function getCachePath($class = '')
     {

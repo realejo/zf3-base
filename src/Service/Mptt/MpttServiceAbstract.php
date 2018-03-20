@@ -68,7 +68,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
         }
 
         if (! in_array($this->traversal['left'], $columns)) {
-            throw new \Exception("Column '" . $this->traversal['left'] . "' not found in table for tree traversal");
+            throw new \InvalidArgumentException("Column '" . $this->traversal['left'] . "' not found in table for tree traversal");
         }
 
         // Verify 'right' value and column
@@ -77,7 +77,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
         }
 
         if (! in_array($this->traversal['right'], $columns)) {
-            throw new \Exception("Column '" . $this->traversal['right'] . "' not found in table for tree traversal");
+            throw new \InvalidArgumentException("Column '" . $this->traversal['right'] . "' not found in table for tree traversal");
         }
 
         // Check for identifying column
@@ -86,16 +86,16 @@ abstract class MpttServiceAbstract extends ServiceAbstract
         }
 
         if (! in_array($this->traversal['column'], $columns)) {
-            throw new \Exception("Column '" . $this->traversal['column'] . "' not found in table for tree traversal");
+            throw new \InvalidArgumentException("Column '" . $this->traversal['column'] . "' not found in table for tree traversal");
         }
 
         // Check for reference column
         if (! isset($this->traversal['refColumn'])) {
-            throw new \Exception("Unable to determine reference column for traversal");
+            throw new \InvalidArgumentException("Unable to determine reference column for traversal");
         }
 
         if (! in_array($this->traversal['refColumn'], $columns)) {
-            throw new \Exception("Column '" . $this->traversal['refColumn'] . "' not found in table for tree traversal");
+            throw new \InvalidArgumentException("Column '" . $this->traversal['refColumn'] . "' not found in table for tree traversal");
         }
 
         // Check the order
@@ -104,7 +104,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
         }
 
         if (! in_array($this->traversal['order'], $columns)) {
-            throw new \Exception("Column '" . $this->traversal['order'] . "' not found in table for tree traversal");
+            throw new \InvalidArgumentException("Column '" . $this->traversal['order'] . "' not found in table for tree traversal");
         }
 
         $this->isTraversable = true;
@@ -171,7 +171,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      *
      * @param mixed $set
      *
-     * @return primary key
+     * @return int|array primary key
      */
     public function insert($set)
     {
@@ -184,7 +184,6 @@ abstract class MpttServiceAbstract extends ServiceAbstract
      *
      * @param array $set
      * @return int $id
-     * @throws \Exception
      */
     protected function insertTraversable($set)
     {
@@ -199,7 +198,7 @@ abstract class MpttServiceAbstract extends ServiceAbstract
             $parent_id = $set[$this->traversal['refColumn']];
             $parent = $this->getMapper()->getTableGateway()->select([$this->getMapper()->getTableKey() => $parent_id])->current();
             if (null === $parent) {
-                throw new \Exception("Traversable error: Parent id {$parent_id} not found");
+                throw new \RuntimeException("Traversable error: Parent id {$parent_id} not found");
             }
 
             $lt = (double) $parent->{$this->traversal['left']};
@@ -385,13 +384,11 @@ abstract class MpttServiceAbstract extends ServiceAbstract
 
     /**
      * Verifies that the current table is a traversable
-     *
-     * @throws \Exception - Table is not traversable
      */
     protected function verifyTraversable()
     {
         if (! $this->isTraversable()) {
-            throw new \Exception("Table {$this->getMapper()->getTableName()} is not traversable");
+            throw new \RuntimeException("Table {$this->getMapper()->getTableName()} is not traversable");
         }
     }
 }

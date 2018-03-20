@@ -2,8 +2,10 @@
 namespace Realejo\Service\Metadata;
 
 use Realejo\Service\ServiceAbstract;
+use Realejo\Utils\DateHelper;
 use Zend\Db\Sql\Expression;
 use Zend\Json\Json;
+use DateTime;
 
 class MetadataService extends ServiceAbstract
 {
@@ -135,9 +137,9 @@ class MetadataService extends ServiceAbstract
                         "AND $field = ?)",
                     $value,
                     $this->getMapperSchema()
-                                                        ->getTableGateway()
-                                                        ->getAdapter()
-                    ->getPlatform(),
+                        ->getTableGateway()
+                        ->getAdapter()
+                        ->getPlatform(),
                     null,
                     $cast
                 ));
@@ -151,20 +153,19 @@ class MetadataService extends ServiceAbstract
      *
      * @param string $schemaTable Tabela onde será gravada a configuração dos metadados
      * @param string $valueTable Tabela onde é gravada os metadados
-     * @param string $mapperForeignKey Chave Estrageira para localizar um metadado na tabelas de valores
+     * @param string $mapperForeignKey Chave Estrangeira para localizar um metadado na tabelas de valores
      * @return MetadataService
-     * @throws \Exception
      */
     public function setMetadataMappers($schemaTable, $valueTable, $mapperForeignKey)
     {
         if (! is_string($schemaTable) || empty($schemaTable)) {
-            throw new \Exception("schemaTable invalid");
+            throw new \InvalidArgumentException("schemaTable invalid");
         }
         if (! is_string($valueTable) || empty($valueTable)) {
-            throw new \Exception("valueTable invalid");
+            throw new \InvalidArgumentException("valueTable invalid");
         }
         if (! is_string($mapperForeignKey) || empty($mapperForeignKey)) {
-            throw new \Exception("mapperForeignKey invalid");
+            throw new \InvalidArgumentException("mapperForeignKey invalid");
         }
 
         $this->mapperSchema     = $schemaTable;
@@ -231,7 +232,8 @@ class MetadataService extends ServiceAbstract
         $getValues = [];
         if (! empty($fetchAll)) {
             foreach ($fetchAll as $row) {
-                $getValues[$schema[$row[$this->infoForeignKeyName]]['nick']] = $this->getCurrentValue($schema[$row[$this->infoForeignKeyName]], $row);
+                $getValues[$schema[$row[$this->infoForeignKeyName]]['nick']]
+                    = $this->getCurrentValue($schema[$row[$this->infoForeignKeyName]], $row);
             }
         }
 
@@ -338,13 +340,12 @@ class MetadataService extends ServiceAbstract
      *
      * @param int $key
      * @param string $dbMetaField
-     * @throws \Exception
      */
     public function fixMetadata($key, $dbMetaField = 'metadata')
     {
         // Verifica o código do PDV
         if (empty($key) || ! is_numeric($key)) {
-            throw new \Exception('Código inválido em MetadaService::fixMetadata()');
+            throw new \InvalidArgumentException('Código inválido em MetadataService::fixMetadata()');
         }
 
         // Recupera as informações do PDV
@@ -407,17 +408,17 @@ class MetadataService extends ServiceAbstract
             // Remove qualquer hora se houver
             $value = explode(' ', $value);
             $value = array_shift($value);
-            if (\Realejo\Utils\DateHelper::isFormat('d/m/Y', $value)) {
-                return \DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d');
+            if (DateHelper::isFormat('d/m/Y', $value)) {
+                return DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d');
             }
         }
 
-        if ($schema['type'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y H:i:s', $value)) {
-            return \DateTime::createFromFormat('d/m/Y H:i:s', $value)->format('Y-m-d H:i:s');
+        if ($schema['type'] == self::DATETIME && DateHelper::isFormat('d/m/Y H:i:s', $value)) {
+            return DateTime::createFromFormat('d/m/Y H:i:s', $value)->format('Y-m-d H:i:s');
         }
 
-        if ($schema['type'] == self::DATETIME && \Realejo\Utils\DateHelper::isFormat('d/m/Y', $value)) {
-            return \DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d 00:00:00');
+        if ($schema['type'] == self::DATETIME && DateHelper::isFormat('d/m/Y', $value)) {
+            return DateTime::createFromFormat('d/m/Y', $value)->format('Y-m-d 00:00:00');
         }
 
         return $value;
@@ -482,7 +483,7 @@ class MetadataService extends ServiceAbstract
      *
      * @param boolean $useCache
      *
-     * @return \Realejo\Metadata\MetadataService
+     * @return MetadataService
      */
     public function setUseCache($useCache)
     {
@@ -575,7 +576,7 @@ class MetadataService extends ServiceAbstract
             } elseif ($cast === 'STRING') {
                 return str_replace('?', $platform->quoteValue($value), $text);
             } else {
-                throw new \Exception('CAST inválido em '.get_class($this).'::quoteInto');
+                throw new \InvalidArgumentException('CAST inválido em '.get_class($this).'::quoteInto');
             }
         } else {
             while ($count > 0) {

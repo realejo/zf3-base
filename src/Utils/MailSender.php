@@ -62,7 +62,6 @@ class MailSender
      * Mail constructor.
      * @param null|array $config
      * @param bool $isException
-     * @throws \Exception
      */
     public function __construct($config = null, $isException = false)
     {
@@ -70,7 +69,7 @@ class MailSender
             if (defined('APPLICATION_PATH')) {
                 $config = include APPLICATION_PATH . "/config/autoload/email_config.php";
             } else {
-                throw new \Exception('Error loading email configuration in '.get_class($this).'::__construct()');
+                throw new \RuntimeException('Error loading email configuration in '.get_class($this).'::__construct()');
             }
         }
 
@@ -117,7 +116,6 @@ class MailSender
      * @param $message
      * @param array $opt
      * @return bool
-     * @throws \Exception
      */
     public function sendEmail($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = [])
     {
@@ -141,7 +139,6 @@ class MailSender
      * @param string $message
      * @param array $opt
      * @return Mail\Message
-     * @throws \Exception
      */
     public function setEmailMessage($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = [])
     {
@@ -155,7 +152,7 @@ class MailSender
 
         // Verifica o email do destinatário
         if (empty($toEmail)) {
-            throw new \Exception('Não há email de destino definido em '.get_class($this).'::setMailMessage()');
+            throw new \InvalidArgumentException('Não há email de destino definido em '.get_class($this).'::setMailMessage()');
         }
 
         // Verifica o nome do destinatário
