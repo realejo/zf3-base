@@ -252,6 +252,9 @@ class MetadataService extends ServiceAbstract
     public function removeMetadata($set)
     {
         $metadataKeys = $this->getSchemaByKeyNames(false);
+        if (empty($metadataKeys)) {
+            return $set;
+        }
 
         foreach ($metadataKeys as $schema) {
             // Verifica se existe o metadado no dados enviados
