@@ -1,7 +1,9 @@
 <?php
+
 namespace Realejo\Stdlib;
 
 use Realejo\Enum\Enum;
+use Realejo\Utils\DateHelper;
 use Zend\Json\Json;
 
 class ArrayObject implements \ArrayAccess
@@ -35,7 +37,7 @@ class ArrayObject implements \ArrayAccess
 
     public function __construct($data = null)
     {
-        if (is_array($data) && ! empty($data)) {
+        if (is_array($data) && !empty($data)) {
             $this->populate($data);
         }
     }
@@ -65,23 +67,23 @@ class ArrayObject implements \ArrayAccess
 
     public function populate(array $data)
     {
-        $useDateKeys = (is_array($this->dateKeys) && ! empty($this->dateKeys));
-        $useJsonKeys = (is_array($this->jsonKeys) && ! empty($this->jsonKeys));
-        $useIntKeys = (is_array($this->intKeys) && ! empty($this->intKeys));
-        $useBooleanKeys = (is_array($this->booleanKeys) && ! empty($this->booleanKeys));
-        $useEnumKeys = (is_array($this->enumKeys) && ! empty($this->enumKeys));
+        $useDateKeys = (is_array($this->dateKeys) && !empty($this->dateKeys));
+        $useJsonKeys = (is_array($this->jsonKeys) && !empty($this->jsonKeys));
+        $useIntKeys = (is_array($this->intKeys) && !empty($this->intKeys));
+        $useBooleanKeys = (is_array($this->booleanKeys) && !empty($this->booleanKeys));
+        $useEnumKeys = (is_array($this->enumKeys) && !empty($this->enumKeys));
 
-        if (! empty($data)) {
+        if (!empty($data)) {
             foreach ($data as $key => $value) {
-                if ($useDateKeys && in_array($key, $this->dateKeys) && ! empty($value)) {
+                if ($useDateKeys && in_array($key, $this->dateKeys) && !empty($value)) {
                     $value = new \DateTime($value);
-                } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && ! empty($value)) {
+                } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
                     $value = Json::decode($value);
-                } elseif ($useIntKeys && in_array($key, $this->intKeys) && ! empty($value)) {
-                    $value = (int) $value;
-                } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && ! empty($value)) {
-                    $value = (boolean) $value;
-                } elseif ($useEnumKeys && array_key_exists($key, $this->enumKeys) && ! empty($value)) {
+                } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
+                    $value = (int)$value;
+                } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && !empty($value)) {
+                    $value = (boolean)$value;
+                } elseif ($useEnumKeys && array_key_exists($key, $this->enumKeys) && !empty($value)) {
                     $value = new $this->enumKeys[$key]($value);
                 }
                 $this->storage[$this->getMappedKey($key)] = $value;
@@ -147,7 +149,7 @@ class ArrayObject implements \ArrayAccess
 
             // desfaz boolean e int
             if (is_bool($value) || is_int($value)) {
-                $value = (int) $value;
+                $value = (int)$value;
             }
 
             $toArray[$key] = $value;
@@ -173,7 +175,7 @@ class ArrayObject implements \ArrayAccess
     public function offsetGet($offset)
     {
         $offset = $this->getMappedKey($offset);
-        if (! array_key_exists($offset, $this->storage)) {
+        if (!array_key_exists($offset, $this->storage)) {
             trigger_error("Undefined index: $offset");
         }
 
@@ -187,7 +189,7 @@ class ArrayObject implements \ArrayAccess
     public function offsetSet($offset, $value)
     {
         $offset = $this->getMappedKey($offset);
-        if (! $this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
+        if (!$this->getLockedKeys() || array_key_exists($offset, $this->storage)) {
             $this->storage[$offset] = $value;
         } else {
             trigger_error("Undefined index: $offset");
