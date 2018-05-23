@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest\Service\Mptt;
 
 use Realejo\Service\Mptt\MpttServiceAbstract;

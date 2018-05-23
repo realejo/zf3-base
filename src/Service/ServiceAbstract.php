@@ -4,9 +4,9 @@ namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
 use Realejo\Cache\CacheService;
-use Realejo\Stdlib\ArrayObject;
-use Realejo\Utils\Cache;
 use Realejo\Paginator\Paginator;
+use Realejo\Stdlib\ArrayObject;
+use Zend\Cache\Storage as CacheStorage;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
@@ -95,14 +95,14 @@ abstract class ServiceAbstract
 
         // Define ao placeholder a ser usado
         $placeholder = $selectPlaceholder = (isset($opts['placeholder'])) ? $opts['placeholder'] : '';
-        if (! empty($placeholder)) {
+        if (!empty($placeholder)) {
             $selectPlaceholder = "placeholder=\"$selectPlaceholder\"";
         }
 
         $grouped = (isset($opts['grouped'])) ? $opts['grouped'] : false;
 
         // Define a chave a ser usada
-        if (isset($opts['key']) && ! empty($opts['key']) && is_string($opts['key'])) {
+        if (isset($opts['key']) && !empty($opts['key']) && is_string($opts['key'])) {
             $key = $opts['key'];
         } else {
             $key = $this->getMapper()->getTableKey(true);
@@ -111,7 +111,7 @@ abstract class ServiceAbstract
         // Monta as opções
         $options = '';
         $group = false;
-        if (! empty($findAll)) {
+        if (!empty($findAll)) {
             foreach ($findAll as $row) {
                 preg_match_all('/\{([a-z_]*)\}/', $this->htmlSelectOption, $matches);
 
@@ -156,7 +156,7 @@ abstract class ServiceAbstract
         }
 
         // Verifica se tem valor padrão
-        if (! is_null($selecionado)) {
+        if (!is_null($selecionado)) {
             $temp = str_replace(
                 "<option value=\"$selecionado\"",
                 "<option value=\"$selecionado\" selected=\"selected\"",
@@ -172,7 +172,7 @@ abstract class ServiceAbstract
         $select = "<select class=\"form-control\" name=\"$nome\" id=\"$nome\" $selectPlaceholder>";
 
         // Verifica se tem valor padrão selecionado
-        if ((empty($selecionado) || $showEmpty) && ! $neverShowEmpty) {
+        if ((empty($selecionado) || $showEmpty) && !$neverShowEmpty) {
             $select .= "<option value=\"\">$placeholder</option>";
         }
 
@@ -230,8 +230,8 @@ abstract class ServiceAbstract
      */
     public function getMapper()
     {
-        if (! isset($this->mapper)) {
-            if (! isset($this->mapperClass)) {
+        if (!isset($this->mapper)) {
+            if (!isset($this->mapperClass)) {
                 throw new \RuntimeException('Mapper class not defined at ' . get_class($this));
             }
             $this->mapper = new $this->mapperClass();
@@ -266,13 +266,12 @@ abstract class ServiceAbstract
     /**
      * Configura o cache
      *
-     * @return \Zend\Cache\Storage\Adapter\Filesystem
+     * @return CacheStorage\Adapter\Filesystem | CacheStorage\StorageInterface
      */
     public function getCache()
     {
-        if (! isset($this->cache)) {
-            $this->cache = $this
-                ->getServiceLocator()
+        if (!isset($this->cache)) {
+            $this->cache = $this->getServiceLocator()
                 ->get(CacheService::class)
                 ->getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
         }
@@ -280,7 +279,11 @@ abstract class ServiceAbstract
         return $this->cache;
     }
 
-    public function setCache($cache)
+    /**
+     * @param CacheStorage\StorageInterface $cache
+     * @return ServiceAbstract
+     */
+    public function setCache(CacheStorage\StorageInterface $cache)
     {
         $this->cache = $cache;
         return $this;
@@ -466,7 +469,7 @@ abstract class ServiceAbstract
 
         $fetchAll = $this->getMapper()->fetchAll($this->getWhere($where), $order, $count, $offset);
         $findAssoc = [];
-        if (! empty($fetchAll)) {
+        if (!empty($fetchAll)) {
             foreach ($fetchAll as $row) {
                 $findAssoc[$row[$this->getMapper()->getTableKey(true)]] = $row;
             }
@@ -532,7 +535,7 @@ abstract class ServiceAbstract
      */
     public function getPaginatorOptions()
     {
-        if (! isset($this->paginatorOptions)) {
+        if (!isset($this->paginatorOptions)) {
             $this->paginatorOptions = new PaginatorOptions();
         }
 
@@ -615,11 +618,11 @@ abstract class ServiceAbstract
 
     public function getFromServiceLocator($class)
     {
-        if (! $this->hasServiceLocator()) {
+        if (!$this->hasServiceLocator()) {
             return null;
         }
 
-        if (! $this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
+        if (!$this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
             $newService = new $class();
             if (method_exists($newService, 'setServiceLocator')) {
                 $newService->setServiceLocator($this->getServiceLocator());

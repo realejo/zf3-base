@@ -71,15 +71,15 @@ class BaseTestCaseTest extends TestCase
     public function testClearApplicationData()
     {
         // Verifica se está tudo ok
-        if (! defined('APPLICATION_DATA')) {
-            $this->fail('APPLICATION_DATA não definido');
+        if (! defined('TEST_DATA')) {
+            $this->fail('TEST_DATA não definido');
         }
-        if (! is_writable(APPLICATION_DATA)) {
-            $this->fail('APPLICATION_DATA não tem permissão de escrita');
+        if (! is_writable(TEST_DATA)) {
+            $this->fail('TEST_DATA não tem permissão de escrita');
         }
 
         // Grava umas bobeiras la
-        $folder = APPLICATION_DATA . '/teste1';
+        $folder = TEST_DATA . '/teste1';
         if (! file_exists($folder)) {
             $oldumask = umask(0);
             mkdir($folder);
@@ -87,7 +87,7 @@ class BaseTestCaseTest extends TestCase
         }
         file_put_contents($folder . '/test1.txt', 'teste');
 
-        $folder = APPLICATION_DATA . '/teste2/teste3';
+        $folder = TEST_DATA . '/teste2/teste3';
         if (! file_exists($folder)) {
             $oldumask = umask(0);
             mkdir($folder, 0777, true);
@@ -101,7 +101,7 @@ class BaseTestCaseTest extends TestCase
         $this->BaseTestCase->clearApplicationData();
 
         // Verifica se está vazia
-        $files = $objects = scandir(APPLICATION_DATA);
+        $files = $objects = scandir(TEST_DATA);
         $this->assertCount(3, $files, 'não tem mais nada no APPLICATION_DATA');
         $this->assertEquals(['.', '..', 'cache'], $files, 'não tem mais nada no APPLICATION_DATA');
 
@@ -109,7 +109,7 @@ class BaseTestCaseTest extends TestCase
         $this->assertTrue($this->BaseTestCase->isApplicationDataEmpty());
 
         // Grava mais coisa no raiz do APPLICATION_DATA
-        file_put_contents(APPLICATION_DATA . '/sample.txt', 'outro teste');
+        file_put_contents(TEST_DATA . '/sample.txt', 'outro teste');
 
         // Verifica se a pasta está vazia depois de apagar
         $this->assertFalse($this->BaseTestCase->isApplicationDataEmpty());

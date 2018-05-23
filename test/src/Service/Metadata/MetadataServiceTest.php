@@ -1,6 +1,7 @@
 <?php
 namespace RealejoTest\Service\Metadata;
 
+use Realejo\Cache\CacheService;
 use Realejo\Service\Metadata\MetadataMapper;
 use Realejo\Service\Metadata\MetadataService;
 use Realejo\Stdlib\ArrayObject;
@@ -64,9 +65,10 @@ class MetadataServiceTest extends BaseTestCase
     {
         parent::setUp();
 
-        // TODO Auto-generated MetadataServiceTest::setUp()
-
         $this->metadataService = new MetadataService();
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+        $this->metadataService->setCache($cacheService->getFrontend());
 
         $this->metadataService
              ->setMapper(MetadataMapperReference::class)
@@ -198,6 +200,10 @@ class MetadataServiceTest extends BaseTestCase
     public function testGetMappersSchema()
     {
         $service = new MetadataService();
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+        $service->setCache($cacheService->getFrontend());
+
         $this->assertNull($service->getMapperSchema());
         $this->assertNull($service->getMapperValue());
         $this->assertInstanceOf(MetadataService::class, $service->setMetadataMappers('schemaTable', 'valuesTable', 'foreignKeyName'));
@@ -212,6 +218,10 @@ class MetadataServiceTest extends BaseTestCase
     public function testCache()
     {
         $service = new MetadataService();
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+        $service->setCache($cacheService->getFrontend());
+
         $this->assertInstanceOf(MetadataService::class, $service->setMetadataMappers('tableone', 'tablesecond', 'keyname'));
         $service->setMapper(MetadataMapperReference::class);
 
@@ -615,39 +625,6 @@ class MetadataServiceTest extends BaseTestCase
     private function getSqlSchemaString($idInfo)
     {
         return "SELECT * FROM metadata_value WHERE metadata_value.fk_info=$idInfo AND tblreference.id_reference=metadata_value.fk_reference";
-    }
-
-    /**
-     * Tests MetadataService->getValues()
-     */
-    public function testGetValues()
-    {
-        // TODO Auto-generated MetadataServiceTest->testGetValues()
-        $this->markTestIncomplete("getValues test not implemented");
-
-        $this->metadataService->getValues(/* parameters */);
-    }
-
-    /**
-     * Tests MetadataService->saveMetadata()
-     */
-    public function testSaveMetadata()
-    {
-        // TODO Auto-generated MetadataServiceTest->testSaveMetadata()
-        $this->markTestIncomplete("saveMetadata test not implemented");
-
-        $this->metadataService->saveMetadata(/* parameters */);
-    }
-
-    /**
-     * Tests MetadataService->getLastSaveMetadataLog()
-     */
-    public function testGetLastSaveMetadataLog()
-    {
-        // TODO Auto-generated MetadataServiceTest->testGetLastSaveMetadataLog()
-        $this->markTestIncomplete("getLastSaveMetadataLog test not implemented");
-
-        $this->metadataService->getLastSaveMetadataLog(/* parameters */);
     }
 
     /**

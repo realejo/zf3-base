@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest\Service\Mptt;
 
 /**
@@ -8,8 +9,9 @@ namespace RealejoTest\Service\Mptt;
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
-use RealejoTest\BaseTestCase;
+use Realejo\Cache\CacheService;
 use Realejo\Service;
+use RealejoTest\BaseTestCase;
 
 /**
  * Mptt test case.
@@ -23,18 +25,18 @@ class MpttTest extends BaseTestCase
      * @var array
      */
     protected $idOrderedTree = [
-        [1,  'Food',      null, 1, 24],
-        [2,  'Fruit',     1, 2, 13],
-        [3,  'Red',       2, 3, 6],
-        [4,  'Yellow',    2, 7, 10],
-        [5,  'Green',     2, 11, 12],
-        [6,  'Cherry',    3, 4, 5],
-        [7,  'Banana',    4, 8, 9],
-        [8,  'Meat',      1, 14, 19],
-        [9,  'Beef',      8, 15, 16],
-        [10, 'Pork',      8, 17, 18],
+        [1, 'Food', null, 1, 24],
+        [2, 'Fruit', 1, 2, 13],
+        [3, 'Red', 2, 3, 6],
+        [4, 'Yellow', 2, 7, 10],
+        [5, 'Green', 2, 11, 12],
+        [6, 'Cherry', 3, 4, 5],
+        [7, 'Banana', 4, 8, 9],
+        [8, 'Meat', 1, 14, 19],
+        [9, 'Beef', 8, 15, 16],
+        [10, 'Pork', 8, 17, 18],
         [11, 'Vegetable', 1, 20, 23],
-        [12, 'Carrot',   11, 21, 22],
+        [12, 'Carrot', 11, 21, 22],
     ];
 
     /**
@@ -44,18 +46,18 @@ class MpttTest extends BaseTestCase
      * @var array
      */
     protected $nameOrderedTree = [
-        [1,  'Food',      null, 1, 24],
-        [2,  'Fruit',     1, 2, 13],
-        [3,  'Red',       2, 5, 8],
-        [4,  'Yellow',    2, 9, 12],
-        [5,  'Green',     2, 3, 4],
-        [6,  'Cherry',    3, 6, 7],
-        [7,  'Banana',    4, 10, 11],
-        [8,  'Meat',      1, 14, 19],
-        [9,  'Beef',      8, 15, 16],
-        [10, 'Pork',      8, 17, 18],
+        [1, 'Food', null, 1, 24],
+        [2, 'Fruit', 1, 2, 13],
+        [3, 'Red', 2, 5, 8],
+        [4, 'Yellow', 2, 9, 12],
+        [5, 'Green', 2, 3, 4],
+        [6, 'Cherry', 3, 6, 7],
+        [7, 'Banana', 4, 10, 11],
+        [8, 'Meat', 1, 14, 19],
+        [9, 'Beef', 8, 15, 16],
+        [10, 'Pork', 8, 17, 18],
         [11, 'Vegetable', 1, 20, 23],
-        [12, 'Carrot',   11, 21, 22],
+        [12, 'Carrot', 11, 21, 22],
     ];
 
     /**
@@ -102,8 +104,16 @@ class MpttTest extends BaseTestCase
      */
     public function testConstruct()
     {
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
         // Cria a tabela sem a implementação do transversable
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
+
         $this->assertInstanceOf(Service\Mptt\MpttServiceAbstract::class, $mptt);
         $this->assertInstanceOf(Service\ServiceAbstract::class, $mptt);
         $this->assertInstanceOf(MapperConcrete::class, $mptt->getMapper());
@@ -115,8 +125,16 @@ class MpttTest extends BaseTestCase
      */
     public function testSetTraversalIncomplete()
     {
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
         // Cria a tabela sem a implementação do transversable
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
+
         $this->assertInstanceOf(Service\Mptt\MpttServiceAbstract::class, $mptt);
         $this->assertInstanceOf(Service\ServiceAbstract::class, $mptt);
 
@@ -133,7 +151,15 @@ class MpttTest extends BaseTestCase
      */
     public function testGetColumns()
     {
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
+        // Cria a tabela sem a implementação do transversable
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
         $this->assertInternalType('array', $mptt->getColumns());
         $this->assertNotNull($mptt->getColumns());
         $this->assertNotEmpty($mptt->getColumns());
@@ -145,7 +171,16 @@ class MpttTest extends BaseTestCase
      */
     public function testSetTraversal()
     {
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
+        // Cria a tabela sem a implementação do transversable
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
+
         $this->assertFalse($mptt->isTraversable());
         $mptt->setTraversal('parent_id');
         $this->assertTrue($mptt->isTraversable());
@@ -157,7 +192,16 @@ class MpttTest extends BaseTestCase
     public function testRebuildTreeTraversal()
     {
         // Cria a tabela com os valores padrões
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
+        // Cria a tabela sem a implementação do transversable
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
+
         $this->assertNull($mptt->getMapper()->fetchAll());
         foreach ($this->defaultRows as $row) {
             $mptt->insert($row);
@@ -197,7 +241,16 @@ class MpttTest extends BaseTestCase
     public function testInsert()
     {
         // Cria a tabela com os valores padrões
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
+        // Cria a tabela sem a implementação do transversable
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
+
         $mptt->getMapper()->setOrder('id');
         $this->assertNull($mptt->getMapper()->fetchAll());
 
@@ -249,7 +302,16 @@ class MpttTest extends BaseTestCase
     public function testDelete()
     {
         // Cria a tabela com os valores padrões
-        $mptt = new ServiceConcrete(MapperConcrete::class, 'id');
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+
+        // Cria a tabela sem a implementação do transversable
+        $mapper = new MapperConcrete();
+        $mapper->setCache($cacheService->getFrontend());
+
+        $mptt = new ServiceConcrete($mapper, 'id');
+        $mptt->setCache($cacheService->getFrontend());
+
         $mptt->getMapper()->setOrder('id');
         $this->assertNull($mptt->getMapper()->fetchAll());
 

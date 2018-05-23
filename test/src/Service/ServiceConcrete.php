@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest\Service;
 
 use Realejo\Service\ServiceAbstract;

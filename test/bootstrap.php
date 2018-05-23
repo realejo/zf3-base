@@ -10,7 +10,7 @@ error_reporting(E_ALL | E_STRICT);
 
 define('APPLICATION_ENV', 'testing');
 define('TEST_ROOT', __DIR__);
-define('APPLICATION_DATA', TEST_ROOT . '/assets/data');
+define('TEST_DATA', TEST_ROOT . '/assets/data');
 
 /**
  * Setup autoloading

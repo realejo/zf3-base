@@ -4,7 +4,9 @@ namespace Realejo\Service;
 
 use ArrayIterator;
 use Psr\Container\ContainerInterface;
+use Realejo\Cache\CacheService;
 use Realejo\Stdlib\ArrayObject;
+use Zend\Cache\Storage as CacheStorage;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql\Expression;
@@ -438,22 +440,24 @@ abstract class MapperAbstract
     }
 
     /**
-     * @return \Zend\Cache\Storage\Adapter\Filesystem
+     * @return CacheStorage\Adapter\Filesystem|CacheStorage\StorageInterface
      */
     public function getCache()
     {
         if (!isset($this->cache)) {
-            $this->cache = \Realejo\Utils\Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
+            $this->cache = $this->getServiceLocator()
+                ->get(CacheService::class)
+                ->getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
         }
 
         return $this->cache;
     }
 
     /**
-     * @param $cache
+     * @param CacheStorage\StorageInterface $cache
      * @return MapperAbstract
      */
-    public function setCache($cache)
+    public function setCache(CacheStorage\StorageInterface $cache)
     {
         $this->cache = $cache;
         return $this;

@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest\Service\Metadata;
 
 use PHPUnit\Framework\TestCase;

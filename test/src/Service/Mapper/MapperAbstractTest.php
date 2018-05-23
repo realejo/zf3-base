@@ -1,8 +1,10 @@
 <?php
+
 namespace RealejoTest\Service\Mapper;
 
-use Realejo\Stdlib\ArrayObject;
+use Realejo\Cache\CacheService;
 use Realejo\Service\MapperAbstract;
+use Realejo\Stdlib\ArrayObject;
 use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\ResultSet\HydratingResultSet;
@@ -25,7 +27,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * @var MapperConcrete
      */
-    private $Mapper;
+    private $mapper;
 
     protected $defaultValues = [
         [
@@ -85,7 +87,11 @@ class MapperAbstractTest extends BaseTestCase
         $this->clearApplicationData();
 
         // Configura o mapper
-        $this->Mapper = new MapperConcrete($this->tableName, $this->tableKeyName, $this->getAdapter());
+        $this->mapper = new MapperConcrete($this->tableName, $this->tableKeyName);
+        $cacheService = new CacheService();
+        $cacheService->setCacheDir($this->getDataDir() . '/cache');
+        $this->mapper->setCache($cacheService->getFrontend());
+
     }
 
     /**
@@ -106,7 +112,7 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testKeyNameInvalido()
     {
-        $this->Mapper->setTableKey(null);
+        $this->mapper->setTableKey(null);
     }
 
     /**
@@ -115,7 +121,7 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testOrderInvalida()
     {
-        $this->Mapper->setOrder(null);
+        $this->mapper->setOrder(null);
     }
 
     /**
@@ -125,8 +131,8 @@ class MapperAbstractTest extends BaseTestCase
     public function testfetchRowMultiKeyException()
     {
         // Cria a tabela com chave string
-        $this->Mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id_int', MapperConcrete::KEY_STRING => 'id_char']);
-        $this->Mapper->fetchRow(1);
+        $this->mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id_int', MapperConcrete::KEY_STRING => 'id_char']);
+        $this->mapper->fetchRow(1);
     }
 
     /**
@@ -134,20 +140,27 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testGettersStters()
     {
-        $this->assertEquals('meuid', $this->Mapper->setTableKey('meuid')->getTableKey());
-        $this->assertEquals('meuid', $this->Mapper->setTableKey('meuid')->getTableKey(true));
-        $this->assertEquals('meuid', $this->Mapper->setTableKey('meuid')->getTableKey(false));
+        $this->assertEquals('meuid', $this->mapper->setTableKey('meuid')->getTableKey());
+        $this->assertEquals('meuid', $this->mapper->setTableKey('meuid')->getTableKey(true));
+        $this->assertEquals('meuid', $this->mapper->setTableKey('meuid')->getTableKey(false));
 
-        $this->assertEquals(['meuid', 'com array'], $this->Mapper->setTableKey(['meuid', 'com array'])->getTableKey());
-        $this->assertEquals(['meuid', 'com array'], $this->Mapper->setTableKey(['meuid', 'com array'])->getTableKey(false));
-        $this->assertEquals('meuid', $this->Mapper->setTableKey(['meuid', 'com array'])->getTableKey(true));
+        $this->assertEquals(['meuid', 'com array'], $this->mapper->setTableKey(['meuid', 'com array'])->getTableKey());
+        $this->assertEquals(['meuid', 'com array'],
+            $this->mapper->setTableKey(['meuid', 'com array'])->getTableKey(false));
+        $this->assertEquals('meuid', $this->mapper->setTableKey(['meuid', 'com array'])->getTableKey(true));
 
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setTableKey(new Sql\Expression('chave muito exotica!'))->getTableKey());
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setTableKey([new Sql\Expression('chave muito mais exotica!'), 'não existo'])->getTableKey(true));
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression',
+            $this->mapper->setTableKey(new Sql\Expression('chave muito exotica!'))->getTableKey());
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->mapper->setTableKey([
+            new Sql\Expression('chave muito mais exotica!'),
+            'não existo'
+        ])->getTableKey(true));
 
-        $this->assertEquals('minhaordem', $this->Mapper->setOrder('minhaordem')->getOrder());
-        $this->assertEquals(['minhaordem', 'comarray'], $this->Mapper->setOrder(['minhaordem', 'comarray'])->getOrder());
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->Mapper->setOrder(new Sql\Expression('ordem muito exotica!'))->getOrder());
+        $this->assertEquals('minhaordem', $this->mapper->setOrder('minhaordem')->getOrder());
+        $this->assertEquals(['minhaordem', 'comarray'],
+            $this->mapper->setOrder(['minhaordem', 'comarray'])->getOrder());
+        $this->assertInstanceOf('\Zend\Db\Sql\Expression',
+            $this->mapper->setOrder(new Sql\Expression('ordem muito exotica!'))->getOrder());
     }
 
     /**
@@ -167,8 +180,10 @@ class MapperAbstractTest extends BaseTestCase
 
         $Base = new MapperConcrete($this->tableName, $this->tableKeyName);
         $this->assertInstanceOf(MapperAbstract::class, $Base);
-        $this->assertInstanceOf(get_class($this->getAdapter()), $Base->getTableGateway()->getAdapter(), 'tem o Adapter padrão');
-        $this->assertEquals($this->getAdapter(), $Base->getTableGateway()->getAdapter(), 'tem a mesma configuração do adapter padrão');
+        $this->assertInstanceOf(get_class($this->getAdapter()), $Base->getTableGateway()->getAdapter(),
+            'tem o Adapter padrão');
+        $this->assertEquals($this->getAdapter(), $Base->getTableGateway()->getAdapter(),
+            'tem a mesma configuração do adapter padrão');
     }
 
     /**
@@ -177,19 +192,19 @@ class MapperAbstractTest extends BaseTestCase
     public function testOrder()
     {
         // Verifica a ordem padrão
-        $this->assertNull($this->Mapper->getOrder());
+        $this->assertNull($this->mapper->getOrder());
 
         // Define uma nova ordem com string
-        $this->Mapper->setOrder('id');
-        $this->assertEquals('id', $this->Mapper->getOrder());
+        $this->mapper->setOrder('id');
+        $this->assertEquals('id', $this->mapper->getOrder());
 
         // Define uma nova ordem com string
-        $this->Mapper->setOrder('title');
-        $this->assertEquals('title', $this->Mapper->getOrder());
+        $this->mapper->setOrder('title');
+        $this->assertEquals('title', $this->mapper->getOrder());
 
         // Define uma nova ordem com array
-        $this->Mapper->setOrder(['id', 'title']);
-        $this->assertEquals(['id', 'title'], $this->Mapper->getOrder());
+        $this->mapper->setOrder(['id', 'title']);
+        $this->assertEquals(['id', 'title'], $this->mapper->getOrder());
     }
 
     /**
@@ -199,7 +214,7 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testWhere()
     {
-        $this->assertEquals('123456789abcde', $this->Mapper->getWhere('123456789abcde'));
+        $this->assertEquals('123456789abcde', $this->mapper->getWhere('123456789abcde'));
     }
 
     /**
@@ -208,18 +223,18 @@ class MapperAbstractTest extends BaseTestCase
     public function testDeletedField()
     {
         // Verifica se deve remover o registro
-        $this->Mapper->setUseDeleted(false);
-        $this->assertFalse($this->Mapper->getUseDeleted());
-        $this->assertTrue($this->Mapper->setUseDeleted(true)->getUseDeleted());
-        $this->assertFalse($this->Mapper->setUseDeleted(false)->getUseDeleted());
-        $this->assertFalse($this->Mapper->getUseDeleted());
+        $this->mapper->setUseDeleted(false);
+        $this->assertFalse($this->mapper->getUseDeleted());
+        $this->assertTrue($this->mapper->setUseDeleted(true)->getUseDeleted());
+        $this->assertFalse($this->mapper->setUseDeleted(false)->getUseDeleted());
+        $this->assertFalse($this->mapper->getUseDeleted());
 
         // Verifica se deve mostrar o registro
-        $this->Mapper->setShowDeleted(false);
-        $this->assertFalse($this->Mapper->getShowDeleted());
-        $this->assertFalse($this->Mapper->setShowDeleted(false)->getShowDeleted());
-        $this->assertTrue($this->Mapper->setShowDeleted(true)->getShowDeleted());
-        $this->assertTrue($this->Mapper->getShowDeleted());
+        $this->mapper->setShowDeleted(false);
+        $this->assertFalse($this->mapper->getShowDeleted());
+        $this->assertFalse($this->mapper->setShowDeleted(false)->getShowDeleted());
+        $this->assertTrue($this->mapper->setShowDeleted(true)->getShowDeleted());
+        $this->assertTrue($this->mapper->getShowDeleted());
     }
 
     /**
@@ -228,31 +243,31 @@ class MapperAbstractTest extends BaseTestCase
     public function testGetSQlString()
     {
         // Verifica o padrão de não usar o campo deleted e não mostrar os removidos
-        $this->Mapper->setOrder('id');
+        $this->mapper->setOrder('id');
         $this->assertEquals(
             'SELECT `album`.* FROM `album` ORDER BY `id` ASC',
-            $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
+            $this->mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
             'showDeleted=false, useDeleted=false'
         );
 
         // Marca para usar o campo deleted
-        $this->Mapper->setUseDeleted(true);
+        $this->mapper->setUseDeleted(true);
         $this->assertEquals(
             'SELECT `album`.* FROM `album` WHERE `album`.`deleted` = \'0\' ORDER BY `id` ASC',
-            $this->Mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
+            $this->mapper->getSelect()->getSqlString($this->adapter->getPlatform()),
             'showDeleted=false, useDeleted=true'
         );
 
         // Marca para não usar o campo deleted
-        $this->Mapper->setUseDeleted(false);
+        $this->mapper->setUseDeleted(false);
 
         $this->assertEquals(
             'SELECT `album`.* FROM `album` WHERE `album`.`id` = \'1234\' ORDER BY `id` ASC',
-            $this->Mapper->getSelect(['id' => 1234])->getSqlString($this->adapter->getPlatform())
+            $this->mapper->getSelect(['id' => 1234])->getSqlString($this->adapter->getPlatform())
         );
         $this->assertEquals(
             'SELECT `album`.* FROM `album` WHERE `album`.`texto` = \'textotextotexto\' ORDER BY `id` ASC',
-            $this->Mapper->getSelect(['texto' => 'textotextotexto'])->getSqlString($this->adapter->getPlatform())
+            $this->mapper->getSelect(['texto' => 'textotextotexto'])->getSqlString($this->adapter->getPlatform())
         );
     }
 
@@ -261,9 +276,9 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testGetSQlSelect()
     {
-        $select = $this->Mapper->getTableSelect();
+        $select = $this->mapper->getTableSelect();
         $this->assertInstanceOf('\Zend\Db\Sql\Select', $select);
-        $this->assertEquals($select->getSqlString(), $this->Mapper->getTableSelect()->getSqlString());
+        $this->assertEquals($select->getSqlString(), $this->mapper->getTableSelect()->getSqlString());
     }
 
     /**
@@ -271,86 +286,92 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchAll()
     {
-        $this->assertFalse($this->Mapper->isUseHydrateResultSet());
+        $this->assertFalse($this->mapper->isUseHydrateResultSet());
 
-         // O padrão é não usar o campo deleted
-        $this->Mapper->setOrder('id');
-        $albuns = $this->Mapper->fetchAll();
+        // O padrão é não usar o campo deleted
+        $this->mapper->setOrder('id');
+        $albuns = $this->mapper->fetchAll();
         $this->assertCount(4, $albuns, 'showDeleted=false, useDeleted=false');
 
         // Marca para mostrar os removidos e não usar o campo deleted
-        $this->Mapper->setShowDeleted(true)->setUseDeleted(false);
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'showDeleted=true, useDeleted=false');
+        $this->mapper->setShowDeleted(true)->setUseDeleted(false);
+        $this->assertCount(4, $this->mapper->fetchAll(), 'showDeleted=true, useDeleted=false');
 
         // Marca pra não mostrar os removidos e usar o campo deleted
-        $this->Mapper->setShowDeleted(false)->setUseDeleted(true);
-        $this->assertCount(3, $this->Mapper->fetchAll(), 'showDeleted=false, useDeleted=true');
+        $this->mapper->setShowDeleted(false)->setUseDeleted(true);
+        $this->assertCount(3, $this->mapper->fetchAll(), 'showDeleted=false, useDeleted=true');
 
         // Marca pra mostrar os removidos e usar o campo deleted
-        $this->Mapper->setShowDeleted(true)->setUseDeleted(true);
-        $albuns = $this->Mapper->fetchAll();
+        $this->mapper->setShowDeleted(true)->setUseDeleted(true);
+        $albuns = $this->mapper->fetchAll();
         $this->assertCount(4, $albuns, 'showDeleted=true, useDeleted=true');
 
         // Marca não mostrar os removios
-        $this->Mapper->setUseDeleted(true)->setShowDeleted(false);
+        $this->mapper->setUseDeleted(true)->setShowDeleted(false);
 
         $albuns = $this->defaultValues;
         unset($albuns[3]); // remove o deleted=1
 
-        $fetchAll = $this->Mapper->fetchAll();
+        $fetchAll = $this->mapper->fetchAll();
         foreach ($fetchAll as $id => $row) {
             $fetchAll[$id] = $row->toArray();
         }
         $this->assertEquals($albuns, $fetchAll);
 
         // Marca mostrar os removios
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
-        $fetchAll = $this->Mapper->fetchAll();
+        $fetchAll = $this->mapper->fetchAll();
         foreach ($fetchAll as $id => $row) {
             $fetchAll[$id] = $row->toArray();
         }
         $this->assertEquals($this->defaultValues, $fetchAll);
-        $this->assertCount(4, $this->Mapper->fetchAll());
-        $this->Mapper->setShowDeleted(false);
-        $this->assertCount(3, $this->Mapper->fetchAll());
+        $this->assertCount(4, $this->mapper->fetchAll());
+        $this->mapper->setShowDeleted(false);
+        $this->assertCount(3, $this->mapper->fetchAll());
 
         // Verifica o where
-        $this->assertCount(2, $this->Mapper->fetchAll(['artist' => $albuns[0]['artist']]));
-        $this->assertNull($this->Mapper->fetchAll(['artist' => $this->defaultValues[3]['artist']]));
+        $this->assertCount(2, $this->mapper->fetchAll(['artist' => $albuns[0]['artist']]));
+        $this->assertNull($this->mapper->fetchAll(['artist' => $this->defaultValues[3]['artist']]));
 
         // Apaga qualquer cache
-        $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
+        $this->assertTrue($this->mapper->getCache()->flush(), 'apaga o cache');
 
         // Define exibir os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
         // Liga o cache
-        $this->Mapper->setUseCache(true);
-        $fetchAll = $this->Mapper->fetchAll();
+        $this->mapper->setUseCache(true);
+        $fetchAll = $this->mapper->fetchAll();
         foreach ($fetchAll as $id => $row) {
             $fetchAll[$id] = $row->toArray();
         }
         $this->assertEquals($this->defaultValues, $fetchAll, 'fetchAll está igual ao defaultValues');
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros');
+        $this->assertCount(4, $this->mapper->fetchAll(), 'Deve conter 4 registros');
 
         // Grava um registro "sem o cache saber"
-        $this->Mapper->getTableGateway()->insert(['id' => 10, 'artist' => 'nao existo por enquanto', 'title' => 'bla bla', 'deleted' => 0]);
+        $this->mapper->getTableGateway()->insert([
+            'id' => 10,
+            'artist' => 'nao existo por enquanto',
+            'title' => 'bla bla',
+            'deleted' => 0
+        ]);
 
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros depois do insert "sem o cache saber"');
-        $this->assertTrue($this->Mapper->getCache()->flush(), 'limpa o cache');
-        $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
+        $this->assertCount(4, $this->mapper->fetchAll(),
+            'Deve conter 4 registros depois do insert "sem o cache saber"');
+        $this->assertTrue($this->mapper->getCache()->flush(), 'limpa o cache');
+        $this->assertCount(5, $this->mapper->fetchAll(), 'Deve conter 5 registros');
 
         // Define não exibir os removidos
-        $this->Mapper->setShowDeleted(false);
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros com showDeleted=false');
+        $this->mapper->setShowDeleted(false);
+        $this->assertCount(4, $this->mapper->fetchAll(), 'Deve conter 4 registros com showDeleted=false');
 
         // Apaga um registro "sem o cache saber"
-        $this->Mapper->getTableGateway()->delete("id=10");
-        $this->Mapper->setShowDeleted(true);
-        $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
-        $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros 4');
+        $this->mapper->getTableGateway()->delete("id=10");
+        $this->mapper->setShowDeleted(true);
+        $this->assertCount(5, $this->mapper->fetchAll(), 'Deve conter 5 registros');
+        $this->assertTrue($this->mapper->getCache()->flush(), 'apaga o cache');
+        $this->assertCount(4, $this->mapper->fetchAll(), 'Deve conter 4 registros 4');
     }
 
     /**
@@ -358,86 +379,92 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchAllHydrateResultSet()
     {
-        $this->Mapper->setUseHydrateResultSet(true);
-        $this->assertTrue($this->Mapper->isUseHydrateResultSet());
+        $this->mapper->setUseHydrateResultSet(true);
+        $this->assertTrue($this->mapper->isUseHydrateResultSet());
 
         // O padrão é não usar o campo deleted
-        $this->Mapper->setOrder('id');
-        $albuns = $this->Mapper->fetchAll();
+        $this->mapper->setOrder('id');
+        $albuns = $this->mapper->fetchAll();
         $this->assertCount(4, $albuns, 'showDeleted=false, useDeleted=false');
 
         // Marca para mostrar os removidos e não usar o campo deleted
-        $this->Mapper->setShowDeleted(true)->setUseDeleted(false);
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'showDeleted=true, useDeleted=false');
+        $this->mapper->setShowDeleted(true)->setUseDeleted(false);
+        $this->assertCount(4, $this->mapper->fetchAll(), 'showDeleted=true, useDeleted=false');
 
         // Marca pra não mostrar os removidos e usar o campo deleted
-        $this->Mapper->setShowDeleted(false)->setUseDeleted(true);
-        $this->assertCount(3, $this->Mapper->fetchAll(), 'showDeleted=false, useDeleted=true');
+        $this->mapper->setShowDeleted(false)->setUseDeleted(true);
+        $this->assertCount(3, $this->mapper->fetchAll(), 'showDeleted=false, useDeleted=true');
 
         // Marca pra mostrar os removidos e usar o campo deleted
-        $this->Mapper->setShowDeleted(true)->setUseDeleted(true);
-        $albuns = $this->Mapper->fetchAll();
+        $this->mapper->setShowDeleted(true)->setUseDeleted(true);
+        $albuns = $this->mapper->fetchAll();
         $this->assertCount(4, $albuns, 'showDeleted=true, useDeleted=true');
 
         // Marca não mostrar os removios
-        $this->Mapper->setUseDeleted(true)->setShowDeleted(false);
+        $this->mapper->setUseDeleted(true)->setShowDeleted(false);
 
         $albuns = $this->defaultValues;
         unset($albuns[3]); // remove o deleted=1
 
-        $fetchAll = $this->Mapper->fetchAll();
+        $fetchAll = $this->mapper->fetchAll();
         $this->assertInstanceOf(HydratingResultSet::class, $fetchAll);
         $fetchAll = $fetchAll->toArray();
         $this->assertEquals($albuns, $fetchAll);
 
         // Marca mostrar os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
-        $fetchAll = $this->Mapper->fetchAll();
+        $fetchAll = $this->mapper->fetchAll();
         $this->assertInstanceOf(HydratingResultSet::class, $fetchAll);
         $fetchAll = $fetchAll->toArray();
 
         $this->assertEquals($this->defaultValues, $fetchAll);
-        $this->assertCount(4, $this->Mapper->fetchAll());
-        $this->Mapper->setShowDeleted(false);
-        $this->assertCount(3, $this->Mapper->fetchAll());
+        $this->assertCount(4, $this->mapper->fetchAll());
+        $this->mapper->setShowDeleted(false);
+        $this->assertCount(3, $this->mapper->fetchAll());
 
         // Verifica o where
-        $this->assertCount(2, $this->Mapper->fetchAll(['artist' => $albuns[0]['artist']]));
-        $this->assertNull($this->Mapper->fetchAll(['artist' => $this->defaultValues[3]['artist']]));
+        $this->assertCount(2, $this->mapper->fetchAll(['artist' => $albuns[0]['artist']]));
+        $this->assertNull($this->mapper->fetchAll(['artist' => $this->defaultValues[3]['artist']]));
 
         // Apaga qualquer cache
-        $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
+        $this->assertTrue($this->mapper->getCache()->flush(), 'apaga o cache');
 
         // Define exibir os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
         // Liga o cache
-        $this->Mapper->setUseCache(true);
-        $fetchAll = $this->Mapper->fetchAll();
+        $this->mapper->setUseCache(true);
+        $fetchAll = $this->mapper->fetchAll();
         $this->assertInstanceOf(HydratingResultSet::class, $fetchAll);
         $fetchAll = $fetchAll->toArray();
 
         $this->assertEquals($this->defaultValues, $fetchAll, 'fetchAll está igual ao defaultValues');
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros');
+        $this->assertCount(4, $this->mapper->fetchAll(), 'Deve conter 4 registros');
 
         // Grava um registro "sem o cache saber"
-        $this->Mapper->getTableGateway()->insert(['id' => 10, 'artist' => 'nao existo por enquanto', 'title' => 'bla bla', 'deleted' => 0]);
+        $this->mapper->getTableGateway()->insert([
+            'id' => 10,
+            'artist' => 'nao existo por enquanto',
+            'title' => 'bla bla',
+            'deleted' => 0
+        ]);
 
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros depois do insert "sem o cache saber"');
-        $this->assertTrue($this->Mapper->getCache()->flush(), 'limpa o cache');
-        $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
+        $this->assertCount(4, $this->mapper->fetchAll(),
+            'Deve conter 4 registros depois do insert "sem o cache saber"');
+        $this->assertTrue($this->mapper->getCache()->flush(), 'limpa o cache');
+        $this->assertCount(5, $this->mapper->fetchAll(), 'Deve conter 5 registros');
 
         // Define não exibir os removidos
-        $this->Mapper->setShowDeleted(false);
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros com showDeleted=false');
+        $this->mapper->setShowDeleted(false);
+        $this->assertCount(4, $this->mapper->fetchAll(), 'Deve conter 4 registros com showDeleted=false');
 
         // Apaga um registro "sem o cache saber"
-        $this->Mapper->getTableGateway()->delete("id=10");
-        $this->Mapper->setShowDeleted(true);
-        $this->assertCount(5, $this->Mapper->fetchAll(), 'Deve conter 5 registros');
-        $this->assertTrue($this->Mapper->getCache()->flush(), 'apaga o cache');
-        $this->assertCount(4, $this->Mapper->fetchAll(), 'Deve conter 4 registros 4');
+        $this->mapper->getTableGateway()->delete("id=10");
+        $this->mapper->setShowDeleted(true);
+        $this->assertCount(5, $this->mapper->fetchAll(), 'Deve conter 5 registros');
+        $this->assertTrue($this->mapper->getCache()->flush(), 'apaga o cache');
+        $this->assertCount(4, $this->mapper->fetchAll(), 'Deve conter 4 registros 4');
     }
 
     /**
@@ -445,25 +472,25 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchRow()
     {
-        $this->assertFalse($this->Mapper->isUseHydrateResultSet());
+        $this->assertFalse($this->mapper->isUseHydrateResultSet());
 
         // Marca pra usar o campo deleted
-        $this->Mapper->setUseDeleted(true);
-        $this->Mapper->setOrder('id');
+        $this->mapper->setUseDeleted(true);
+        $this->mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(1));
-        $this->assertEquals($this->defaultValues[0], $this->Mapper->fetchRow(1)->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(2));
-        $this->assertEquals($this->defaultValues[1], $this->Mapper->fetchRow(2)->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(3));
-        $this->assertEquals($this->defaultValues[2], $this->Mapper->fetchRow(3)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(1));
+        $this->assertEquals($this->defaultValues[0], $this->mapper->fetchRow(1)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(2));
+        $this->assertEquals($this->defaultValues[1], $this->mapper->fetchRow(2)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(3));
+        $this->assertEquals($this->defaultValues[2], $this->mapper->fetchRow(3)->toArray());
 
         // Verifica o item removido
-        $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(4));
-        $this->assertEquals($this->defaultValues[3], $this->Mapper->fetchRow(4)->toArray());
-        $this->Mapper->setShowDeleted(false);
+        $this->mapper->setShowDeleted(true);
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(4));
+        $this->assertEquals($this->defaultValues[3], $this->mapper->fetchRow(4)->toArray());
+        $this->mapper->setShowDeleted(false);
     }
 
     /**
@@ -471,26 +498,26 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchRowHydrateResultaSet()
     {
-        $this->Mapper->setUseHydrateResultSet(true);
-        $this->assertTrue($this->Mapper->isUseHydrateResultSet());
+        $this->mapper->setUseHydrateResultSet(true);
+        $this->assertTrue($this->mapper->isUseHydrateResultSet());
 
         // Marca pra usar o campo deleted
-        $this->Mapper->setUseDeleted(true);
-        $this->Mapper->setOrder('id');
+        $this->mapper->setUseDeleted(true);
+        $this->mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(1));
-        $this->assertEquals($this->defaultValues[0], $this->Mapper->fetchRow(1)->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(2));
-        $this->assertEquals($this->defaultValues[1], $this->Mapper->fetchRow(2)->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(3));
-        $this->assertEquals($this->defaultValues[2], $this->Mapper->fetchRow(3)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(1));
+        $this->assertEquals($this->defaultValues[0], $this->mapper->fetchRow(1)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(2));
+        $this->assertEquals($this->defaultValues[1], $this->mapper->fetchRow(2)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(3));
+        $this->assertEquals($this->defaultValues[2], $this->mapper->fetchRow(3)->toArray());
 
         // Verifica o item removido
-        $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(4));
-        $this->assertEquals($this->defaultValues[3], $this->Mapper->fetchRow(4)->toArray());
-        $this->Mapper->setShowDeleted(false);
+        $this->mapper->setShowDeleted(true);
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(4));
+        $this->assertEquals($this->defaultValues[3], $this->mapper->fetchRow(4)->toArray());
+        $this->mapper->setShowDeleted(false);
     }
 
     /**
@@ -498,25 +525,25 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testFetchRowWithIntegerKey()
     {
-        $this->Mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id']);
+        $this->mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id']);
 
         // Marca pra usar o campo deleted
-        $this->Mapper->setUseDeleted(true);
-        $this->Mapper->setOrder('id');
+        $this->mapper->setUseDeleted(true);
+        $this->mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(1));
-        $this->assertEquals($this->defaultValues[0], $this->Mapper->fetchRow(1)->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(2));
-        $this->assertEquals($this->defaultValues[1], $this->Mapper->fetchRow(2)->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(3));
-        $this->assertEquals($this->defaultValues[2], $this->Mapper->fetchRow(3)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(1));
+        $this->assertEquals($this->defaultValues[0], $this->mapper->fetchRow(1)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(2));
+        $this->assertEquals($this->defaultValues[1], $this->mapper->fetchRow(2)->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(3));
+        $this->assertEquals($this->defaultValues[2], $this->mapper->fetchRow(3)->toArray());
 
         // Verifica o item removido
-        $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(4));
-        $this->assertEquals($this->defaultValues[3], $this->Mapper->fetchRow(4)->toArray());
-        $this->Mapper->setShowDeleted(false);
+        $this->mapper->setShowDeleted(true);
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(4));
+        $this->assertEquals($this->defaultValues[3], $this->mapper->fetchRow(4)->toArray());
+        $this->mapper->setShowDeleted(false);
     }
 
     /**
@@ -526,30 +553,30 @@ class MapperAbstractTest extends BaseTestCase
     {
         $this->dropTables()->createTables(['album_string']);
         $defaultValues = [
-                [
-                        'id' => 'A',
-                        'artist' => 'Rush',
-                        'title' => 'Rush',
-                        'deleted' => 0
-                ],
-                [
-                        'id' => 'B',
-                        'artist' => 'Rush',
-                        'title' => 'Moving Pictures',
-                        'deleted' => 0
-                ],
-                [
-                        'id' => 'C',
-                        'artist' => 'Dream Theater',
-                        'title' => 'Images And Words',
-                        'deleted' => 0
-                ],
-                [
-                        'id' => 'D',
-                        'artist' => 'Claudia Leitte',
-                        'title' => 'Exttravasa',
-                        'deleted' => 1
-                ]
+            [
+                'id' => 'A',
+                'artist' => 'Rush',
+                'title' => 'Rush',
+                'deleted' => 0
+            ],
+            [
+                'id' => 'B',
+                'artist' => 'Rush',
+                'title' => 'Moving Pictures',
+                'deleted' => 0
+            ],
+            [
+                'id' => 'C',
+                'artist' => 'Dream Theater',
+                'title' => 'Images And Words',
+                'deleted' => 0
+            ],
+            [
+                'id' => 'D',
+                'artist' => 'Claudia Leitte',
+                'title' => 'Exttravasa',
+                'deleted' => 1
+            ]
         ];
         foreach ($defaultValues as $row) {
             $this->getAdapter()->query("INSERT into {$this->tableName}({$this->tableKeyName}, artist, title, deleted)
@@ -561,26 +588,26 @@ class MapperAbstractTest extends BaseTestCase
                                         );", Adapter::QUERY_MODE_EXECUTE);
         }
 
-        $this->Mapper->setTableKey([MapperConcrete::KEY_STRING => 'id']);
+        $this->mapper->setTableKey([MapperConcrete::KEY_STRING => 'id']);
 
         // Marca pra usar o campo deleted
-        $this->Mapper->setUseDeleted(true);
+        $this->mapper->setUseDeleted(true);
 
-        $this->Mapper->setOrder('id');
+        $this->mapper->setOrder('id');
 
         // Verifica os itens que existem
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('A'));
-        $this->assertEquals($defaultValues[0], $this->Mapper->fetchRow('A')->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('B'));
-        $this->assertEquals($defaultValues[1], $this->Mapper->fetchRow('B')->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('C'));
-        $this->assertEquals($defaultValues[2], $this->Mapper->fetchRow('C')->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow('A'));
+        $this->assertEquals($defaultValues[0], $this->mapper->fetchRow('A')->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow('B'));
+        $this->assertEquals($defaultValues[1], $this->mapper->fetchRow('B')->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow('C'));
+        $this->assertEquals($defaultValues[2], $this->mapper->fetchRow('C')->toArray());
 
         // Verifica o item removido
-        $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow('D'));
-        $this->assertEquals($defaultValues[3], $this->Mapper->fetchRow('D')->toArray());
-        $this->Mapper->setShowDeleted(false);
+        $this->mapper->setShowDeleted(true);
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow('D'));
+        $this->assertEquals($defaultValues[3], $this->mapper->fetchRow('D')->toArray());
+        $this->mapper->setShowDeleted(false);
     }
 
     /**
@@ -590,34 +617,34 @@ class MapperAbstractTest extends BaseTestCase
     {
         $this->dropTables()->createTables(['album_array']);
         $defaultValues = [
-                [
-                        'id_int' => 1,
-                        'id_char' => 'A',
-                        'artist' => 'Rush',
-                        'title' => 'Rush',
-                        'deleted' => 0
-                ],
-                [
-                        'id_int' => 2,
-                        'id_char' => 'B',
-                        'artist' => 'Rush',
-                        'title' => 'Moving Pictures',
-                        'deleted' => 0
-                ],
-                [
-                        'id_int' => 3,
-                        'id_char' => 'C',
-                        'artist' => 'Dream Theater',
-                        'title' => 'Images And Words',
-                        'deleted' => 0
-                ],
-                [
-                        'id_int' => 4,
-                        'id_char' => 'D',
-                        'artist' => 'Claudia Leitte',
-                        'title' => 'Exttravasa',
-                        'deleted' => 1
-                ]
+            [
+                'id_int' => 1,
+                'id_char' => 'A',
+                'artist' => 'Rush',
+                'title' => 'Rush',
+                'deleted' => 0
+            ],
+            [
+                'id_int' => 2,
+                'id_char' => 'B',
+                'artist' => 'Rush',
+                'title' => 'Moving Pictures',
+                'deleted' => 0
+            ],
+            [
+                'id_int' => 3,
+                'id_char' => 'C',
+                'artist' => 'Dream Theater',
+                'title' => 'Images And Words',
+                'deleted' => 0
+            ],
+            [
+                'id_int' => 4,
+                'id_char' => 'D',
+                'artist' => 'Claudia Leitte',
+                'title' => 'Exttravasa',
+                'deleted' => 1
+            ]
         ];
         foreach ($defaultValues as $row) {
             $this->getAdapter()->query("INSERT into album (id_int, id_char, artist, title, deleted)
@@ -630,28 +657,28 @@ class MapperAbstractTest extends BaseTestCase
                                         );", Adapter::QUERY_MODE_EXECUTE);
         }
 
-        $this->Mapper->setTableKey([MapperConcrete::KEY_STRING => 'id']);
+        $this->mapper->setTableKey([MapperConcrete::KEY_STRING => 'id']);
 
         // Marca pra usar o campo deleted
-        $this->Mapper->setUseDeleted(true);
+        $this->mapper->setUseDeleted(true);
 
-        $this->Mapper->setOrder(['id_int', 'id_char']);
+        $this->mapper->setOrder(['id_int', 'id_char']);
 
         // Verifica os itens que existem
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]));
-        $this->assertEquals($defaultValues[0], $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1])->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]));
-        $this->assertEquals($defaultValues[1], $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2])->toArray());
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 3]));
-        $this->assertEquals($defaultValues[2], $this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 3])->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]));
+        $this->assertEquals($defaultValues[0], $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1])->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]));
+        $this->assertEquals($defaultValues[1], $this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2])->toArray());
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(['id_char' => 'C', 'id_int' => 3]));
+        $this->assertEquals($defaultValues[2], $this->mapper->fetchRow(['id_char' => 'C', 'id_int' => 3])->toArray());
 
-        $this->assertNull($this->Mapper->fetchRow(['id_char' => 'C', 'id_int' => 2]));
+        $this->assertNull($this->mapper->fetchRow(['id_char' => 'C', 'id_int' => 2]));
 
         // Verifica o item removido
-        $this->Mapper->setShowDeleted(true);
-        $this->assertInstanceOf(ArrayObject::class, $this->Mapper->fetchRow(['id_char' => 'D', 'id_int' => 4]));
-        $this->assertEquals($defaultValues[3], $this->Mapper->fetchRow(['id_char' => 'D', 'id_int' => 4])->toArray());
-        $this->Mapper->setShowDeleted(false);
+        $this->mapper->setShowDeleted(true);
+        $this->assertInstanceOf(ArrayObject::class, $this->mapper->fetchRow(['id_char' => 'D', 'id_int' => 4]));
+        $this->assertEquals($defaultValues[3], $this->mapper->fetchRow(['id_char' => 'D', 'id_int' => 4])->toArray());
+        $this->mapper->setShowDeleted(false);
     }
 
     /**
@@ -661,60 +688,65 @@ class MapperAbstractTest extends BaseTestCase
     {
         // Certifica que a tabela está vazia
         $this->dropTables()->createTables();
-        $this->Mapper->setOrder('id');
-        $this->assertNull($this->Mapper->fetchAll(), 'Verifica se há algum registro pregravado');
+        $this->mapper->setOrder('id');
+        $this->assertNull($this->mapper->fetchAll(), 'Verifica se há algum registro pregravado');
 
-        $this->assertFalse($this->Mapper->insert([]), 'Verifica inclusão inválida 1');
-        $this->assertFalse($this->Mapper->insert(null), 'Verifica inclusão inválida 2');
+        $this->assertFalse($this->mapper->insert([]), 'Verifica inclusão inválida 1');
+        $this->assertFalse($this->mapper->insert(null), 'Verifica inclusão inválida 2');
 
         $row = [
-            'artist'  => 'Rush',
-            'title'   => 'Rush',
+            'artist' => 'Rush',
+            'title' => 'Rush',
             'deleted' => '0'
         ];
 
-        $id = $this->Mapper->insert($row);
+        $id = $this->mapper->insert($row);
         $this->assertEquals(1, $id, 'Verifica a chave criada=1');
 
-        $this->assertNotNull($this->Mapper->fetchAll(), 'Verifica o fetchAll não vazio');
-        $this->assertEquals($row, $this->Mapper->getLastInsertSet(), 'Verifica o set do ultimo insert');
-        $this->assertCount(1, $this->Mapper->fetchAll(), 'Verifica se apenas um registro foi adicionado');
+        $this->assertNotNull($this->mapper->fetchAll(), 'Verifica o fetchAll não vazio');
+        $this->assertEquals($row, $this->mapper->getLastInsertSet(), 'Verifica o set do ultimo insert');
+        $this->assertCount(1, $this->mapper->fetchAll(), 'Verifica se apenas um registro foi adicionado');
 
         $row = array_merge(['id' => $id], $row);
 
-        $this->assertEquals([new ArrayObject($row)], $this->Mapper->fetchAll(), 'Verifica se o registro adicionado corresponde ao original pelo fetchAll()');
-        $this->assertEquals(new ArrayObject($row), $this->Mapper->fetchRow(1), 'Verifica se o registro adicionado corresponde ao original pelo fetchRow()');
+        $this->assertEquals([new ArrayObject($row)], $this->mapper->fetchAll(),
+            'Verifica se o registro adicionado corresponde ao original pelo fetchAll()');
+        $this->assertEquals(new ArrayObject($row), $this->mapper->fetchRow(1),
+            'Verifica se o registro adicionado corresponde ao original pelo fetchRow()');
 
         $row = [
-            'id'      => 2,
-            'artist'  => 'Rush',
-            'title'   => 'Test For Echos',
+            'id' => 2,
+            'artist' => 'Rush',
+            'title' => 'Test For Echos',
             'deleted' => '0'
         ];
 
-        $id = $this->Mapper->insert($row);
+        $id = $this->mapper->insert($row);
         $this->assertEquals(2, $id, 'Verifica a chave criada=2');
 
-        $this->assertCount(2, $this->Mapper->fetchAll(), 'Verifica que há DOIS registro');
-        $this->assertEquals(new ArrayObject($row), $this->Mapper->fetchRow(2), 'Verifica se o SEGUNDO registro adicionado corresponde ao original pelo fetchRow()');
-        $this->assertEquals($row, $this->Mapper->getLastInsertSet());
+        $this->assertCount(2, $this->mapper->fetchAll(), 'Verifica que há DOIS registro');
+        $this->assertEquals(new ArrayObject($row), $this->mapper->fetchRow(2),
+            'Verifica se o SEGUNDO registro adicionado corresponde ao original pelo fetchRow()');
+        $this->assertEquals($row, $this->mapper->getLastInsertSet());
 
         $row = [
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
             'deleted' => '0'
         ];
-        $id = $this->Mapper->insert($row);
+        $id = $this->mapper->insert($row);
         $this->assertEquals(3, $id);
-        $this->assertEquals($row, $this->Mapper->getLastInsertSet(), 'Verifica se o TERCEIRO registro adicionado corresponde ao original pelo getLastInsertSet()');
+        $this->assertEquals($row, $this->mapper->getLastInsertSet(),
+            'Verifica se o TERCEIRO registro adicionado corresponde ao original pelo getLastInsertSet()');
 
         $row = array_merge(['id' => $id], $row);
 
-        $this->assertCount(3, $this->Mapper->fetchAll());
-        $this->assertEquals(new ArrayObject($row), $this->Mapper->fetchRow(3), 'Verifica se o TERCEIRO registro adicionado corresponde ao original pelo fetchRow()');
+        $this->assertCount(3, $this->mapper->fetchAll());
+        $this->assertEquals(new ArrayObject($row), $this->mapper->fetchRow(3),
+            'Verifica se o TERCEIRO registro adicionado corresponde ao original pelo fetchRow()');
 
         // Teste com Zend_Db_Expr
-        $id = $this->Mapper->insert(['title' => new \Zend\Db\Sql\Expression('now()')]);
+        $id = $this->mapper->insert(['title' => new \Zend\Db\Sql\Expression('now()')]);
         $this->assertEquals(4, $id);
     }
 
@@ -725,65 +757,66 @@ class MapperAbstractTest extends BaseTestCase
     {
         // Apaga as tabelas
         $this->dropTables()->createTables();
-        $this->Mapper->setOrder('id');
-        $this->assertEmpty($this->Mapper->fetchAll(), 'tabela não está vazia');
+        $this->mapper->setOrder('id');
+        $this->assertEmpty($this->mapper->fetchAll(), 'tabela não está vazia');
 
         $row1 = [
-            'id'      => 1,
-            'artist'  => 'Não me altere',
-            'title'   => 'Presto',
+            'id' => 1,
+            'artist' => 'Não me altere',
+            'title' => 'Presto',
             'deleted' => 0
         ];
 
         $row2 = [
-            'id'      => 2,
-            'artist'  => 'Rush',
-            'title'   => 'Rush',
+            'id' => 2,
+            'artist' => 'Rush',
+            'title' => 'Rush',
             'deleted' => 0
         ];
 
-        $this->Mapper->insert($row1);
-        $this->Mapper->insert($row2);
+        $this->mapper->insert($row1);
+        $this->mapper->insert($row2);
 
-        $this->assertNotNull($this->Mapper->fetchAll());
-        $this->assertCount(2, $this->Mapper->fetchAll());
-        $row = $this->Mapper->fetchRow(1);
+        $this->assertNotNull($this->mapper->fetchAll());
+        $this->assertCount(2, $this->mapper->fetchAll());
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         $rowUpdate = [
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
         ];
 
-        $this->Mapper->update($rowUpdate, 2);
+        $this->mapper->update($rowUpdate, 2);
         $rowUpdate['id'] = '2';
         $rowUpdate['deleted'] = '0';
 
-        $this->assertNotNull($this->Mapper->fetchAll());
-        $this->assertCount(2, $this->Mapper->fetchAll());
-        $row = $this->Mapper->fetchRow(2);
+        $this->assertNotNull($this->mapper->fetchAll());
+        $this->assertCount(2, $this->mapper->fetchAll());
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($rowUpdate, $row->toArray(), 'Alterou o 2?');
 
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'Alterou o 1?');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertNotEquals($row2, $row->toArray(), 'O 2 não é mais o mesmo?');
 
         $row = $row->toArray();
         unset($row['id']);
         unset($row['deleted']);
-        $this->assertEquals($row, $this->Mapper->getLastUpdateSet(), 'Os dados diferentes foram os alterados?');
-        $this->assertEquals(['title' => [$row2['title'], $row['title']]], $this->Mapper->getLastUpdateDiff(), 'As alterações foram detectadas corretamente?');
+        $this->assertEquals($row, $this->mapper->getLastUpdateSet(), 'Os dados diferentes foram os alterados?');
+        $this->assertEquals(['title' => [$row2['title'], $row['title']]], $this->mapper->getLastUpdateDiff(),
+            'As alterações foram detectadas corretamente?');
 
-        $this->assertFalse($this->Mapper->update([], 2));
-        $this->assertFalse($this->Mapper->update(null, 2));
+        $this->assertFalse($this->mapper->update([], 2));
+        $this->assertFalse($this->mapper->update(null, 2));
     }
 
     /**
@@ -793,8 +826,8 @@ class MapperAbstractTest extends BaseTestCase
     {
         // Apaga as tabelas
         $this->dropTables()->createTables();
-        $this->Mapper->setOrder('id');
-        $this->assertEmpty($this->Mapper->fetchAll(), 'tabela não está vazia');
+        $this->mapper->setOrder('id');
+        $this->assertEmpty($this->mapper->fetchAll(), 'tabela não está vazia');
 
         $row1 = [
             'id' => 1,
@@ -804,67 +837,67 @@ class MapperAbstractTest extends BaseTestCase
         ];
         $row2 = [
             'id' => 2,
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
             'deleted' => 0
         ];
 
-        $this->Mapper->insert($row1);
-        $this->Mapper->insert($row2);
+        $this->mapper->insert($row1);
+        $this->mapper->insert($row2);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
-        $this->Mapper->setUseDeleted(true)->setShowDeleted(true);
+        $this->mapper->setUseDeleted(true)->setShowDeleted(true);
 
         // Remove o registro
-        $this->Mapper->delete(1);
+        $this->mapper->delete(1);
         $row1['deleted'] = 1;
 
         // Verifica se foi removido
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe');
 
         // Marca para mostrar os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v1');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para remover o registro da tabela
-        $this->Mapper->setUseDeleted(false);
+        $this->mapper->setUseDeleted(false);
 
         // Remove o registro qwue não existe
-        $this->Mapper->delete(3);
+        $this->mapper->delete(3);
 
         // Verifica se ele foi removido
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v2');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v2');
 
         // Remove o registro
-        $this->Mapper->delete(1);
+        $this->mapper->delete(1);
 
         // Verifica se ele foi removido
-        $this->assertNull($this->Mapper->fetchRow(1), 'row1 não existe v3');
-        $row = $this->Mapper->fetchRow(2);
+        $this->assertNull($this->mapper->fetchRow(1), 'row1 não existe v3');
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v3');
     }
@@ -875,10 +908,10 @@ class MapperAbstractTest extends BaseTestCase
     public function testDeleteIntegerKey()
     {
         $this->dropTables()->createTables();
-        $this->Mapper->setOrder('id');
-        $this->assertEmpty($this->Mapper->fetchAll(), 'tabela não está vazia');
+        $this->mapper->setOrder('id');
+        $this->assertEmpty($this->mapper->fetchAll(), 'tabela não está vazia');
 
-        $this->Mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id']);
+        $this->mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id']);
 
         // Abaixo é igual ao testDelete
         $row1 = [
@@ -889,67 +922,67 @@ class MapperAbstractTest extends BaseTestCase
         ];
         $row2 = [
             'id' => 2,
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
             'deleted' => 0
         ];
 
-        $this->Mapper->insert($row1);
-        $this->Mapper->insert($row2);
+        $this->mapper->insert($row1);
+        $this->mapper->insert($row2);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
-        $this->Mapper->setUseDeleted(true)->setShowDeleted(true);
+        $this->mapper->setUseDeleted(true)->setShowDeleted(true);
 
         // Remove o registro
-        $this->Mapper->delete(1);
+        $this->mapper->delete(1);
         $row1['deleted'] = 1;
 
         // Verifica se foi removido
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe');
 
         // Marca para mostrar os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v1');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para remover o registro da tabela
-        $this->Mapper->setUseDeleted(false);
+        $this->mapper->setUseDeleted(false);
 
         // Remove o registro qwue não existe
-        $this->Mapper->delete(3);
+        $this->mapper->delete(3);
 
         // Verifica se ele foi removido
-        $row = $this->Mapper->fetchRow(1);
+        $row = $this->mapper->fetchRow(1);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v2');
-        $row = $this->Mapper->fetchRow(2);
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v2');
 
         // Remove o registro
-        $this->Mapper->delete(1);
+        $this->mapper->delete(1);
 
         // Verifica se ele foi removido
-        $this->assertNull($this->Mapper->fetchRow(1), 'row1 não existe v3');
-        $row = $this->Mapper->fetchRow(2);
+        $this->assertNull($this->mapper->fetchRow(1), 'row1 não existe v3');
+        $row = $this->mapper->fetchRow(2);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v3');
     }
@@ -961,9 +994,9 @@ class MapperAbstractTest extends BaseTestCase
     {
 
         // Cria a tabela com chave string
-        $this->Mapper->setTableKey([MapperAbstract::KEY_STRING => 'id']);
+        $this->mapper->setTableKey([MapperAbstract::KEY_STRING => 'id']);
         $this->dropTables()->createTables(['album_string']);
-        $this->Mapper->setOrder('id');
+        $this->mapper->setOrder('id');
 
         // Abaixo é igual ao testDelete trocando 1, 2 por A, B
         $row1 = [
@@ -974,67 +1007,67 @@ class MapperAbstractTest extends BaseTestCase
         ];
         $row2 = [
             'id' => 'B',
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
             'deleted' => 0
         ];
 
-        $this->Mapper->insert($row1);
-        $this->Mapper->insert($row2);
+        $this->mapper->insert($row1);
+        $this->mapper->insert($row2);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow('A');
+        $row = $this->mapper->fetchRow('A');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow('B');
+        $row = $this->mapper->fetchRow('B');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
-        $this->Mapper->setUseDeleted(true)->setShowDeleted(true);
+        $this->mapper->setUseDeleted(true)->setShowDeleted(true);
 
         // Remove o registro
-        $this->Mapper->delete('A');
+        $this->mapper->delete('A');
         $row1['deleted'] = 1;
 
         // Verifica se foi removido
-        $row = $this->Mapper->fetchRow('A');
+        $row = $this->mapper->fetchRow('A');
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
-        $row = $this->Mapper->fetchRow('B');
+        $row = $this->mapper->fetchRow('B');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe');
 
         // Marca para mostrar os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow('A');
+        $row = $this->mapper->fetchRow('A');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v1');
-        $row = $this->Mapper->fetchRow('B');
+        $row = $this->mapper->fetchRow('B');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para remover o registro da tabela
-        $this->Mapper->setUseDeleted(false);
+        $this->mapper->setUseDeleted(false);
 
         // Remove o registro qwue não existe
-        $this->Mapper->delete('C');
+        $this->mapper->delete('C');
 
         // Verifica se ele foi removido
-        $row = $this->Mapper->fetchRow('A');
+        $row = $this->mapper->fetchRow('A');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 ainda existe v2');
-        $row = $this->Mapper->fetchRow('B');
+        $row = $this->mapper->fetchRow('B');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v2');
 
         // Remove o registro
-        $this->Mapper->delete('A');
+        $this->mapper->delete('A');
 
         // Verifica se ele foi removido
-        $this->assertNull($this->Mapper->fetchRow('A'), 'row1 não existe v3');
-        $row = $this->Mapper->fetchRow('B');
+        $this->assertNull($this->mapper->fetchRow('A'), 'row1 não existe v3');
+        $row = $this->mapper->fetchRow('B');
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v3');
     }
@@ -1046,8 +1079,8 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testDeleteInvalidArrayKey()
     {
-        $this->Mapper->setTableKey([MapperAbstract::KEY_INTEGER => 'id_int', MapperAbstract::KEY_STRING => 'id_char']);
-        $this->Mapper->delete('A');
+        $this->mapper->setTableKey([MapperAbstract::KEY_INTEGER => 'id_int', MapperAbstract::KEY_STRING => 'id_char']);
+        $this->mapper->delete('A');
     }
 
     /**
@@ -1057,11 +1090,11 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testDeleteInvalidArrayMultiKey()
     {
-        $this->Mapper->setTableKey([
+        $this->mapper->setTableKey([
             MapperAbstract::KEY_INTEGER => 'id_int',
             MapperAbstract::KEY_STRING => ['id_char', 'id_char2']
         ]);
-        $this->Mapper->delete('A');
+        $this->mapper->delete('A');
     }
 
     /**
@@ -1071,8 +1104,8 @@ class MapperAbstractTest extends BaseTestCase
      */
     public function testDeleteInvalidArraySingleKey()
     {
-        $this->Mapper->setTableKey([MapperAbstract::KEY_INTEGER => 'id_int', MapperAbstract::KEY_STRING => 'id_char']);
-        $this->Mapper->delete(['id_int' => 'A']);
+        $this->mapper->setTableKey([MapperAbstract::KEY_INTEGER => 'id_int', MapperAbstract::KEY_STRING => 'id_char']);
+        $this->mapper->delete(['id_int' => 'A']);
     }
 
 
@@ -1083,10 +1116,10 @@ class MapperAbstractTest extends BaseTestCase
     {
 
         // Cria a tabela com chave string
-        $this->Mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id_int', MapperConcrete::KEY_STRING => 'id_char']);
+        $this->mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id_int', MapperConcrete::KEY_STRING => 'id_char']);
         $this->dropTables()->createTables(['album_array']);
-        $this->Mapper->setUseAllKeys(false);
-        $this->Mapper->setOrder(['id_int','id_char']);
+        $this->mapper->setUseAllKeys(false);
+        $this->mapper->setOrder(['id_int', 'id_char']);
 
         // Abaixo é igual ao testDelete trocando 1, 2 por A, B
         $row1 = [
@@ -1099,65 +1132,65 @@ class MapperAbstractTest extends BaseTestCase
         $row2 = [
             'id_int' => 2,
             'id_char' => 'B',
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
             'deleted' => 0
         ];
 
-        $this->Mapper->insert($row1);
-        $this->Mapper->insert($row2);
+        $this->mapper->insert($row1);
+        $this->mapper->insert($row2);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
+        $row = $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
+        $row = $this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
         // Marca para usar o campo deleted
-        $this->Mapper->setUseDeleted(true)->setShowDeleted(true);
+        $this->mapper->setUseDeleted(true)->setShowDeleted(true);
 
         // Remove o registro
-        $this->Mapper->delete(['id_char' => 'A']);
+        $this->mapper->delete(['id_char' => 'A']);
         $row1['deleted'] = 1;
 
         // Verifica se foi removido
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
+        $row = $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals(1, $row['deleted'], 'row1 marcado como deleted');
 
-        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
+        $row = $this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 ainda existe v1');
 
         // Marca para mostrar os removidos
-        $this->Mapper->setShowDeleted(true);
+        $this->mapper->setShowDeleted(true);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
+        $row = $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]);
         $this->assertInstanceOf(ArrayObject::class, $row, 'row1 ainda existe v1');
         $this->assertEquals($row1, $row->toArray());
-        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
+        $row = $this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]);
         $this->assertInstanceOf(ArrayObject::class, $row, 'row2 ainda existe v1');
         $this->assertEquals($row2, $row->toArray());
 
         // Marca para remover o registro da tabela
-        $this->Mapper->setUseDeleted(false);
+        $this->mapper->setUseDeleted(false);
 
         // Remove o registro que não existe
-        $this->Mapper->delete(['id_char' => 'C']);
+        $this->mapper->delete(['id_char' => 'C']);
 
         // Verifica se ele foi removido
-        $this->assertNotEmpty($this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]), 'row1 ainda existe v3');
-        $this->assertNotEmpty($this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]), 'row2 ainda existe v3');
+        $this->assertNotEmpty($this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]), 'row1 ainda existe v3');
+        $this->assertNotEmpty($this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]), 'row2 ainda existe v3');
 
         // Remove o registro
-        $this->Mapper->delete(['id_char' => 'A']);
+        $this->mapper->delete(['id_char' => 'A']);
 
         // Verifica se ele foi removido
-        $this->assertNull($this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]), 'row1 não existe v4');
-        $this->assertNotEmpty($this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]), 'row2 ainda existe v4');
+        $this->assertNull($this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1]), 'row1 não existe v4');
+        $this->assertNotEmpty($this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2]), 'row2 ainda existe v4');
     }
 
     /**
@@ -1166,13 +1199,13 @@ class MapperAbstractTest extends BaseTestCase
     public function testUpdateArrayKey()
     {
         // Cria a tabela com chave string
-        $this->Mapper->setTableKey([
+        $this->mapper->setTableKey([
             MapperConcrete::KEY_INTEGER => 'id_int',
             MapperConcrete::KEY_STRING => ['id_char', 'artist']
         ]);
         $this->dropTables()->createTables(['album_array_two']);
-        $this->Mapper->setUseAllKeys(true);
-        $this->Mapper->setOrder(['id_int','id_char', 'artist']);
+        $this->mapper->setUseAllKeys(true);
+        $this->mapper->setOrder(['id_int', 'id_char', 'artist']);
 
         // Abaixo é igual ao testDelete trocando 1, 2 por A, B
         $row1 = [
@@ -1185,28 +1218,28 @@ class MapperAbstractTest extends BaseTestCase
         $row2 = [
             'id_int' => 2,
             'id_char' => 'B',
-            'artist'  => 'Rush',
-            'title'   => 'Moving Pictures',
+            'artist' => 'Rush',
+            'title' => 'Moving Pictures',
             'deleted' => 0
         ];
 
-        $this->Mapper->insert($row1);
-        $this->Mapper->insert($row2);
+        $this->mapper->insert($row1);
+        $this->mapper->insert($row2);
 
         // Verifica se o registro existe
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
+        $row = $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row1, $row->toArray(), 'row1 existe');
-        $row = $this->Mapper->fetchRow(['id_char' => 'B', 'id_int' => 2, 'artist' => 'Rush']);
+        $row = $this->mapper->fetchRow(['id_char' => 'B', 'id_int' => 2, 'artist' => 'Rush']);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals($row2, $row->toArray(), 'row2 existe');
 
 
         // atualizar o registro
-        $this->Mapper->update(['title' => 'New title'], ['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
+        $this->mapper->update(['title' => 'New title'], ['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
 
         // Verifica se foi removido
-        $row = $this->Mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
+        $row = $this->mapper->fetchRow(['id_char' => 'A', 'id_int' => 1, 'artist' => 'Rush']);
         $this->assertInstanceOf(ArrayObject::class, $row);
         $this->assertEquals('New title', $row['title'], 'row1 atualizado ');
     }

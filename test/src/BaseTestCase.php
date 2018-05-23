@@ -11,12 +11,13 @@
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   proprietary
  */
+
 namespace RealejoTest;
 
 use PHPUnit\Framework\TestCase;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Adapter\Adapter;
 
 class BaseTestCase extends TestCase
 {
@@ -34,6 +35,8 @@ class BaseTestCase extends TestCase
      * @var array
      */
     protected $tables = [];
+
+    protected $dataDir;
 
     /**
      * Prepares the environment before running ALL tests.
@@ -60,7 +63,7 @@ class BaseTestCase extends TestCase
      */
     public function getAdapter()
     {
-        if (! isset($this->adapter)) {
+        if (!isset($this->adapter)) {
             $this->adapter = GlobalAdapterFeature::getStaticAdapter();
         }
         return $this->adapter;
@@ -99,7 +102,8 @@ class BaseTestCase extends TestCase
         // Recupera o script para criar as tabelas
         foreach ($tables as $tbl) {
             // Cria a tabela de usuários
-            $this->getAdapter()->query(file_get_contents($this->getSqlFile($tbl, self::SQL_CREATE)), Adapter::QUERY_MODE_EXECUTE);
+            $this->getAdapter()->query(file_get_contents($this->getSqlFile($tbl, self::SQL_CREATE)),
+                Adapter::QUERY_MODE_EXECUTE);
         }
 
         return $this;
@@ -174,14 +178,17 @@ class BaseTestCase extends TestCase
             $tables = array_reverse($this->tables);
         }
 
-        if (! empty($tables)) {
+        if (!empty($tables)) {
             // Desabilita os indices e constrains para não dar erro
             // ao apagar uma tabela com foreign key
             // No mundo real isso é inviável, mas nos teste podemos
             // ignorar as foreign keys APÓS os testes
-            $this->getAdapter()->query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;', Adapter::QUERY_MODE_EXECUTE);
-            $this->getAdapter()->query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;', Adapter::QUERY_MODE_EXECUTE);
-            $this->getAdapter()->query('SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'TRADITIONAL,ALLOW_INVALID_DATES\';', Adapter::QUERY_MODE_EXECUTE);
+            $this->getAdapter()->query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;',
+                Adapter::QUERY_MODE_EXECUTE);
+            $this->getAdapter()->query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;',
+                Adapter::QUERY_MODE_EXECUTE);
+            $this->getAdapter()->query('SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'TRADITIONAL,ALLOW_INVALID_DATES\';',
+                Adapter::QUERY_MODE_EXECUTE);
 
             // Recupera o script para remover as tabelas
             foreach ($tables as $tbl) {
@@ -205,7 +212,7 @@ class BaseTestCase extends TestCase
 
     /**
      *
-     * @param string  $table
+     * @param string $table
      * @param array $rows
      *
      * @throws \Exception
@@ -227,7 +234,7 @@ class BaseTestCase extends TestCase
 
         if (is_string($table)) {
             $table = new TableGateway($table, GlobalAdapterFeature::getStaticAdapter());
-        } elseif (! $table instanceof TableGateway) {
+        } elseif (!$table instanceof TableGateway) {
             throw new \Exception("$table deve ser um string ou TableGateway");
         }
 
@@ -238,29 +245,38 @@ class BaseTestCase extends TestCase
         return $this;
     }
 
+    public function getDataDir()
+    {
+        if (empty($this->dataDir)) {
+            // Verifica se há APPLICATION_DATA
+            if (!defined('TEST_DATA')) {
+                $this->fail('TEST_DATA not defined.');
+            }
+            $this->dataDir = TEST_DATA;
+        }
+
+        // Verifica se a pasta existe e tem permissão de escrita
+        if (!is_dir($this->dataDir) || !is_writeable($this->dataDir)) {
+            $this->fail("{$this->dataDir} not writeable.");
+        }
+
+        return $this->dataDir;
+    }
+
+    public function setDataDir(string $dataDir)
+    {
+        $this->dataDir = $dataDir;
+    }
+
     /**
      * Apaga todas pastas do APPLICATION_DATA
      * @return boolean
      */
     public function clearApplicationData()
     {
-        // Não deixa executar em produção
-        if (APPLICATION_ENV !== 'testing') {
-            $this->fail('Só é possível executar clearApplicationData() em testing');
-        }
-
-        // Verifica se há APPLICATION_DATA
-        if (! defined('APPLICATION_DATA')) {
-            $this->fail('APPLICATION_DATA não definido');
-        }
-
-        // Verifica se a pasta existe e tem permissão de escrita
-        if (! is_dir(APPLICATION_DATA) || ! is_writeable(APPLICATION_DATA)) {
-            $this->fail('APPLICATION_DATA não definido');
-        }
 
         // Apaga todo o conteudo dele
-        $this->rrmdir(APPLICATION_DATA, APPLICATION_DATA);
+        $this->rrmdir($this->getDataDir(), $this->getDataDir());
 
         return $this->isApplicationDataEmpty();
     }
@@ -272,17 +288,8 @@ class BaseTestCase extends TestCase
      */
     public function isApplicationDataEmpty()
     {
-        // Verifica se há APPLICATION_DATA
-        if (! defined('APPLICATION_DATA')) {
-            $this->fail('APPLICATION_DATA não definido');
-        }
-        // Verifica se a pasta existe e tem permissão de escrita
-        if (! is_dir(APPLICATION_DATA) || ! is_writeable(APPLICATION_DATA)) {
-            $this->fail('APPLICATION_DATA não definido');
-        }
-
         // Retorna se está vazio
-        return (count(scandir(APPLICATION_DATA)) == 3);
+        return (count(scandir($this->getDataDir())) == 3);
     }
 
     /**
@@ -299,7 +306,7 @@ class BaseTestCase extends TestCase
         }
 
         // Não deixa apagar fora do APPLICATION_DATA
-        if (strpos($dir, APPLICATION_DATA) === false || empty(APPLICATION_DATA)) {
+        if (strpos($dir, $this->getDataDir()) === false || empty($this->getDataDir())) {
             $this->fail('Não é possível apagar fora do APPLICATION_DATA');
         }
 
@@ -331,36 +338,27 @@ class BaseTestCase extends TestCase
      */
     protected function getAssetsPath($path = '')
     {
-        // Verifica se há APPLICATION_DATA
-        if (! defined('APPLICATION_DATA')) {
-            $this->fail('APPLICATION_DATA não definido');
-        }
-
-        // Verifica se a pasta existe e tem permissão de escrita
-        if (! is_dir(APPLICATION_DATA)) {
-            $this->fail('APPLICATION_DATA não definido');
-        }
 
         // Path do asset a ser usado
-        $path = realpath(APPLICATION_DATA . '/../'. $path);
+        $path = realpath($this->getDataDir() . '/../' . $path);
 
         // Verifica se a pasta existe e tem permissão de escrita
-        if (empty($path) || ! is_dir($path)) {
-            $this->fail(APPLICATION_DATA . "/../$path não definido");
+        if (empty($path) || !is_dir($path)) {
+            $this->fail($this->getDataDir() . "/../$path não definido");
         }
 
         return $path;
     }
 
-
     /**
      * Call protected/private method of a class.
      *
-     * @param object &$object    Instantiated object that we will run method on.
+     * @param object &$object Instantiated object that we will run method on.
      * @param string $methodName Method name to call
-     * @param array  $parameters Array of parameters to pass into method.
+     * @param array $parameters Array of parameters to pass into method.
      *
      * @return mixed Method return.
+     * @throws \ReflectionException
      */
     public function invokePrivateMethod(&$object, $methodName, array $parameters = [])
     {
