@@ -90,11 +90,8 @@ class DateHelper
      *
      * @return boolean
      */
-    public static function isDate($date, $format = 'm/d/Y')
+    public static function isDate(string $date, string $format = 'm/d/Y')
     {
-        if (!is_string($date)) {
-            return false;
-        }
         $dateTime = \DateTime::createFromFormat($format, $date);
 
         // Verifica se apareceu algum erro
@@ -114,7 +111,7 @@ class DateHelper
      *
      * @return true
      */
-    public static function isFormat($format, $date)
+    public static function isFormat(string $format, string $date)
     {
         \DateTime::createFromFormat($format, $date);
         $date_errors = \DateTime::getLastErrors();
