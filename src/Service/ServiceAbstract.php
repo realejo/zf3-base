@@ -3,6 +3,7 @@
 namespace Realejo\Service;
 
 use Psr\Container\ContainerInterface;
+use Realejo\Cache\CacheService;
 use Realejo\Stdlib\ArrayObject;
 use Realejo\Utils\Cache;
 use Realejo\Paginator\Paginator;
@@ -270,7 +271,10 @@ abstract class ServiceAbstract
     public function getCache()
     {
         if (! isset($this->cache)) {
-            $this->cache = Cache::getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
+            $this->cache = $this
+                ->getServiceLocator()
+                ->get(CacheService::class)
+                ->getFrontend(str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)));
         }
 
         return $this->cache;

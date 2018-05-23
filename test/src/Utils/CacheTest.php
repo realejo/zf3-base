@@ -8,7 +8,7 @@ namespace RealejoTest\Utils;
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
-use Realejo\Utils\Cache;
+use Realejo\Utils\CacheService;
 use RealejoTest\BaseTestCase;
 
 class CacheTest extends BaseTestCase
@@ -41,7 +41,7 @@ class CacheTest extends BaseTestCase
     public function testGetCacheRoot()
     {
         // Recupera a pasta aonde será salva as informações
-        $path = Cache::getCacheRoot();
+        $path = CacheService::getCacheRoot();
 
         // Verifica se tere o retorno correto
         $this->assertNotNull($path);
@@ -57,12 +57,12 @@ class CacheTest extends BaseTestCase
     public function testGetCachePath()
     {
         // Verifica se todas as opções são iguais
-        $this->assertEquals(Cache::getCacheRoot(), Cache::getCachePath(null));
-        $this->assertEquals(Cache::getCacheRoot(), Cache::getCachePath(''));
-        $this->assertEquals(Cache::getCacheRoot(), Cache::getCachePath());
+        $this->assertEquals(CacheService::getCacheRoot(), CacheService::getCachePath(null));
+        $this->assertEquals(CacheService::getCacheRoot(), CacheService::getCachePath(''));
+        $this->assertEquals(CacheService::getCacheRoot(), CacheService::getCachePath());
 
         // Cria ou recupera a pasta album
-        $path = Cache::getCachePath('Album');
+        $path = CacheService::getCachePath('Album');
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path);
@@ -79,7 +79,7 @@ class CacheTest extends BaseTestCase
         $this->assertFalse(file_exists($path));
 
         // Cria ou recupera a pasta album
-        $path = Cache::getCachePath('album');
+        $path = CacheService::getCachePath('album');
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path);
@@ -96,7 +96,7 @@ class CacheTest extends BaseTestCase
         $this->assertFalse(file_exists($path));
 
         // Cria ou recupera a pasta
-        $path = Cache::getCachePath('album_Teste');
+        $path = CacheService::getCachePath('album_Teste');
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path);
@@ -113,7 +113,7 @@ class CacheTest extends BaseTestCase
         $this->assertFalse(file_exists($path), 'Verifica se a pasta album_Teste foi apagada');
 
         // Cria ou recupera a pasta
-        $path = Cache::getCachePath('album/Teste');
+        $path = CacheService::getCachePath('album/Teste');
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path, 'Teste se o album/Teste foi criado');
@@ -129,7 +129,7 @@ class CacheTest extends BaseTestCase
      */
     public function testgetFrontendComClass()
     {
-        $cache = Cache::getFrontend('Album');
+        $cache = CacheService::getFrontend('Album');
         $this->assertInstanceOf('Zend\Cache\Storage\Adapter\Filesystem', $cache);
     }
 
@@ -138,7 +138,7 @@ class CacheTest extends BaseTestCase
      */
     public function testgetFrontendSemClass()
     {
-        $cache = Cache::getFrontend(null);
+        $cache = CacheService::getFrontend(null);
         $this->assertInstanceOf('Zend\Cache\Storage\Adapter\Filesystem', $cache);
     }
 }

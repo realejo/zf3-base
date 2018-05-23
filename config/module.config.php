@@ -2,8 +2,6 @@
 
 namespace Realejo;
 
-use Realejo\View\Helper\ApplicationConfigFactory;
-
 return [
     'realejo' => [
         'vendor' => [
@@ -24,12 +22,21 @@ return [
             ],
         ]
     ],
+    'service_manager' => [
+        'abstract_factories' => [
+            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+            'Zend\Log\LoggerAbstractServiceFactory'
+        ],
+        'factories' => [
+            Cache\CacheService::class => Cache\CacheFactory::class,
+        ],
+    ],
     'view_helpers' => [
         'aliases' => [
             'applicationConfig' => View\Helper\ApplicationConfig::class,
         ],
         'factories' => [
-            View\Helper\ApplicationConfig::class => ApplicationConfigFactory::class
+            View\Helper\ApplicationConfig::class => View\Helper\ApplicationConfigFactory::class
         ],
         'invokables' => [
             'formValidation' => View\Helper\FormValidation::class,
