@@ -641,7 +641,7 @@ abstract class MapperAbstract
     {
         // Cria a assinatura da consulta
         if ($where instanceof Select) {
-            $cacheKey = 'fetchAll' . md5($where->getSqlString());
+            $cacheKey = 'fetchAll' . md5($where->getSqlString($this->getAdapter()->getPlatform()));
         } else {
             $cacheKey = 'fetchAll'
                 . md5(
