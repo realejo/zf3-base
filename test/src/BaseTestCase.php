@@ -92,7 +92,6 @@ class BaseTestCase extends TestCase
      */
     public function setAdapter(Adapter $adapter)
     {
-        GlobalAdapterFeature::setStaticAdapter($adapter);
         $this->adapter = $adapter;
         return $this;
     }
@@ -233,7 +232,7 @@ class BaseTestCase extends TestCase
         }
 
         if (is_string($table)) {
-            $table = new TableGateway($table, GlobalAdapterFeature::getStaticAdapter());
+            $table = new TableGateway($table, $this->getAdapter());
         } elseif (!$table instanceof TableGateway) {
             throw new \RuntimeException("$table deve ser um string ou TableGateway");
         }
