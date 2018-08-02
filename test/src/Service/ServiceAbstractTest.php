@@ -142,7 +142,7 @@ class ServiceTest extends BaseTestCase
         }
         $this->assertEquals($albuns, $findAll);
 
-        // Marca mostrar os removios
+        // Marca mostrar os removidos
         $this->service->getMapper()->setShowDeleted(true);
 
         $findAll = $this->service->findAll();

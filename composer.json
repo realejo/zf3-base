@@ -9,8 +9,7 @@
   "prefer-stable": true,
   "require" : {
     "php" : "~7.1",
-    "ext-intl": "*",
-    "ext-mysqli": "*",
+    "ext-json" : "*",
     "zendframework/zend-db" : "^2.8.1",
     "zendframework/zend-cache": "^2.7.1",
     "zendframework/zend-paginator": "^2.8.0",
@@ -40,6 +39,11 @@
     "psr-4" : {
       "RealejoTest\\" : "test/src"
     }
+  },
+  "suggest": {
+    "ext-gd" : "Needed to support resizing images in Realejo\\Image",
+    "ext-exif" : "Needed to support resizing images in Realejo\\Image",
+    "ext-fileinfo" : "Needed to support attachments in Realejo\\MailSender"
   },
   "scripts": {
     "cs-check": "phpcs",
