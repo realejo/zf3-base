@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Realejo\Stdlib\ArrayObject;
 use RealejoTest\Enum\EnumConcrete;
 use RealejoTest\Enum\EnumFlaggedConcrete;
+use Zend\Json\Json;
 
 /**
  * ArrayObject test case.
@@ -255,7 +256,9 @@ class ArrayObjectTest extends TestCase
         // populate as it comes from database
         $object = new ArrayObjectTypedKeys([
             'booleanKey' => '1',
-            'jsonKey' => json_encode(['key' => 'value']),
+            'jsonKey' => Json::encode(['key' => 'value']),
+            'jsonObjectKey' => Json::encode(['key' => 'value']),
+            'jsonArrayKey' => Json::encode(['key' => 'value']),
             'datetimeKey' => '2010-01-01 00:00:00',
             'intKey' => '1',
             'enum' => EnumConcrete::STRING1,

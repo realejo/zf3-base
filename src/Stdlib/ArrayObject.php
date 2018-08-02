@@ -87,6 +87,8 @@ class ArrayObject implements \ArrayAccess
                     $value = Json::decode($value, Json::TYPE_ARRAY);
                 } elseif ($useJsonObjectKeys && in_array($key, $this->jsonObjectKeys) && !empty($value)) {
                     $value = Json::decode($value, Json::TYPE_OBJECT);
+                } elseif ($useJsonObjectKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
+                    $value = Json::decode($value, Json::TYPE_OBJECT);
                 } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
                     $value = (int)$value;
                 } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && !empty($value)) {

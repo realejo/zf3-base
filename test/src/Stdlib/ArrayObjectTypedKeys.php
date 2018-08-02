@@ -10,6 +10,8 @@ use RealejoTest\Enum\EnumFlaggedConcrete;
  * @property bool booleanKey
  * @property int intKey
  * @property \stdClass jsonKey
+ * @property \stdClass jsonObjectKey
+ * @property array jsonArrayKey
  * @property \DateTime datetimeKey
  * @property EnumConcrete enum
  * @property EnumFlaggedConcrete enumFlagged
@@ -21,6 +23,10 @@ class ArrayObjectTypedKeys extends ArrayObject
     protected $intKeys = ['intKey'];
 
     protected $jsonKeys = ['jsonKey'];
+
+    protected $jsonArrayKeys = ['jsonArrayKey'];
+
+    protected $jsonObjectKeys = ['jsonObjectKey'];
 
     protected $dateKeys = ['datetimeKey'];
 
