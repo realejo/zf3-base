@@ -196,17 +196,6 @@ class BaseTestCase extends TestCase
         }
 
         if (!empty($tables)) {
-            // Desabilita os indices e constrains para não dar erro
-            // ao apagar uma tabela com foreign key
-            // No mundo real isso é inviável, mas nos teste podemos
-            // ignorar as foreign keys APÓS os testes
-            $this->getAdapter()->query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;',
-                Adapter::QUERY_MODE_EXECUTE);
-            $this->getAdapter()->query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;',
-                Adapter::QUERY_MODE_EXECUTE);
-            $this->getAdapter()->query('SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE=\'TRADITIONAL,ALLOW_INVALID_DATES\';',
-                Adapter::QUERY_MODE_EXECUTE);
-
             // Recupera o script para remover as tabelas
             foreach ($tables as $tbl) {
                 $tblFile = $this->getSqlFile($tbl, self::SQL_DROP);
@@ -218,10 +207,6 @@ class BaseTestCase extends TestCase
 
                 $this->getAdapter()->query($dropCommand, Adapter::QUERY_MODE_EXECUTE);
             }
-
-            $this->getAdapter()->query('SET SQL_MODE=@OLD_SQL_MODE;', Adapter::QUERY_MODE_EXECUTE);
-            $this->getAdapter()->query('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;', Adapter::QUERY_MODE_EXECUTE);
-            $this->getAdapter()->query('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;', Adapter::QUERY_MODE_EXECUTE);
         }
 
         return $this;
