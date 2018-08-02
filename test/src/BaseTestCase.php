@@ -38,6 +38,8 @@ class BaseTestCase extends TestCase
 
     protected $dataDir;
 
+    private $tableGateways = [];
+
     /**
      * Prepares the environment before running ALL tests.
      */
@@ -59,7 +61,7 @@ class BaseTestCase extends TestCase
     }
 
     /**
-     * @return \Zend\Db\Adapter\Adapter
+     * @return Adapter
      */
     public function getAdapter()
     {
@@ -67,6 +69,21 @@ class BaseTestCase extends TestCase
             $this->adapter = GlobalAdapterFeature::getStaticAdapter();
         }
         return $this->adapter;
+    }
+
+    /**
+     * @param string $table
+     * @return TableGateway
+     */
+    public function getTableGateway(string $table)
+    {
+        if (!isset($this->tableGateways[$table])) {
+            $this->tableGateways[$table] = new TableGateway(
+                $table,
+                $this->getAdapter()
+            );
+        }
+        return $this->tableGateways[$table];
     }
 
     /**
@@ -215,8 +232,6 @@ class BaseTestCase extends TestCase
      * @param string $table
      * @param array $rows
      *
-     * @throws \Exception
-     *
      * @return BaseTestCase
      */
     public function insertRows($table, $rows)
@@ -235,7 +250,7 @@ class BaseTestCase extends TestCase
         if (is_string($table)) {
             $table = new TableGateway($table, GlobalAdapterFeature::getStaticAdapter());
         } elseif (!$table instanceof TableGateway) {
-            throw new \Exception("$table deve ser um string ou TableGateway");
+            throw new \RuntimeException("$table deve ser um string ou TableGateway");
         }
 
         foreach ($rows as $r) {
@@ -358,11 +373,14 @@ class BaseTestCase extends TestCase
      * @param array $parameters Array of parameters to pass into method.
      *
      * @return mixed Method return.
-     * @throws \ReflectionException
      */
     public function invokePrivateMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        try {
+            $reflection = new \ReflectionClass(get_class($object));
+        } catch (\ReflectionException $e) {
+            throw new \RuntimeException('Cannot reflect class ' . get_class($object) . ':' . $e->getMessage());
+        }
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
