@@ -9,6 +9,8 @@
   "prefer-stable": true,
   "require" : {
     "php" : "~7.1",
+    "ext-intl": "*",
+    "ext-mysqli": "*",
     "zendframework/zend-db" : "^2.8.1",
     "zendframework/zend-cache": "^2.7.1",
     "zendframework/zend-paginator": "^2.8.0",

@@ -3,7 +3,6 @@
 namespace Realejo\Stdlib;
 
 use Realejo\Enum\Enum;
-use Realejo\Utils\DateHelper;
 use Zend\Json\Json;
 
 class ArrayObject implements \ArrayAccess
@@ -31,7 +30,13 @@ class ArrayObject implements \ArrayAccess
 
     protected $dateKeys = [];
 
+    /**
+     * @deprecated use $jsonArrayKeys OR $jsonObjectKeys
+     * @var array
+     */
     protected $jsonKeys = [];
+    protected $jsonArrayKeys = [];
+    protected $jsonObjectKeys = [];
 
     protected $enumKeys = [];
 
@@ -68,7 +73,8 @@ class ArrayObject implements \ArrayAccess
     public function populate(array $data)
     {
         $useDateKeys = (is_array($this->dateKeys) && !empty($this->dateKeys));
-        $useJsonKeys = (is_array($this->jsonKeys) && !empty($this->jsonKeys));
+        $useJsonArrayKeys = (is_array($this->jsonArrayKeys) && !empty($this->jsonArrayKeys));
+        $useJsonObjectKeys = (is_array($this->jsonObjectKeys) && !empty($this->jsonObjectKeys));
         $useIntKeys = (is_array($this->intKeys) && !empty($this->intKeys));
         $useBooleanKeys = (is_array($this->booleanKeys) && !empty($this->booleanKeys));
         $useEnumKeys = (is_array($this->enumKeys) && !empty($this->enumKeys));
@@ -77,8 +83,10 @@ class ArrayObject implements \ArrayAccess
             foreach ($data as $key => $value) {
                 if ($useDateKeys && in_array($key, $this->dateKeys) && !empty($value)) {
                     $value = new \DateTime($value);
-                } elseif ($useJsonKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
-                    $value = Json::decode($value);
+                } elseif ($useJsonArrayKeys && in_array($key, $this->jsonArrayKeys) && !empty($value)) {
+                    $value = Json::decode($value, Json::TYPE_ARRAY);
+                } elseif ($useJsonObjectKeys && in_array($key, $this->jsonObjectKeys) && !empty($value)) {
+                    $value = Json::decode($value, Json::TYPE_OBJECT);
                 } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
                     $value = (int)$value;
                 } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && !empty($value)) {
@@ -138,8 +146,14 @@ class ArrayObject implements \ArrayAccess
             }
 
             // desfaz o json
+            if (in_array($key, $this->jsonArrayKeys) && is_array($value)) {
+                $value = Json::encode($value, true);
+            }
+            if (in_array($key, $this->jsonObjectKeys) && $value instanceof \stdClass) {
+                $value = Json::encode($value, true);
+            }
             if (in_array($key, $this->jsonKeys) && ($value instanceof \stdClass || is_array($value))) {
-                $value = json_encode($value, JSON_OBJECT_AS_ARRAY);
+                $value = Json::encode($value, true);
             }
 
             // desfaz o enum
