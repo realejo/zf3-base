@@ -1,0 +1,8 @@
+<?php
+return [
+    'realejo' => [
+        'backup' => [
+            'dump_dir' => 'data/backup'
+        ],
+    ],
+];

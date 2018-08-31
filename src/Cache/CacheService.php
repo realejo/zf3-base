@@ -129,6 +129,10 @@ class CacheService
             umask($oldumask);
         }
 
+        if (!is_writable($cachePath)) {
+            throw new \RuntimeException("Pasta $cachePath nẽo tem permissão de escrita");
+        }
+
         // Retorna a pasta de cache
         return realpath($cachePath);
     }

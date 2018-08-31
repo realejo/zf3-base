@@ -29,6 +29,7 @@ return [
         ],
         'factories' => [
             Cache\CacheService::class => Cache\CacheFactory::class,
+            Backup\BackupService::class => Backup\BackupFactory::class
         ],
     ],
     'view_helpers' => [
@@ -42,6 +43,7 @@ return [
             'formValidation' => View\Helper\FormValidation::class,
             'getInputFilter' => View\Helper\GetInputFilter::class,
             'CKEditor' => View\Helper\CKEditor::class,
+            'formatFileSize' => View\Helper\FormatFileSize::class,
             'formatDate' => View\Helper\FormatDate::class,
             'text' => View\Helper\Text::class,
             'frmEnumChecked' => View\Helper\FrmEnumChecked::class,
