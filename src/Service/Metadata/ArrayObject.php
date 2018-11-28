@@ -9,7 +9,6 @@
 namespace Realejo\Service\Metadata;
 
 use Realejo\Stdlib\ArrayObject as StdlibArrayObject;
-use Zend\Json\Json;
 
 class ArrayObject extends StdlibArrayObject
 {
@@ -70,7 +69,7 @@ class ArrayObject extends StdlibArrayObject
     {
         if (isset($data[$this->metadataKeyName])) {
             if (is_string($data[$this->metadataKeyName])) {
-                $data[$this->metadataKeyName] = Json::decode($data[$this->metadataKeyName], Json::TYPE_ARRAY);
+                $data[$this->metadataKeyName] = json_decode($data[$this->metadataKeyName], JSON_OBJECT_AS_ARRAY);
             }
             if (!empty($data[$this->metadataKeyName])) {
                 $this->setMetadata($data[$this->metadataKeyName]);

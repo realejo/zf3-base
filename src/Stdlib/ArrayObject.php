@@ -37,6 +37,7 @@ class ArrayObject implements \ArrayAccess
     protected $jsonKeys = [];
     protected $jsonArrayKeys = [];
     protected $jsonObjectKeys = [];
+    protected $jsonEncodeOptions = 0;
 
     /**
      * @var Enum[]
@@ -159,13 +160,13 @@ class ArrayObject implements \ArrayAccess
 
             // desfaz o json
             if (in_array($key, $this->jsonArrayKeys) && is_array($value)) {
-                $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $value = json_encode($value, $this->jsonEncodeOptions);
             }
             if (in_array($key, $this->jsonObjectKeys) && $value instanceof \stdClass) {
-                $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $value = json_encode($value, $this->jsonEncodeOptions);
             }
             if (in_array($key, $this->jsonKeys) && ($value instanceof \stdClass || is_array($value))) {
-                $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $value = json_encode($value, $this->jsonEncodeOptions);
             }
 
             // desfaz o enum
@@ -291,4 +292,24 @@ class ArrayObject implements \ArrayAccess
         $this->lockedKeys = $lockedKeys;
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getJsonEncodeOptions(): int
+    {
+        return $this->jsonEncodeOptions;
+    }
+
+    /**
+     * @param int $jsonEncodeOptions
+     * @return ArrayObject
+     */
+    public function setJsonEncodeOptions(int $jsonEncodeOptions): ArrayObject
+    {
+        $this->jsonEncodeOptions = $jsonEncodeOptions;
+        return $this;
+    }
+
+
 }

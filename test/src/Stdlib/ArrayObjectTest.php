@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Realejo\Stdlib\ArrayObject;
 use RealejoTest\Enum\EnumConcrete;
 use RealejoTest\Enum\EnumFlaggedConcrete;
-use Zend\Json\Json;
 
 /**
  * ArrayObject test case.
@@ -23,15 +22,19 @@ class ArrayObjectTest extends TestCase
         $this->assertEmpty($object->toArray());
         $this->assertEquals([], $object->toArray());
 
-        $this->assertNull($object->populate(['one' => 'first']));
+        $originalArray = ['one' => 'first', 'three' => 'áéíóú', 'four' => '\\slashes\\'];
+
+        $this->assertNull($object->populate($originalArray));
 
         $this->assertNotNull($object->toArray());
         $this->assertNotEmpty($object->toArray());
-        $this->assertEquals(['one' => 'first'], $object->toArray());
+        $this->assertEquals($originalArray, $object->toArray());
         $this->assertEquals($object->toArray(), $object->entityToArray());
         $this->assertEquals($object->toArray(), $object->getArrayCopy());
         $this->assertEquals('first', $object->one);
         $this->assertEquals('first', $object['one']);
+        $this->assertEquals('áéíóú', $object->three);
+        $this->assertEquals('áéíóú', $object['three']);
 
         $object = new ArrayObject(['two' => 'second']);
         $this->assertNotNull($object->toArray());
@@ -254,11 +257,12 @@ class ArrayObjectTest extends TestCase
         $this->assertNull($object->populate(['one' => 'first']));
 
         // populate as it comes from database
+        $originalArray = ['key' => 'value', 'unicode' => 'áéíóú😶çý', 'slashes' => '\\slashes\\'];
         $object = new ArrayObjectTypedKeys([
             'booleanKey' => '1',
-            'jsonKey' => Json::encode(['key' => 'value']),
-            'jsonObjectKey' => Json::encode(['key' => 'value']),
-            'jsonArrayKey' => Json::encode(['key' => 'value']),
+            'jsonKey' => json_encode($originalArray),
+            'jsonObjectKey' => json_encode($originalArray),
+            'jsonArrayKey' => json_encode($originalArray),
             'datetimeKey' => '2010-01-01 00:00:00',
             'intKey' => '1',
             'enum' => EnumConcrete::STRING1,
@@ -269,6 +273,8 @@ class ArrayObjectTest extends TestCase
         $this->assertTrue($object->booleanKey === true);
         $stdClass = new \stdClass();
         $stdClass->key = 'value';
+        $stdClass->unicode = 'áéíóú😶çý';
+        $stdClass->slashes = '\\slashes\\';
         $this->assertEquals($stdClass, $object->jsonKey);
         $this->assertEquals($stdClass->key, $object->jsonKey->key);
         $this->assertEquals((array)$stdClass, (array)$object->jsonKey);
@@ -286,7 +292,20 @@ class ArrayObjectTest extends TestCase
         // get the array as it will be inserted on database
         $objectArray = $object->getArrayCopy();
         $this->assertEquals(1, $objectArray['booleanKey']);
-        $this->assertEquals(json_encode(['key' => 'value'], JSON_OBJECT_AS_ARRAY), $objectArray['jsonKey']);
+        $this->assertEquals(json_encode($originalArray), $objectArray['jsonKey']);
+        $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
+        $this->assertEquals(1, $objectArray['intKey']);
+        $this->assertEquals('S', $objectArray['enum']);
+        $this->assertEquals(2, $objectArray['enumFlagged']);
+
+        // get the array as it will be inserted on database
+        $objectArray = $object->setJsonEncodeOptions(JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            ->getArrayCopy();
+        $this->assertEquals(1, $objectArray['booleanKey']);
+        $this->assertEquals(
+            json_encode($originalArray, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $objectArray['jsonKey']
+        );
         $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
         $this->assertEquals(1, $objectArray['intKey']);
         $this->assertEquals('S', $objectArray['enum']);

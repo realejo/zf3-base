@@ -2,7 +2,6 @@
 
 namespace Realejo\View\Helper;
 
-use Zend\Json\Encoder;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -107,7 +106,7 @@ class CKEditor extends AbstractHelper
             $options['customConfig'] = self::$ckEditorCustomConfig;
         }
 
-        $options = (empty($options)) ? '{}' : Encoder::encode($options);
+        $options = (empty($options)) ? '{}' : json_encode($options, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         // Carrega as opções para cada campo
         $config = '';

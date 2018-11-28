@@ -6,7 +6,6 @@ use DateTime;
 use Realejo\Service\ServiceAbstract;
 use Realejo\Utils\DateHelper;
 use Zend\Db\Sql\Expression;
-use Zend\Json\Json;
 
 class MetadataService extends ServiceAbstract
 {
@@ -356,7 +355,7 @@ class MetadataService extends ServiceAbstract
         $values = $this->getValues($key, true);
 
         // Cria o JSON
-        $jsonValues = Json::encode($values);
+        $jsonValues = json_encode($values, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         // Atualiza o PDV sem passar pelo log
         $this->getMapper()
