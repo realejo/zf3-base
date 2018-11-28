@@ -95,7 +95,7 @@ class CacheService
             if (defined('APPLICATION_DATA') === false) {
                 throw new \RuntimeException('A pasta raiz do data não está definido em APPLICATION_DATA');
             }
-            $cacheRoot = APPLICATION_DATA  . '/cache';
+            $cacheRoot = APPLICATION_DATA . '/cache';
         }
 
         // Verifica se a pasta do cache existe

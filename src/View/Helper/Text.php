@@ -3,6 +3,7 @@
  * @see https://github.com/cakephp/cakephp/blob/ec23730aff39a2ca1230c2f34cbff92a96a44a75/src/Utility/Text.php
  * @link http://book.cakephp.org/3.0/en/views/helpers/text.html#truncating-text
  */
+
 namespace Realejo\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
@@ -31,10 +32,13 @@ class Text extends AbstractHelper
     public static function truncate($text, $length = 100, array $options = [])
     {
         $default = [
-            'ellipsis' => '...', 'exact' => true, 'html' => true, 'trimWidth' => false,
+            'ellipsis' => '...',
+            'exact' => true,
+            'html' => true,
+            'trimWidth' => false,
         ];
 
-        if (! empty($options['html']) && strtolower(mb_internal_encoding()) === 'utf-8') {
+        if (!empty($options['html']) && strtolower(mb_internal_encoding()) === 'utf-8') {
             $default['ellipsis'] = "\xe2\x80\xa6";
         }
         $options += $default;
@@ -50,7 +54,8 @@ class Text extends AbstractHelper
             foreach ($tags as $tag) {
                 $contentLength = self::_strlen($tag[3], $options);
                 if ($truncate === '') {
-                    if (! preg_match('/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/i', $tag[2])) {
+                    if (!preg_match('/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/i',
+                        $tag[2])) {
                         if (preg_match('/<[\w]+[^>]*>/', $tag[0])) {
                             array_unshift($openTags, $tag[2]);
                         } elseif (preg_match('/<\/([\w]+)[^>]*>/', $tag[0], $closeTag)) {
@@ -88,12 +93,12 @@ class Text extends AbstractHelper
             $ellipsisLength = self::_strlen($options['ellipsis'], $options);
         }
         $result = self::_substr($text, 0, $length - $ellipsisLength, $options);
-        if (! $options['exact']) {
+        if (!$options['exact']) {
             if (self::_substr($text, $length - $ellipsisLength, 1, $options) !== ' ') {
                 $result = self::_removeLastWord($result);
             }
             // If result is empty, then we don't need to count ellipsis in the cut.
-            if (! strlen($result)) {
+            if (!strlen($result)) {
                 $result = self::_substr($text, 0, $length, $options);
             }
         }
@@ -214,6 +219,7 @@ class Text extends AbstractHelper
         }
         return $result;
     }
+
     /**
      * Removes the last word from the input text.
      *

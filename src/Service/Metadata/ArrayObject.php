@@ -5,9 +5,10 @@
  * Ele deveria extender Realejo\Stdlib\ArrayObject mas como rescreve a maioria dos
  * metodos eu deixei numa classe a parte
  */
+
 namespace Realejo\Service\Metadata;
 
-use \Realejo\Stdlib\ArrayObject as StdlibArrayObject;
+use Realejo\Stdlib\ArrayObject as StdlibArrayObject;
 use Zend\Json\Json;
 
 class ArrayObject extends StdlibArrayObject
@@ -71,7 +72,7 @@ class ArrayObject extends StdlibArrayObject
             if (is_string($data[$this->metadataKeyName])) {
                 $data[$this->metadataKeyName] = Json::decode($data[$this->metadataKeyName], Json::TYPE_ARRAY);
             }
-            if (! empty($data[$this->metadataKeyName])) {
+            if (!empty($data[$this->metadataKeyName])) {
                 $this->setMetadata($data[$this->metadataKeyName]);
             }
             unset($data[$this->metadataKeyName]);
@@ -87,7 +88,7 @@ class ArrayObject extends StdlibArrayObject
     public function toArray($unMapKeys = true)
     {
         $toArray = parent::toArray($unMapKeys);
-        if (! empty($this->getMetadata()->count())) {
+        if (!empty($this->getMetadata()->count())) {
             $toArray[$this->metadataKeyName] = $this->getMetadata()->toArray();
         }
 
@@ -135,7 +136,7 @@ class ArrayObject extends StdlibArrayObject
 
         // Verifica as chaves estão bloqueadas
         //@todo tem que testar isso!!
-        if (! $this->getLockedKeys()) {
+        if (!$this->getLockedKeys()) {
             $this->storage[$offset] = $value;
             return;
         }

@@ -5,6 +5,7 @@ namespace RealejoTest\View\Helper;
 /**
  * Version test case.
  */
+
 use PHPUnit\Framework\TestCase;
 use Realejo\View\Helper\GetInputFilter;
 use Zend\Form\Element\Text;
@@ -48,9 +49,9 @@ class GetInputFilterTest extends TestCase
 
         // Adiciona validação [obrigatório, inteiro, não vazio, entre 1 e 3]
         $inputFilter->add([
-            'name'       => 'campo1',
-            'required'   => true,
-            'filters'    => [],
+            'name' => 'campo1',
+            'required' => true,
+            'filters' => [],
             'validators' => [
                 ['name' => IsInt::class],
                 ['name' => NotEmpty::class],
@@ -101,9 +102,9 @@ class GetInputFilterTest extends TestCase
 
         // Adiciona validação [obrigatório, inteiro, não vazio, entre 1 e 3]
         $inputFilter->add([
-            'name'       => 'campo1',
-            'required'   => true,
-            'filters'    => [],
+            'name' => 'campo1',
+            'required' => true,
+            'filters' => [],
             'validators' => [
                 ['name' => IsInt::class],
                 ['name' => NotEmpty::class],

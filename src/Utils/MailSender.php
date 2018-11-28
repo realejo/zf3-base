@@ -6,11 +6,12 @@
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
+
 namespace Realejo\Utils;
 
-use Zend\Stdlib\ArrayUtils;
 use Zend\Mail;
 use Zend\Mime;
+use Zend\Stdlib\ArrayUtils;
 
 class MailSender
 {
@@ -39,7 +40,7 @@ class MailSender
     private $smtpUsername;
 
     /**
-     *  @var string
+     * @var string
      */
     private $smtpPassword;
 
@@ -69,22 +70,22 @@ class MailSender
             if (defined('APPLICATION_PATH')) {
                 $config = include APPLICATION_PATH . "/config/autoload/email_config.php";
             } else {
-                throw new \RuntimeException('Error loading email configuration in '.get_class($this).'::__construct()');
+                throw new \RuntimeException('Error loading email configuration in ' . get_class($this) . '::__construct()');
             }
         }
 
-        $this->senderName  = $config['name'];
+        $this->senderName = $config['name'];
         $this->senderEmail = $config['email'];
-        $this->smtpHost    = $config['host'];
-        $this->smtpPort    = $config['port'];
+        $this->smtpHost = $config['host'];
+        $this->smtpPort = $config['port'];
 
-        $this->smtpUsername   = isset($config['username']) ? $config['username'] : '';
-        $this->smtpPassword   = isset($config['password']) ? $config['password'] : '';
+        $this->smtpUsername = isset($config['username']) ? $config['username'] : '';
+        $this->smtpPassword = isset($config['password']) ? $config['password'] : '';
 
         $smtpConfig = [
-            'name'     => $this->smtpHost,
-            'host'     => $this->smtpHost,
-            'port'     => $this->smtpPort,
+            'name' => $this->smtpHost,
+            'host' => $this->smtpHost,
+            'port' => $this->smtpPort,
             'connection_class' => 'login',
             'connection_config' => [
                 'username' => $this->smtpUsername,
@@ -99,7 +100,7 @@ class MailSender
         }
 
         // verifica se há uma porta definida
-        if (isset($config['port']) &&  $config['port'] != '') {
+        if (isset($config['port']) && $config['port'] != '') {
             $smtpConfig['port'] = $config['port'];
         }
 
@@ -117,8 +118,15 @@ class MailSender
      * @param array $opt
      * @return bool
      */
-    public function sendEmail($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = [])
-    {
+    public function sendEmail(
+        $replyName = null,
+        $replyEmail = null,
+        $toName = null,
+        $toEmail,
+        $subject,
+        $message,
+        $opt = []
+    ) {
         $this->setEmailMessage($replyName, $replyEmail, $toName, $toEmail, $subject, $message, $opt);
         $this->getTransport()->send($this->getMessage());
         return true;
@@ -131,28 +139,35 @@ class MailSender
 
 
     /**
-     * @param null|string  $replyName
-     * @param null|string  $replyEmail
-     * @param null|string  $toName
+     * @param null|string $replyName
+     * @param null|string $replyEmail
+     * @param null|string $toName
      * @param string $toEmail
      * @param string $subject
      * @param string $message
      * @param array $opt
      * @return Mail\Message
      */
-    public function setEmailMessage($replyName = null, $replyEmail = null, $toName = null, $toEmail, $subject, $message, $opt = [])
-    {
+    public function setEmailMessage(
+        $replyName = null,
+        $replyEmail = null,
+        $toName = null,
+        $toEmail,
+        $subject,
+        $message,
+        $opt = []
+    ) {
         // Verifica a codificação
-        $replyName  = $this->fixEncoding($replyName);
+        $replyName = $this->fixEncoding($replyName);
         $replyEmail = $this->fixEncoding($replyEmail);
-        $toName     = $this->fixEncoding($toName);
-        $toEmail    = $this->fixEncoding($toEmail);
-        $subject    = $this->fixEncoding($subject);
-        $message    = $this->fixEncoding($message);
+        $toName = $this->fixEncoding($toName);
+        $toEmail = $this->fixEncoding($toEmail);
+        $subject = $this->fixEncoding($subject);
+        $message = $this->fixEncoding($message);
 
         // Verifica o email do destinatário
         if (empty($toEmail)) {
-            throw new \InvalidArgumentException('Não há email de destino definido em '.get_class($this).'::setMailMessage()');
+            throw new \InvalidArgumentException('Não há email de destino definido em ' . get_class($this) . '::setMailMessage()');
         }
 
         // Verifica o nome do destinatário
@@ -228,7 +243,7 @@ class MailSender
         $oMessage->setSubject($subject);
 
         // Verifica se há headers para serem adicionados ao email
-        if (is_array($opt) && isset($opt['headers']) &&  is_array($opt['headers'])) {
+        if (is_array($opt) && isset($opt['headers']) && is_array($opt['headers'])) {
             foreach ($opt['headers'] as $h => $v) {
                 $oMessage->getHeaders()->addHeader(new Mail\Header\GenericHeader($h, $v));
             }
@@ -237,7 +252,7 @@ class MailSender
         // Cria a mensagem
         $msgText = null;
         $msgHtml = null;
-        if (is_string($message) && ! isset($opt['html'])) {
+        if (is_string($message) && !isset($opt['html'])) {
             $msgText = $message;
         } elseif (is_string($message) && isset($opt['html'])) {
             $msgHtml = $message;
@@ -256,18 +271,18 @@ class MailSender
         }
 
         // Cria o TXT a partir do HTML
-        if (is_null($msgText) && ! is_null($msgHtml)) {
+        if (is_null($msgText) && !is_null($msgHtml)) {
             $msgText = $this->extractText($msgHtml);
         }
 
-        if (! is_null($msgText)) {
+        if (!is_null($msgText)) {
             $html = new Mime\Part($msgText);
             $html->type = 'text/html';
             $body = new Mime\Message();
             $body->setParts([$html]);
             $oMessage->setBody($body);
         }
-        if (! is_null($msgHtml)) {
+        if (!is_null($msgHtml)) {
             $html = new Mime\Part($msgHtml);
             $html->type = 'text/html';
             $body = new Mime\Message();
@@ -349,7 +364,7 @@ class MailSender
                 }
 
                 // Verifica se foi setado o encoding e disposition
-                if (! $encodingAndDispositionAreSet) {
+                if (!$encodingAndDispositionAreSet) {
                     $part->encoding = Mime\Mime::ENCODING_BASE64;
                     $part->disposition = Mime\Mime::DISPOSITION_ATTACHMENT;
                 }
@@ -373,14 +388,14 @@ class MailSender
      * Remove o encoding UTF-8 para não gerar caracteres inválidos no email
      * @todo não detecta UTF-8 depois de utf8_decode
      *
-     * @param array|string  $str Texto a ser corrigido
+     * @param array|string $str Texto a ser corrigido
      * @return array|string
      */
     private function fixEncoding($str)
     {
         if (is_array($str)) {
             foreach ($str as $key => $value) {
-                $key   = $this->fixEncoding($key);
+                $key = $this->fixEncoding($key);
                 $value = $this->fixEncoding($value);
                 $str[$key] = $value;
             }
@@ -453,7 +468,7 @@ class MailSender
      */
     public static function maskEmail($email)
     {
-        if (! empty($email)) {
+        if (!empty($email)) {
             $explode = explode('@', $email);
             $email = substr($explode[0], 0, 2);
             $email .= str_repeat('*', strlen($explode[0]) - 2);

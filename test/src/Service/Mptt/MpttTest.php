@@ -9,6 +9,7 @@ namespace RealejoTest\Service\Mptt;
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
+
 use Realejo\Cache\CacheService;
 use Realejo\Service;
 use RealejoTest\BaseTestCase;

@@ -1,8 +1,9 @@
 <?php
+
 namespace Realejo\Service;
 
-use Zend\Hydrator\ArraySerializable;
 use Realejo\Stdlib\ArrayObject;
+use Zend\Hydrator\ArraySerializable;
 use Zend\Paginator\Adapter\DbSelect;
 
 /**
@@ -27,7 +28,7 @@ class HydratorPagination extends DbSelect
      */
     public function getHydrator()
     {
-        if (! isset($this->hydrator)) {
+        if (!isset($this->hydrator)) {
             $this->hydrator = new ArraySerializable();
         }
 

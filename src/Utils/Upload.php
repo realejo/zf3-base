@@ -6,6 +6,7 @@
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
+
 namespace Realejo\Utils;
 
 class Upload
@@ -24,7 +25,7 @@ class Upload
         $path = self::getUploadRoot() . '/' . str_replace('_', '/', strtolower($path));
 
         // Verifica se a pasta do cache existe
-        if (! file_exists($path)) {
+        if (!file_exists($path)) {
             $oldumask = umask(0);
             mkdir($path, 0777, true);
             umask($oldumask);
@@ -48,7 +49,7 @@ class Upload
         $path = self::getAssetsReservedRoot() . '/' . str_replace('_', '/', strtolower($path));
 
         // Verifica se a pasta do cache existe
-        if (! file_exists($path)) {
+        if (!file_exists($path)) {
             $oldumask = umask(0);
             mkdir($path, 0777, true);
             umask($oldumask);
@@ -72,7 +73,7 @@ class Upload
         $path = self::getAssetsPublicRoot() . '/' . str_replace('_', '/', strtolower($path));
 
         // Verifica se a pasta do cache existe
-        if (! file_exists($path)) {
+        if (!file_exists($path)) {
             $oldumask = umask(0);
             mkdir($path, 0777, true);
             umask($oldumask);
@@ -89,15 +90,15 @@ class Upload
      */
     public static function getUploadRoot()
     {
-         // Verifica se a pasta de cache existe
-        if (! defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
+        // Verifica se a pasta de cache existe
+        if (!defined('APPLICATION_DATA') || realpath(APPLICATION_DATA) == false) {
             throw new \RuntimeException('A pasta raiz do data não está definido em APPLICATION_DATA');
         }
 
-         $path = APPLICATION_DATA . '/uploads';
+        $path = APPLICATION_DATA . '/uploads';
 
-         // Verifica se existe e se tem permissão de escrita
-        if (! is_dir($path) || ! is_writable($path)) {
+        // Verifica se existe e se tem permissão de escrita
+        if (!is_dir($path) || !is_writable($path)) {
             throw new \RuntimeException('A pasta raiz de upload data/uploads não existe ou não tem permissão de escrita');
         }
 
@@ -112,14 +113,14 @@ class Upload
     public static function getAssetsReservedRoot()
     {
         // Verifica se a pasta de upload existe
-        if (! defined('APPLICATION_DATA')  || realpath(APPLICATION_DATA) == false) {
+        if (!defined('APPLICATION_DATA') || realpath(APPLICATION_DATA) == false) {
             throw new \RuntimeException('A pasta raiz do data não está definido em APPLICATION_DATA');
         }
 
         $path = APPLICATION_DATA . '/assets';
 
         // Verifica se existe e se tem permissão de escrita
-        if (! is_dir($path) || ! is_writable($path)) {
+        if (!is_dir($path) || !is_writable($path)) {
             throw new \RuntimeException('A pasta raiz de upload data/assets não existe ou não tem permissão de escrita');
         }
 
@@ -134,14 +135,14 @@ class Upload
     public static function getAssetsPublicRoot()
     {
         // Verifica se a pasta de upload existe
-        if (! defined('APPLICATION_HTTP')  || realpath(APPLICATION_HTTP) == false) {
+        if (!defined('APPLICATION_HTTP') || realpath(APPLICATION_HTTP) == false) {
             throw new \RuntimeException('A pasta raiz do site não está definido em APPLICATION_HTTP');
         }
 
         $path = APPLICATION_HTTP . '/assets';
 
         // Verifica se existe e se tem permissão de escrita
-        if (! is_dir($path) || ! is_writable($path)) {
+        if (!is_dir($path) || !is_writable($path)) {
             throw new \RuntimeException('A pasta raiz de upload site/assets não existe ou não tem permissão de escrita');
         }
 

@@ -26,7 +26,7 @@ abstract class EnumFlagged extends Enum
      */
     public static function getName($value = null, $join = '/')
     {
-        if (! is_int($value)) {
+        if (!is_int($value)) {
             return null;
         }
 
@@ -59,7 +59,7 @@ abstract class EnumFlagged extends Enum
      */
     public static function getDescription($value = null, $join = '/')
     {
-        if (! is_int($value)) {
+        if (!is_int($value)) {
             return null;
         }
 
@@ -125,7 +125,7 @@ abstract class EnumFlagged extends Enum
 
     public static function isValid($value): bool
     {
-        if (! is_int($value)) {
+        if (!is_int($value)) {
             return false;
         }
 
@@ -144,7 +144,7 @@ abstract class EnumFlagged extends Enum
 
     public function has($value): bool
     {
-        if (! is_int($value)) {
+        if (!is_int($value)) {
             return false;
         }
 

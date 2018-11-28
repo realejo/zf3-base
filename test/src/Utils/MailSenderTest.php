@@ -5,10 +5,11 @@ namespace RealejoTest\Utils;
 /**
  * Version test case.
  */
+
 use PHPUnit\Framework\TestCase;
 use Realejo\Utils\MailSender;
-use Zend\Mime;
 use Zend\Mail;
+use Zend\Mime;
 
 class MailSenderTest extends TestCase
 {
@@ -40,7 +41,7 @@ class MailSenderTest extends TestCase
         $this->assertInstanceOf(Mail\Transport\Smtp::class, $oMailer->getTransport());
     }
 
-       /**
+    /**
      *
      */
     public function testSetEmailComAnexoStrings()
@@ -72,7 +73,8 @@ class MailSenderTest extends TestCase
         //define e verifica o reply-to
         $oMailer->getMessage()->setReplyTo($config['mailsender']['email'], $config['mailsender']['name']);
         $this->assertEquals($config['mailsender']['name'], $oMailer->getMessage()->getReplyTo()->current()->getName());
-        $this->assertEquals($config['mailsender']['email'], $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+        $this->assertEquals($config['mailsender']['email'],
+            $oMailer->getMessage()->getReplyTo()->current()->getEmail());
 
         //verifica o assunto
         $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());
@@ -103,7 +105,8 @@ class MailSenderTest extends TestCase
         $file2 = fopen(TEST_ROOT . '/assets/sql/album.drop.sql', 'r');
 
         $files = [
-            $file1, $file2,
+            $file1,
+            $file2,
         ];
 
         $oMailer->setEmailMessage(
@@ -155,7 +158,7 @@ class MailSenderTest extends TestCase
         $config = $this->getMailSenderConfig();
         $oMailer = new MailSender($config['mailsender']);
         $htmlEmail = '<html><head><title>Olá mundo</title></head>'
-            .'<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
+            . '<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
 
         $oMailer->setEmailMessage(
             null,
@@ -175,7 +178,8 @@ class MailSenderTest extends TestCase
         //define e verifica o reply-to
         $oMailer->getMessage()->setReplyTo($config['mailsender']['email'], $config['mailsender']['name']);
         $this->assertEquals($config['mailsender']['name'], $oMailer->getMessage()->getReplyTo()->current()->getName());
-        $this->assertEquals($config['mailsender']['email'], $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+        $this->assertEquals($config['mailsender']['email'],
+            $oMailer->getMessage()->getReplyTo()->current()->getEmail());
 
         //verifica o assunto
         $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());
@@ -189,7 +193,7 @@ class MailSenderTest extends TestCase
 
         $this->assertEquals(
             '<html><head><title>Olá mundo</title></head>'
-            .'<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>',
+            . '<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>',
             $parts[0]->getContent()
         );
 
@@ -206,7 +210,7 @@ class MailSenderTest extends TestCase
         $config = $this->getMailSenderConfig();
         $oMailer = new MailSender($config['mailsender']);
         $htmlEmail = '<html><head><title>Olá mundo</title></head>'
-                    .'<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
+            . '<body><h2>Teste do html</h2>Aqui é um post em html<br/></body></html>';
 
         $oMailer->setEmailMessage(
             'Another sender',
@@ -226,7 +230,8 @@ class MailSenderTest extends TestCase
         //define e verifica o reply-to
         $oMailer->getMessage()->setReplyTo('another-email2@somewhere.com', 'Another sender 2');
         $this->assertEquals('Another sender 2', $oMailer->getMessage()->getReplyTo()->current()->getName());
-        $this->assertEquals('another-email2@somewhere.com', $oMailer->getMessage()->getReplyTo()->current()->getEmail());
+        $this->assertEquals('another-email2@somewhere.com',
+            $oMailer->getMessage()->getReplyTo()->current()->getEmail());
 
         //verifica o assunto
         $this->assertEquals('Olá', $oMailer->getMessage()->getSubject());

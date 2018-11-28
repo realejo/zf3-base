@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest\Enum;
 
 use Realejo\Enum\Enum;

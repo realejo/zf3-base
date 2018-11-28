@@ -1,4 +1,5 @@
 <?php
+
 namespace Realejo\MvcUtils;
 
 use Interop\Container\ContainerInterface;

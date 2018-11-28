@@ -9,7 +9,7 @@ use Zend\View\Helper\AbstractHelper;
 
 class FormatFileSize extends AbstractHelper
 {
-    public function __invoke(int $bytes, int $precision = 2):string
+    public function __invoke(int $bytes, int $precision = 2): string
     {
         $units = array('B', 'KB', 'MB', 'GB', 'TB');
 

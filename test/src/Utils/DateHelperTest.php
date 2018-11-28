@@ -5,6 +5,7 @@ namespace RealejoTest\Utils;
 /**
  * Version test case.
  */
+
 use PHPUnit\Framework\TestCase;
 use Realejo\Utils\DateHelper;
 
@@ -25,8 +26,10 @@ class DateHelperTest extends TestCase
 
     public function testStaticDiffFromDateTimeObject()
     {
-        $data1 = \DateTime::createFromFormat('d/m/Y H:i:s', '12/02/2016 01:02:03', new \DateTimeZone('America/Sao_Paulo'));
-        $data2 = \DateTime::createFromFormat('d/m/Y H:i:s', '12/05/2018 03:02:01', new \DateTimeZone('America/Sao_Paulo'));
+        $data1 = \DateTime::createFromFormat('d/m/Y H:i:s', '12/02/2016 01:02:03',
+            new \DateTimeZone('America/Sao_Paulo'));
+        $data2 = \DateTime::createFromFormat('d/m/Y H:i:s', '12/05/2018 03:02:01',
+            new \DateTimeZone('America/Sao_Paulo'));
 
         //diferenca de anos entre as datas
         $dataDiffAno = DateHelper::staticDiff($data1, $data2, 'y');

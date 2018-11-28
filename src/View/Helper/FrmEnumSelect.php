@@ -2,9 +2,9 @@
 /**
  * Retorna o HTML de um <select> apra usar em formulários
  *
- * @param string $nome        Name/ID a ser usado no <select>
+ * @param string $nome Name/ID a ser usado no <select>
  * @param string $selecionado Valor pré selecionado
- * @param string $opts        Opções adicionais
+ * @param string $opts Opções adicionais
  *
  * Os valores de option serão os valores dos campos definidos em $status
  *
@@ -58,7 +58,7 @@ class FrmEnumSelect extends AbstractHelper
 
         // Monta as opções
         $options = '';
-        if (! empty($names)) {
+        if (!empty($names)) {
             foreach ($names as $v => $n) {
                 $selected = ($enum->is($v)) ? 'selected="selected"' : '';
                 $options .= "<option value=\"$v\" $selected>$n</option>";
@@ -71,7 +71,7 @@ class FrmEnumSelect extends AbstractHelper
         $select = "<select class=\"form-control\" name=\"$name\" id=\"$name\" $selectPlaceholder>";
 
         // Verifica se tem valor padrão selecionado
-        if ((! $hasSelected || $showEmpty) && ! $neverShowEmpty) {
+        if ((!$hasSelected || $showEmpty) && !$neverShowEmpty) {
             $select .= "<option value=\"\">$placeholder</option>";
         }
 

@@ -2,6 +2,7 @@
 /**
  * @see https://gist.github.com/mcaskill/02636e5970be1bb22270#file-function-date-format-conversion-php
  */
+
 namespace Realejo\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
@@ -15,7 +16,7 @@ class FormatDate extends AbstractHelper
      */
     public function __invoke($date, $format)
     {
-        if (! $date instanceof \DateTime) {
+        if (!$date instanceof \DateTime) {
             $date = new \DateTime($date);
         }
 
@@ -46,29 +47,67 @@ class FormatDate extends AbstractHelper
         // http://php.net/manual/en/function.strftime.php
         $strf_syntax = [
             // Day - no strf eq : S (created one called %O)
-            '%O', '%d', '%a', '%e', '%A', '%u', '%w', '%j',
+            '%O',
+            '%d',
+            '%a',
+            '%e',
+            '%A',
+            '%u',
+            '%w',
+            '%j',
             // Week - no date eq : %U, %W
             '%V',
             // Month - no strf eq : n, t
-            '%B', '%m', '%b', '%-m',
+            '%B',
+            '%m',
+            '%b',
+            '%-m',
             // Year - no strf eq : L; no date eq : %C, %g
-            '%G', '%Y', '%y',
+            '%G',
+            '%Y',
+            '%y',
             // Time - no strf eq : B, G, u; no date eq : %r, %R, %T, %X
-            '%P', '%p', '%l', '%I', '%H', '%M', '%S',
+            '%P',
+            '%p',
+            '%l',
+            '%I',
+            '%H',
+            '%M',
+            '%S',
             // Timezone - no strf eq : e, I, P, Z
-            '%z', '%Z',
+            '%z',
+            '%Z',
             // Full Date / Time - no strf eq : c, r; no date eq : %c, %D, %F, %x
             '%s'
         ];
 
         // http://php.net/manual/en/function.date.php
         $date_syntax = [
-            'S', 'd', 'D', 'j', 'l', 'N', 'w', 'z',
+            'S',
+            'd',
+            'D',
+            'j',
+            'l',
+            'N',
+            'w',
+            'z',
             'W',
-            'F', 'm', 'M', 'n',
-            'o', 'Y', 'y',
-            'a', 'A', 'g', 'h', 'H', 'i', 's',
-            'O', 'T',
+            'F',
+            'm',
+            'M',
+            'n',
+            'o',
+            'Y',
+            'y',
+            'a',
+            'A',
+            'g',
+            'h',
+            'H',
+            'i',
+            's',
+            'O',
+            'T',
             'U'
         ];
 

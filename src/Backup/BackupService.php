@@ -1,14 +1,14 @@
 <?php
+
 namespace Realejo\Backup;
 
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\Adapter\AdapterAbstractServiceFactory;
 
 /**
  * Controle de backup
-*
-* @todo verificar se exite o mysqldump e zip instalado
-*/
+ *
+ * @todo verificar se exite o mysqldump e zip instalado
+ */
 class BackupService
 {
 
@@ -28,7 +28,7 @@ class BackupService
      */
     public function setConfig(array $config)
     {
-        foreach(['hostname', 'username', 'password', 'database', 'driver'] as $key) {
+        foreach (['hostname', 'username', 'password', 'database', 'driver'] as $key) {
             if (isset($config[$key])) {
                 $this->config[$key] = $config[$key];
             }
@@ -65,17 +65,18 @@ class BackupService
         // Creates a temp file to save the password.
         // Using it directly in command it's a security hazard and mysqldump will complain
         $tempConfig = tmpfile();
-        fwrite($tempConfig, "[client]\nhost={$config['hostname']}\nuser={$config['username']}\npassword={$config['password']}");
+        fwrite($tempConfig,
+            "[client]\nhost={$config['hostname']}\nuser={$config['username']}\npassword={$config['password']}");
         $tempConfigPath = stream_get_meta_data($tempConfig)['uri'];
 
         // Defines the zip file location and name
         $backupFile = $dumpPath . "/dump-{$config['database']}-" . date('Ymd-Hi') . '.zip';
 
         if (empty($tables)) {
-            $tempFilename = $dumpPath .'/'. date('Ymd-Hi') . '.sql';
+            $tempFilename = $dumpPath . '/' . date('Ymd-Hi') . '.sql';
 
             // Creates the mysqldump command
-            $command  = "mysqldump --defaults-extra-file=$tempConfigPath"
+            $command = "mysqldump --defaults-extra-file=$tempConfigPath"
                 . ' --opt --quote-names --default-character-set=utf8 --dump-date'
                 . " {$config['database']} > $tempFilename;";
             system($command);
@@ -99,7 +100,7 @@ class BackupService
                 $tempFilename = $dumpTempFolder . '/' . $tableName . '.sql';
 
                 // Creates the mysqldump command
-                $command  = "mysqldump --defaults-extra-file=$tempConfigPath"
+                $command = "mysqldump --defaults-extra-file=$tempConfigPath"
                     . ' --opt --quote-names --default-character-set=utf8 --dump-date'
                     . " {$config['database']} $tableName > $tempFilename;";
                 system($command);
@@ -240,12 +241,12 @@ RESTORESCRIPT;
 
         $config = $this->getConfig();
         $script = str_replace(
-            ['{{hostname}}',      '{{database}}',      '{{user}}'],
+            ['{{hostname}}', '{{database}}', '{{user}}'],
             [$config['hostname'], $config['database'], $config['username']],
-        $script);
+            $script);
 
-	    // Returns the script
-	    return $script;
+        // Returns the script
+        return $script;
     }
 
     /**
@@ -253,7 +254,7 @@ RESTORESCRIPT;
      *
      * @return string
      */
-    public function getPath():string
+    public function getPath(): string
     {
         return $this->dumpPath;
     }
@@ -283,7 +284,7 @@ RESTORESCRIPT;
         $config = $this->getConfig();
 
         // Recover tables from database
-        $adapter =  new Adapter($config);
+        $adapter = new Adapter($config);
         $tables = $adapter->query(
             "SELECT * FROM `INFORMATION_SCHEMA`.`TABLES` where `TABLE_SCHEMA` ='{$config['database']}' and `TABLE_TYPE` = 'BASE TABLE'",
             Adapter::QUERY_MODE_EXECUTE

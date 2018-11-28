@@ -1,4 +1,5 @@
 <?php
+
 namespace Realejo\Backup;
 
 use Interop\Container\ContainerInterface;

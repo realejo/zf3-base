@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest\Utils;
 
 /**
@@ -8,6 +9,7 @@ namespace RealejoTest\Utils;
  * @copyright Copyright (c) 2014 Realejo (http://realejo.com.br)
  * @license   http://unlicense.org
  */
+
 use Realejo\Cache\CacheService;
 use RealejoTest\BaseTestCase;
 
@@ -52,7 +54,7 @@ class CacheTest extends BaseTestCase
 
         // Verifica se tere o retorno correto
         $this->assertNotNull($path);
-        $this->assertEquals(realpath(TEST_DATA.'/cache'), $path);
+        $this->assertEquals(realpath(TEST_DATA . '/cache'), $path);
         $this->assertTrue(file_exists($path));
         $this->assertTrue(is_dir($path));
         $this->assertTrue(is_writable($path));
@@ -73,8 +75,8 @@ class CacheTest extends BaseTestCase
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path);
-        $this->assertEquals(realpath(TEST_DATA.'/cache/album'), $path);
-        $this->assertNotEquals(realpath(TEST_DATA.'/cache/Album'), $path);
+        $this->assertEquals(realpath(TEST_DATA . '/cache/album'), $path);
+        $this->assertNotEquals(realpath(TEST_DATA . '/cache/Album'), $path);
         $this->assertTrue(file_exists($path));
         $this->assertTrue(is_dir($path));
         $this->assertTrue(is_writable($path));
@@ -90,8 +92,8 @@ class CacheTest extends BaseTestCase
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path);
-        $this->assertEquals(realpath(TEST_DATA.'/cache/album'), $path);
-        $this->assertNotEquals(realpath(TEST_DATA.'/cache/Album'), $path);
+        $this->assertEquals(realpath(TEST_DATA . '/cache/album'), $path);
+        $this->assertNotEquals(realpath(TEST_DATA . '/cache/Album'), $path);
         $this->assertTrue(file_exists($path), 'Verifica se a pasta album existe');
         $this->assertTrue(is_dir($path), 'Verifica se a pasta album é uma pasta');
         $this->assertTrue(is_writable($path), 'Verifica se a pasta album tem permissão de escrita');
@@ -107,8 +109,8 @@ class CacheTest extends BaseTestCase
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path);
-        $this->assertEquals(realpath(TEST_DATA.'/cache/album/teste'), $path);
-        $this->assertNotEquals(realpath(TEST_DATA.'/cache/Album/Teste'), $path);
+        $this->assertEquals(realpath(TEST_DATA . '/cache/album/teste'), $path);
+        $this->assertNotEquals(realpath(TEST_DATA . '/cache/Album/Teste'), $path);
         $this->assertTrue(file_exists($path), 'Verifica se a pasta album_Teste existe');
         $this->assertTrue(is_dir($path), 'Verifica se a pasta album_Teste é uma pasta');
         $this->assertTrue(is_writable($path), 'Verifica se a pasta album_Teste tem permissão de escrita');
@@ -124,8 +126,8 @@ class CacheTest extends BaseTestCase
 
         // Verifica se foi criada corretamente a pasta
         $this->assertNotNull($path, 'Teste se o album/Teste foi criado');
-        $this->assertEquals(realpath(TEST_DATA.'/cache/album/teste'), $path);
-        $this->assertNotEquals(realpath(TEST_DATA.'/cache/Album/Teste'), $path);
+        $this->assertEquals(realpath(TEST_DATA . '/cache/album/teste'), $path);
+        $this->assertNotEquals(realpath(TEST_DATA . '/cache/Album/Teste'), $path);
         $this->assertTrue(file_exists($path), 'Verifica se a pasta album/Teste existe');
         $this->assertTrue(is_dir($path), 'Verifica se a pasta album/Teste é uma pasta');
         $this->assertTrue(is_writable($path), 'Verifica se a pasta album/Teste tem permissão de escrita');

@@ -1,4 +1,5 @@
 <?php
+
 namespace RealejoTest;
 
 use PHPUnit\Framework\TestCase;
@@ -71,16 +72,16 @@ class BaseTestCaseTest extends TestCase
     public function testClearApplicationData()
     {
         // Verifica se está tudo ok
-        if (! defined('TEST_DATA')) {
+        if (!defined('TEST_DATA')) {
             $this->fail('TEST_DATA não definido');
         }
-        if (! is_writable(TEST_DATA)) {
+        if (!is_writable(TEST_DATA)) {
             $this->fail('TEST_DATA não tem permissão de escrita');
         }
 
         // Grava umas bobeiras la
         $folder = TEST_DATA . '/teste1';
-        if (! file_exists($folder)) {
+        if (!file_exists($folder)) {
             $oldumask = umask(0);
             mkdir($folder);
             umask($oldumask);
@@ -88,7 +89,7 @@ class BaseTestCaseTest extends TestCase
         file_put_contents($folder . '/test1.txt', 'teste');
 
         $folder = TEST_DATA . '/teste2/teste3';
-        if (! file_exists($folder)) {
+        if (!file_exists($folder)) {
             $oldumask = umask(0);
             mkdir($folder, 0777, true);
             umask($oldumask);

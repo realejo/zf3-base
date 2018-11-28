@@ -140,7 +140,7 @@ abstract class Enum
 
     public function __construct($value = null)
     {
-        if ($value !== null && ! $this->isValid($value)) {
+        if ($value !== null && !$this->isValid($value)) {
             throw new InvalidArgumentException("Value '$value' is not valid.");
         }
 

@@ -18,10 +18,10 @@ class FormValidation extends AbstractHelper
 
     public function init()
     {
-        if (! self::$initialized) {
+        if (!self::$initialized) {
             $config = $this->getView()->applicationConfig();
 
-            if (! isset($config['realejo']['vendor']['form-validation'])) {
+            if (!isset($config['realejo']['vendor']['form-validation'])) {
                 throw new \InvalidArgumentException('Form Validation not defined.');
             }
 
@@ -35,7 +35,7 @@ class FormValidation extends AbstractHelper
                 $this->getView()->headScript()->appendFile($file);
             }
 
-            if (! empty($config['css'])) {
+            if (!empty($config['css'])) {
                 foreach ($config['css'] as $file) {
                     $this->getView()->headLink()->appendStylesheet($file);
                 }

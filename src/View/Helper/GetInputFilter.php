@@ -1,4 +1,5 @@
 <?php
+
 namespace Realejo\View\Helper;
 
 use Zend\Form\Form;
@@ -35,7 +36,8 @@ class GetInputFilter extends AbstractHelper
             // Coloca as mensagens de tradução em Português se existir
             if (file_exists('./vendor/zendframework/zend-i18n-resources/languages/pt_BR/Zend_Validate.php')) {
                 // Define o local onde se encontra o arquivo de tradução de mensagens
-                $translator->addTranslationFile('phparray', './vendor/zendframework/zend-i18n-resources/languages/pt_BR/Zend_Validate.php');
+                $translator->addTranslationFile('phparray',
+                    './vendor/zendframework/zend-i18n-resources/languages/pt_BR/Zend_Validate.php');
                 // Define o local (você também pode definir diretamente no método acima
                 $translator->setLocale('pt_BR');
             }
@@ -50,7 +52,7 @@ class GetInputFilter extends AbstractHelper
     /**
      * Array ou json com as configurações dos inputs do formvalidation
      *
-     * @param Form $form  form a ser validado
+     * @param Form $form form a ser validado
      * @param boolean $json OPCIONAL retornar json ou array
      *
      * @return array|string        Campos do formulario com regras e mensagens
@@ -71,7 +73,9 @@ class GetInputFilter extends AbstractHelper
                     case $validator['instance'] instanceof Regex:
                         $messages = $validator['instance']->getMessageTemplates();
                         $result[$element->getName()]['validators']['regexp']['message'] = $this->getTranslator()->translate($messages[Regex::NOT_MATCH]);
-                        $result[$element->getName()]['validators']['regexp']['message'] = str_replace('%pattern%', $validator['instance']->getPattern(), $result[$element->getName()]['validators']['regexp']['message']);
+                        $result[$element->getName()]['validators']['regexp']['message'] = str_replace('%pattern%',
+                            $validator['instance']->getPattern(),
+                            $result[$element->getName()]['validators']['regexp']['message']);
                         $result[$element->getName()]['validators']['regexp']['regexp'] = $validator['instance']->getPattern();
                         break;
                     case $validator['instance'] instanceof StringLength:
@@ -84,7 +88,9 @@ class GetInputFilter extends AbstractHelper
                     case $validator['instance'] instanceof Date:
                         $messages = $validator['instance']->getMessageTemplates();
                         $result[$element->getName()]['validators']['date']['message'] = $this->getTranslator()->translate($messages[Date::FALSEFORMAT]);
-                        $result[$element->getName()]['validators']['date']['message'] = str_replace('%format%', $validator['instance']->getFormat(), $result[$element->getName()]['validators']['date']['message']);
+                        $result[$element->getName()]['validators']['date']['message'] = str_replace('%format%',
+                            $validator['instance']->getFormat(),
+                            $result[$element->getName()]['validators']['date']['message']);
                         if ($validator['instance']->getFormat() == 'd/m/Y') {
                             $result[$element->getName()]['validators']['date']['format'] = 'DD/MM/YYYY';
                         } elseif ($validator['instance']->getFormat() == 'd/m/Y H:i:s') {
@@ -96,7 +102,7 @@ class GetInputFilter extends AbstractHelper
                         } elseif ($validator['instance']->getFormat() == 'Y-m-d H:i:s') {
                             $result[$element->getName()]['validators']['date']['format'] = 'YYYY/MM/DD h:m:s';
                         } else {
-                            throw new \RuntimeException('Não foi possível mapear o formato de data '.$validator['instance']->getFormat(). ' para o JS');
+                            throw new \RuntimeException('Não foi possível mapear o formato de data ' . $validator['instance']->getFormat() . ' para o JS');
                         }
                         break;
                     case $validator['instance'] instanceof EmailAddress:
@@ -110,7 +116,9 @@ class GetInputFilter extends AbstractHelper
                         break;
                     case $validator['instance'] instanceof Between:
                         $messages = $validator['instance']->getMessageTemplates();
-                        $result[$element->getName()]['validators']['between']['message'] = str_replace('%max%', $validator['instance']->getMax(), str_replace('%min%', $validator['instance']->getMin(), $this->getTranslator()->translate($messages[Between::NOT_BETWEEN])));
+                        $result[$element->getName()]['validators']['between']['message'] = str_replace('%max%',
+                            $validator['instance']->getMax(), str_replace('%min%', $validator['instance']->getMin(),
+                                $this->getTranslator()->translate($messages[Between::NOT_BETWEEN])));
                         $result[$element->getName()]['validators']['between']['max'] = $validator['instance']->getMax();
                         $result[$element->getName()]['validators']['between']['min'] = $validator['instance']->getMin();
                         break;
@@ -138,7 +146,8 @@ class GetInputFilter extends AbstractHelper
             }
         }
 
-        return $json == false ? $result : json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        return $json == false ? $result : json_encode($result,
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -168,11 +177,11 @@ class GetInputFilter extends AbstractHelper
     public function getFormValidationJS(Form $form, $target, $useTooltip = false)
     {
         if (empty($form)) {
-            throw new \InvalidArgumentException('Form não pode estar vazio em '.get_class($this).'::getFormValidationJS()');
+            throw new \InvalidArgumentException('Form não pode estar vazio em ' . get_class($this) . '::getFormValidationJS()');
         }
 
         if (empty($target)) {
-            throw new \InvalidArgumentException('Target não pode estar vazio em '.get_class($this).'::getFormValidationJS()');
+            throw new \InvalidArgumentException('Target não pode estar vazio em ' . get_class($this) . '::getFormValidationJS()');
         }
 
         $script = "$('#$target').formValidation({
@@ -194,7 +203,8 @@ class GetInputFilter extends AbstractHelper
 
         return $script;
     }
-        /**
+
+    /**
      * @return Translator
      */
     public function getTranslator()

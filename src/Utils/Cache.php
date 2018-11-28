@@ -1,4 +1,5 @@
 <?php
+
 namespace Realejo\Utils;
 
 use Realejo\Cache\CacheService;

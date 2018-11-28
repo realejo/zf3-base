@@ -2,8 +2,8 @@
 
 namespace Realejo\View\Helper;
 
-use Zend\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 class ApplicationConfigFactory implements FactoryInterface
 {
