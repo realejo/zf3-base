@@ -44,36 +44,50 @@ class FrmEnumCheckbox extends AbstractHelper
 
         $inputName = ($enum instanceof EnumFlagged) ? $name . '[]' : $name;
 
+        $required = (isset($options['required']) && $options['required'] === true) ? 'required' : '';
+
+        $showDescription = (isset($options['show-description']) && $options['show-description'] === true);
+
+        $readOnly = $options['read-only'] ?? 0;
+
         // Monta as opções
         $checkbox = [];
-        if (! empty($names)) {
+        if (!empty($names)) {
             foreach ($names as $v => $n) {
-                if ($enum instanceof EnumFlagged) {
-                    $checked = ($enum->has($v)) ? 'checked="checked"' : '';
-                } else {
-                    $checked = ($enum->is($v)) ? 'checked="checked"' : '';
+                if ($showDescription) {
+                    $n .= ' <span class="tip" title="' . $enum->getValueDescription($v) . '"><i class="fa fa fa-question-circle"></i></span>';
                 }
 
-                $checkbox[] = '<div class="checkbox"> <label>'
-                    . "<input type=\"checkbox\" $checked
-                            id=\"$name\" 
+                $checked = ($enum instanceof EnumFlagged) ? $enum->has($v) : $enum->is($v);
+                $isReadOnly = ($readOnly && ($v & $readOnly));
+
+                if ($isReadOnly) {
+                    $checked = ($checked) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>';
+                    $checkbox[] = "<p class=\"form-control-static\"> $checked $n </p>";
+                } else {
+
+                    $checked = ($checked) ? 'checked="checked"' : '';
+                    $checkbox[] = '<div class="checkbox"> <label>'
+                        . "<input type=\"checkbox\" $checked
+                            id=\"$name\" $required
                             name=\"$inputName\" 
                             value=\"$v\">$n"
-                    . '</label></div>';
+                        . '</label></div>';
+                }
             }
-        }
 
-        if (isset($options['cols'])) {
-            $countCheckbox = count($checkbox);
-            $slice = ceil($countCheckbox / $options['cols']);
-            $columns = [];
-            $columnSize = round(12 / $options['cols']);
-            for ($c = 1; $c <= $options['cols']; $c++) {
-                $columns[$c] = "<div class=\"col-xs-$columnSize\">"
+            if (isset($options['cols'])) {
+                $countCheckbox = count($checkbox);
+                $slice = ceil($countCheckbox / $options['cols']);
+                $columns = [];
+                $columnSize = round(12 / $options['cols']);
+                for ($c = 1; $c <= $options['cols']; $c++) {
+                    $columns[$c] = "<div class=\"col-xs-$columnSize\">"
                         . implode('', array_slice($checkbox, ($c - 1) * $slice, $slice))
-                    .'</div>';
+                        . '</div>';
+                }
+                return '<div class="row">' . implode('', $columns) . '</div>';
             }
-            return '<div class="row">' . implode('', $columns) . '</div>';
         }
 
         return implode('', $checkbox);

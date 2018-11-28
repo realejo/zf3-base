@@ -44,11 +44,16 @@ class FrmEnumSelect extends AbstractHelper
         // Verifica se deve mostrar a primeira opção em branco
         $showEmpty = (isset($options['show-empty']) && $options['show-empty'] === true);
         $neverShowEmpty = (isset($options['show-empty']) && $options['show-empty'] === false);
+        $required = (isset($options['required']) && $options['required'] === true);
 
         // Defines the correct holder
         $placeholder = $selectPlaceholder = $options['placeholder'] ?? '';
-        if (! empty($placeholder)) {
+        if (!empty($placeholder)) {
             $selectPlaceholder = "placeholder=\"$selectPlaceholder\"";
+        }
+
+        if ($required) {
+            $selectPlaceholder .= ' required ';
         }
 
         // Monta as opções

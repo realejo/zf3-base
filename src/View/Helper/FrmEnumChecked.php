@@ -41,14 +41,18 @@ class FrmEnumChecked extends AbstractHelper
             }
         }
 
+        $showDescription = (isset($options['show-description']) && $options['show-description'] === true);
+
         // Monta as opções
         $values = [];
-        if (! empty($names)) {
+        if (!empty($names)) {
             foreach ($names as $v => $n) {
-                if ($enum instanceof EnumFlagged) {
-                    $checked = ($enum->has($v)) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>';
-                } else {
-                    $checked = ($enum->is($v)) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>';
+
+                $checked = ($enum instanceof EnumFlagged) ? $enum->has($v) : $enum->is($v);
+                $checked = ($checked) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>';
+
+                if ($showDescription) {
+                    $n .= ' <span class="tip" title="' . $enum->getValueDescription($v) . '"><i class="fa fa fa-question-circle"></i></span>';
                 }
 
                 $values[] = "<p class=\"form-control-static\"> $checked $n </p>";
@@ -62,8 +66,8 @@ class FrmEnumChecked extends AbstractHelper
             $columnSize = round(12 / $options['cols']);
             for ($c = 1; $c <= $options['cols']; $c++) {
                 $columns[$c] = "<div class=\"col-xs-$columnSize\">"
-                        . implode('', array_slice($values, ($c - 1) * $slice, $slice))
-                    .'</div>';
+                    . implode('', array_slice($values, ($c - 1) * $slice, $slice))
+                    . '</div>';
             }
             return '<div class="row">' . implode('', $columns) . '</div>';
         }
