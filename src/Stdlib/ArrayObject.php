@@ -30,11 +30,6 @@ class ArrayObject implements \ArrayAccess
 
     protected $dateKeys = [];
 
-    /**
-     * @deprecated use $jsonArrayKeys OR $jsonObjectKeys
-     * @var array
-     */
-    protected $jsonKeys = [];
     protected $jsonArrayKeys = [];
     protected $jsonObjectKeys = [];
     protected $jsonEncodeOptions = 0;
@@ -92,9 +87,6 @@ class ArrayObject implements \ArrayAccess
                     $value = json_decode($value, JSON_OBJECT_AS_ARRAY);
 
                 } elseif ($useJsonObjectKeys && in_array($key, $this->jsonObjectKeys) && !empty($value)) {
-                    $value = json_decode($value);
-
-                } elseif ($useJsonObjectKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
                     $value = json_decode($value);
 
                 } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
@@ -163,9 +155,6 @@ class ArrayObject implements \ArrayAccess
                 $value = json_encode($value, $this->jsonEncodeOptions);
             }
             if (in_array($key, $this->jsonObjectKeys) && $value instanceof \stdClass) {
-                $value = json_encode($value, $this->jsonEncodeOptions);
-            }
-            if (in_array($key, $this->jsonKeys) && ($value instanceof \stdClass || is_array($value))) {
                 $value = json_encode($value, $this->jsonEncodeOptions);
             }
 

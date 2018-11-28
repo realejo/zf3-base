@@ -9,7 +9,6 @@ use RealejoTest\Enum\EnumFlaggedConcrete;
 /**
  * @property bool booleanKey
  * @property int intKey
- * @property \stdClass jsonKey
  * @property \stdClass jsonObjectKey
  * @property array jsonArrayKey
  * @property \DateTime datetimeKey
@@ -21,8 +20,6 @@ class ArrayObjectTypedKeys extends ArrayObject
     protected $booleanKeys = ['booleanKey'];
 
     protected $intKeys = ['intKey'];
-
-    protected $jsonKeys = ['jsonKey'];
 
     protected $jsonArrayKeys = ['jsonArrayKey'];
 

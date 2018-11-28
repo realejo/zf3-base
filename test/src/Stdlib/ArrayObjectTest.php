@@ -260,7 +260,6 @@ class ArrayObjectTest extends TestCase
         $originalArray = ['key' => 'value', 'unicode' => 'áéíóú😶çý', 'slashes' => '\\slashes\\'];
         $object = new ArrayObjectTypedKeys([
             'booleanKey' => '1',
-            'jsonKey' => json_encode($originalArray),
             'jsonObjectKey' => json_encode($originalArray),
             'jsonArrayKey' => json_encode($originalArray),
             'datetimeKey' => '2010-01-01 00:00:00',
@@ -271,13 +270,6 @@ class ArrayObjectTest extends TestCase
 
         // check keys
         $this->assertTrue($object->booleanKey === true);
-        $stdClass = new \stdClass();
-        $stdClass->key = 'value';
-        $stdClass->unicode = 'áéíóú😶çý';
-        $stdClass->slashes = '\\slashes\\';
-        $this->assertEquals($stdClass, $object->jsonKey);
-        $this->assertEquals($stdClass->key, $object->jsonKey->key);
-        $this->assertEquals((array)$stdClass, (array)$object->jsonKey);
         $this->assertEquals(new \DateTime('2010-01-01'), $object->datetimeKey);
         $this->assertTrue($object->intKey === 1);
 
@@ -292,7 +284,6 @@ class ArrayObjectTest extends TestCase
         // get the array as it will be inserted on database
         $objectArray = $object->getArrayCopy();
         $this->assertEquals(1, $objectArray['booleanKey']);
-        $this->assertEquals(json_encode($originalArray), $objectArray['jsonKey']);
         $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
         $this->assertEquals(1, $objectArray['intKey']);
         $this->assertEquals('S', $objectArray['enum']);
@@ -304,7 +295,11 @@ class ArrayObjectTest extends TestCase
         $this->assertEquals(1, $objectArray['booleanKey']);
         $this->assertEquals(
             json_encode($originalArray, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-            $objectArray['jsonKey']
+            $objectArray['jsonArrayKey']
+        );
+        $this->assertEquals(
+            json_encode($originalArray, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $objectArray['jsonObjectKey']
         );
         $this->assertEquals('2010-01-01 00:00:00', $objectArray['datetimeKey']);
         $this->assertEquals(1, $objectArray['intKey']);
