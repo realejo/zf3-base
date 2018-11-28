@@ -9,9 +9,7 @@ php:
 
 # optionally specify a list of environments, for example to test different RDBMS
 env:
-  - TRAVIS=true
-  - EXECUTE_CS_CHECK=true
-  - EXECUTE_TEST_COVERALLS=true
+  - TRAVIS=true EXECUTE_CS_CHECK=true EXECUTE_TEST_COVERALLS=true
 
 before_install:
   - composer self-update
