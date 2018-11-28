@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2018-11-28
+### Added
+- Bump to 7.1
+- Added `Realejo\Cache\CacheService`.
+- Added `Realejo\Backup\BackupService`.
+- Added `View\Helper\FrmEnumChecked*` option: `show-description`.
+- Added `View\Helper\FrmEnumCheckbox*` option `show-description`, `read-only` and `required`.
+- Added `View\Helper\FrmEnumChecknx*` option `required`.
+
+### Changed
+- `DateHelper::isDate()` validates only if it's a string.
+- Removed `APPLICATION_DATA` dependency from `CacheService`.
+- `ArrayObject::$jsonKeys` is separated in `ArrayObject::$jsonArrayKeys` and `ArrayObject::$jsonObjectKeys`.
+
+### Deprecated
+- `APPLICATION_DATA` at `CacheService`.
+
+### Removed
+- `Realejo\Utils\Cache`, use `Realejo\Cache\CacheService`.
+- `Zend\Json` dependency
+
+### Fixed
+- Fixed cache key bug when using `Zend\Db\Select`.
+
 ## [2.1.6] - 2018-03-20
 ### Fixed
 - Warning prevention when there are no metadata created in the database and method `MetadataService::removeMetadata()` is called.
