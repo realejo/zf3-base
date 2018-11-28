@@ -2,8 +2,8 @@
 
 namespace Realejo\Stdlib;
 
+use DateTime;
 use Realejo\Enum\Enum;
-use Zend\Json\Json;
 
 class ArrayObject implements \ArrayAccess
 {
@@ -38,6 +38,9 @@ class ArrayObject implements \ArrayAccess
     protected $jsonArrayKeys = [];
     protected $jsonObjectKeys = [];
 
+    /**
+     * @var Enum[]
+     */
     protected $enumKeys = [];
 
     public function __construct($data = null)
@@ -48,7 +51,7 @@ class ArrayObject implements \ArrayAccess
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @param bool $reverse
      * @return mixed
      */
@@ -82,20 +85,27 @@ class ArrayObject implements \ArrayAccess
         if (!empty($data)) {
             foreach ($data as $key => $value) {
                 if ($useDateKeys && in_array($key, $this->dateKeys) && !empty($value)) {
-                    $value = new \DateTime($value);
+                    $value = new DateTime($value);
+
                 } elseif ($useJsonArrayKeys && in_array($key, $this->jsonArrayKeys) && !empty($value)) {
-                    $value = Json::decode($value, Json::TYPE_ARRAY);
+                    $value = json_decode($value, JSON_OBJECT_AS_ARRAY);
+
                 } elseif ($useJsonObjectKeys && in_array($key, $this->jsonObjectKeys) && !empty($value)) {
-                    $value = Json::decode($value, Json::TYPE_OBJECT);
+                    $value = json_decode($value);
+
                 } elseif ($useJsonObjectKeys && in_array($key, $this->jsonKeys) && !empty($value)) {
-                    $value = Json::decode($value, Json::TYPE_OBJECT);
+                    $value = json_decode($value);
+
                 } elseif ($useIntKeys && in_array($key, $this->intKeys) && !empty($value)) {
                     $value = (int)$value;
+
                 } elseif ($useBooleanKeys && in_array($key, $this->booleanKeys) && !empty($value)) {
                     $value = (boolean)$value;
-                } elseif ($useEnumKeys && array_key_exists($key, $this->enumKeys) && !empty($value)) {
+
+                } elseif ($useEnumKeys && array_key_exists($key, $this->enumKeys)) {
                     $value = new $this->enumKeys[$key]($value);
                 }
+
                 $this->storage[$this->getMappedKey($key)] = $value;
             }
         }
@@ -149,13 +159,13 @@ class ArrayObject implements \ArrayAccess
 
             // desfaz o json
             if (in_array($key, $this->jsonArrayKeys) && is_array($value)) {
-                $value = Json::encode($value, true);
+                $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
             if (in_array($key, $this->jsonObjectKeys) && $value instanceof \stdClass) {
-                $value = Json::encode($value, true);
+                $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
             if (in_array($key, $this->jsonKeys) && ($value instanceof \stdClass || is_array($value))) {
-                $value = Json::encode($value, true);
+                $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
 
             // desfaz o enum
@@ -174,20 +184,12 @@ class ArrayObject implements \ArrayAccess
         return $toArray;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetExists()
-     */
     public function offsetExists($offset)
     {
         $offset = $this->getMappedKey($offset);
         return (array_key_exists($offset, $this->storage));
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetGet()
-     */
     public function offsetGet($offset)
     {
         $offset = $this->getMappedKey($offset);
@@ -198,10 +200,6 @@ class ArrayObject implements \ArrayAccess
         return $this->storage[$offset];
     }
 
-    /**
-     * {@inheritDoc}
-     * @see ArrayAccess::offsetSet()
-     */
     public function offsetSet($offset, $value)
     {
         $offset = $this->getMappedKey($offset);
@@ -267,12 +265,12 @@ class ArrayObject implements \ArrayAccess
     }
 
     /**
-     * @param array $deprecatedMapping
+     * @param array $mappedKeys
      * @return ArrayObject
      */
-    public function setMapping(array $deprecatedMapping = null)
+    public function setMapping(array $mappedKeys = null)
     {
-        $this->mappedKeys = $deprecatedMapping;
+        $this->mappedKeys = $mappedKeys;
         return $this;
     }
 
