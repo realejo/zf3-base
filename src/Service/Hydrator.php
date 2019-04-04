@@ -2,7 +2,9 @@
 
 namespace Realejo\Service;
 
-class Hydrator
+use Zend\Hydrator\ArraySerializable;
+
+class Hydrator extends ArraySerializable
 {
 
 }
