@@ -5,12 +5,12 @@ namespace RealejoTest\Service\Mapper;
 use Realejo\Service\MapperAbstract;
 use Zend\Db\Sql\Select;
 
-class MapperConcrete extends MapperAbstract
+class MapperConcreteDeprecated extends MapperAbstract
 {
     protected $tableName = 'album';
     protected $tableKey = 'id';
 
-    protected $tableJoin = [
+    protected $tableJoinLeft = [
         'test' => [
             'table' =>'test_table',
             'condition' => 'test_condition',

@@ -3,9 +3,12 @@
 namespace Realejo\Service;
 
 use ArrayIterator;
+use InvalidArgumentException;
+use LogicException;
 use Psr\Container\ContainerInterface;
 use Realejo\Cache\CacheService;
 use Realejo\Stdlib\ArrayObject;
+use RuntimeException;
 use Zend\Cache\Storage as CacheStorage;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\ResultSet\HydratingResultSet;
@@ -24,12 +27,12 @@ abstract class MapperAbstract
     /**
      * @var ArrayObject
      */
-    protected $hydratorEntity = null;
+    protected $hydratorEntity;
 
     /**
      * @var ArraySerializable
      */
-    protected $hydrator = null;
+    protected $hydrator;
 
     /**
      * @var bool
@@ -56,9 +59,18 @@ abstract class MapperAbstract
     /**
      * Join lefts que devem ser usados no mapper
      *
+     * @deprecated use $tableJoin
+     *
      * @var array
      */
     protected $tableJoinLeft = false;
+
+    /**
+     * Join lefts que devem ser usados no mapper
+     *
+     * @var array
+     */
+    protected $tableJoin;
 
     /**
      * Join lefts que devem ser usados no mapper
@@ -153,11 +165,11 @@ abstract class MapperAbstract
     public function delete($key)
     {
         if (empty($key)) {
-            throw new \InvalidArgumentException("Chave <b>'$key'</b> inválida");
+            throw new InvalidArgumentException("Chave <b>'$key'</b> inválida");
         }
 
         if (!is_array($key) && is_array($this->getTableKey()) && count($this->getTableKey()) > 1) {
-            throw new \InvalidArgumentException('Não é possível apagar um registro usando chaves múltiplas parciais');
+            throw new InvalidArgumentException('Não é possível apagar um registro usando chaves múltiplas parciais');
         }
 
         // Grava os dados alterados para referencia
@@ -210,7 +222,7 @@ abstract class MapperAbstract
     public function setTableKey($key)
     {
         if (empty($key) && !is_string($key) && !is_array($key)) {
-            throw new \InvalidArgumentException('Chave inválida em ' . get_class($this));
+            throw new InvalidArgumentException('Chave inválida em ' . get_class($this));
         }
 
         $this->tableKey = $key;
@@ -224,7 +236,7 @@ abstract class MapperAbstract
     public function getTableGateway()
     {
         if (null === $this->tableName) {
-            throw new \InvalidArgumentException('Tabela não definida em ' . get_class($this));
+            throw new InvalidArgumentException('Tabela não definida em ' . get_class($this));
         }
 
         // Verifica se a tabela já foi previamente carregada
@@ -310,7 +322,7 @@ abstract class MapperAbstract
         }
 
         if (!is_array($this->getTableKey())) {
-            throw new \LogicException('Chave mal definida em ' . get_class($this));
+            throw new LogicException('Chave mal definida em ' . get_class($this));
         }
 
         $where = [];
@@ -362,7 +374,7 @@ abstract class MapperAbstract
 
         // Verifica se alguma chave foi definida
         if (empty($where)) {
-            throw new \LogicException('Nenhuma chave definida em ' . get_class($this));
+            throw new LogicException('Nenhuma chave definida em ' . get_class($this));
         }
 
         // Verifica se todas as chaves foram usadas
@@ -370,7 +382,7 @@ abstract class MapperAbstract
             && is_array($this->getTableKey())
             && count($usedKeys) !== count($this->getTableKey())
         ) {
-            throw new \LogicException('Não é permitido usar chaves parciais em ' . get_class($this));
+            throw new LogicException('Não é permitido usar chaves parciais em ' . get_class($this));
         }
 
         return '(' . implode(') AND (', $where) . ')';
@@ -475,14 +487,14 @@ abstract class MapperAbstract
 
         // Caso não seja, envia um Exception
         if (!is_numeric($set[$this->getTableKey()])) {
-            throw new \RuntimeException("Chave invalida: '{$set[$this->getTableKey()]}'");
+            throw new RuntimeException("Chave invalida: '{$set[$this->getTableKey()]}'");
         }
 
         if ($this->fetchRow($set[$this->getTableKey()])) {
             return $this->update($set, $set[$this->getTableKey()]);
         }
 
-        throw new \RuntimeException("{$this->getTableKey()} key does not exist in " . get_class($this));
+        throw new RuntimeException("{$this->getTableKey()} key does not exist in " . get_class($this));
     }
 
     /**
@@ -583,7 +595,7 @@ abstract class MapperAbstract
     public function setHydrator(ArraySerializable $hydrator)
     {
         if (empty($hydrator)) {
-            throw new \InvalidArgumentException('Invalid hydrator');
+            throw new InvalidArgumentException('Invalid hydrator');
         }
         $this->hydrator = $hydrator;
 
@@ -604,14 +616,14 @@ abstract class MapperAbstract
         if (is_numeric($where) || is_string($where)) {
             // Verifica se há chave definida
             if (empty($this->tableKey)) {
-                throw new \InvalidArgumentException('Chave não definida em ' . get_class($this));
+                throw new InvalidArgumentException('Chave não definida em ' . get_class($this));
             }
 
             // Verifica se é uma chave múltipla ou com cast
             if (is_array($this->tableKey)) {
                 // Verifica se é uma chave simples com cast
                 if (count($this->tableKey) != 1) {
-                    throw new \InvalidArgumentException('Não é possível acessar chaves múltiplas informando apenas uma');
+                    throw new InvalidArgumentException('Não é possível acessar chaves múltiplas informando apenas uma');
                 }
                 $where = [$this->getTableKey(true) => $where];
             } else {
@@ -623,10 +635,10 @@ abstract class MapperAbstract
         $fetchRow = $this->fetchAll($where, $order, 1);
 
         if ($this->useHydrateResultSet) {
-            return (!empty($fetchRow)) ? $fetchRow->current() : null;
+            return !empty($fetchRow) ? $fetchRow->current() : null;
         }
 
-        return (!empty($fetchRow)) ? $fetchRow[0] : null;
+        return !empty($fetchRow) ? $fetchRow[0] : null;
     }
 
     /**
@@ -671,7 +683,7 @@ abstract class MapperAbstract
         $fetchAll = $this->getTableGateway()->selectWith($select);
 
         // Verifica se foi localizado algum registro
-        if (!is_null($fetchAll) && count($fetchAll) > 0) {
+        if ($fetchAll !== null && count($fetchAll) > 0) {
             // Passa o $fetch para array para poder incluir campos extras
             $fetchAll = $fetchAll->toArray();
         } else {
@@ -729,7 +741,7 @@ abstract class MapperAbstract
      * @param int $count OPTIONAL An SQL LIMIT count.
      * @param int $offset OPTIONAL An SQL LIMIT offset.
      *
-     * @return \Zend\Db\Sql\Select
+     * @return Select
      */
     public function getSelect(array $where = null, $order = null, $count = null, $offset = null)
     {
@@ -752,16 +764,16 @@ abstract class MapperAbstract
         }
 
         // Verifica se há paginação, não confundir com o Zend\Paginator
-        if (!is_null($count)) {
+        if ($count !== null) {
             $select->limit($count);
         }
-        if (!is_null($offset)) {
+        if ($offset !== null) {
             $select->offset($offset);
         }
 
         // Verifica se é um array para fazer o processamento abaixo
         if (!is_array($where)) {
-            $where = (empty($where)) ? [] : [$where];
+            $where = empty($where) ? [] : [$where];
         }
 
         // Checks $where is deleted
@@ -788,7 +800,9 @@ abstract class MapperAbstract
             if ($id === 'deleted' && $w === false) {
                 $select->where("{$this->getTableGateway()->getTable()}.deleted=0");
                 continue;
-            } elseif ($id === 'deleted' && $w === true) {
+            }
+
+            if ($id === 'deleted' && $w === true) {
                 $select->where("{$this->getTableGateway()->getTable()}.deleted=1");
                 continue;
             }
@@ -796,7 +810,9 @@ abstract class MapperAbstract
             if ((is_numeric($id) && $w === 'ativo') || ($id === 'ativo' && $w === true)) {
                 $select->where("{$this->getTableGateway()->getTable()}.ativo=1");
                 continue;
-            } elseif ($id === 'ativo' && $w === false) {
+            }
+
+            if ($id === 'ativo' && $w === false) {
                 $select->where("{$this->getTableGateway()->getTable()}.ativo=0");
                 continue;
             }
@@ -816,7 +832,7 @@ abstract class MapperAbstract
                     $id = "{$this->tableName}.$id";
                 }
 
-                if (is_null($w)) {
+                if ($w === null) {
                     $select->where(new Predicate\IsNull($id));
                 } else {
                     $select->where(new Predicate\Operator($id, '=', $w));
@@ -824,7 +840,7 @@ abstract class MapperAbstract
                 continue;
             }
 
-            throw new \LogicException("Condição inválida '$w' em " . get_class($this));
+            throw new LogicException("Condição inválida '$w' em " . get_class($this));
         }
 
         return $select;
@@ -833,48 +849,46 @@ abstract class MapperAbstract
     /**
      * Retorna o select a ser usado no fetchAll e fetchRow
      *
-     * @return \Zend\Db\Sql\Select
+     * @return Select
      */
     public function getTableSelect()
     {
         $select = $this->getTableGateway()->getSql()->select();
 
-        if ($this->getUseJoin() && !empty($this->tableJoinLeft)) {
-            foreach ($this->tableJoinLeft as $tableJoinLeft) {
-                #TODO validar se tem os tres campos no array
+        $tableJoinDefinition = $this->tableJoin ?? $this->tableJoinLeft;
 
-                if (empty($tableJoinLeft['table']) && !is_string($tableJoinLeft['table'])) {
-                    throw new \InvalidArgumentException('Tabela não definida em ' . get_class($this));
+        if (!empty($tableJoinDefinition) && $this->getUseJoin()) {
+            foreach ($tableJoinDefinition as $definition) {
+                if (empty($definition['table']) && !is_string($definition['table'])) {
+                    throw new InvalidArgumentException('Tabela não definida em ' . get_class($this));
                 }
 
-                if (empty($tableJoinLeft['condition']) && !is_string($tableJoinLeft['condition'])) {
-                    throw new \InvalidArgumentException('Condição não definida' . get_class($this));
+                if (empty($definition['condition']) && !is_string($definition['condition'])) {
+                    throw new InvalidArgumentException("Condição para a tabela {$definition['table']} não definida em " . get_class($this));
                 }
 
-                if (isset($tableJoinLeft['columns']) && !empty($tableJoinLeft['columns'])
-                    && !is_array($tableJoinLeft['columns'])
-                ) {
-                    throw new \InvalidArgumentException('Colunas devem ser um array em ' . get_class($this));
+                if (isset($definition['columns']) && !empty($definition['columns']) && !is_array($definition['columns'])) {
+                    throw new InvalidArgumentException("Colunas para a tabela {$definition['table']} devem ser um array em " . get_class($this));
                 }
 
-                if (array_key_exists('schema', $tableJoinLeft)) {
+                if (array_key_exists('schema', $definition)) {
                     trigger_error('Schema não pode ser usado. Use type.', E_USER_DEPRECATED);
-                    $tableJoinLeft['type'] = $tableJoinLeft['schema'];
+                    $definition['type'] = $definition['schema'];
                 }
 
-                if (isset($tableJoinLeft['type']) && !empty($tableJoinLeft['type'])
-                    && !is_string($tableJoinLeft['type'])
-                ) {
-                    throw new \InvalidArgumentException('Type devem ser uma string em ' . get_class($this));
-                } elseif (!isset($tableJoinLeft['type'])) {
-                    $tableJoinLeft['type'] = null;
+                if (isset($definition['type']) && !empty($definition['type']) && !is_string($definition['type'])) {
+                    throw new InvalidArgumentException('Type devem ser uma string em ' . get_class($this));
+                }
+
+                if (!isset($definition['type'])) {
+                    $definition['type'] = null;
                 }
 
                 $select->join(
-                    $tableJoinLeft['table'],
-                    $tableJoinLeft['condition'],
-                    $tableJoinLeft['columns'],
-                    $tableJoinLeft['type']
+                    $definition['table'],
+                    $definition['condition'],
+                    $definition['columns'],
+                    $definition['type']
                 );
             }
         }
@@ -1003,7 +1017,7 @@ abstract class MapperAbstract
     {
         // Verifica se o código é válido
         if (empty($key)) {
-            throw new \InvalidArgumentException("Chave <b>'$key'</b> inválida");
+            throw new InvalidArgumentException("Chave <b>'$key'</b> inválida");
         }
 
         // Verifica se há algo para alterar
@@ -1200,7 +1214,7 @@ abstract class MapperAbstract
     public function setOrder($order)
     {
         if (empty($order) && !is_string($order) && !is_array($order) && (!$order instanceof Expression)) {
-            throw new \InvalidArgumentException('Ordem inválida em ' . get_class($this));
+            throw new InvalidArgumentException('Ordem inválida em ' . get_class($this));
         }
 
         $this->order = $order;

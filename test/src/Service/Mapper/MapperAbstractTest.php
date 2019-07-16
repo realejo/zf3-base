@@ -9,6 +9,8 @@ use RealejoTest\BaseTestCase;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql;
+use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
 
 class MapperAbstractTest extends BaseTestCase
 {
@@ -28,6 +30,11 @@ class MapperAbstractTest extends BaseTestCase
      * @var MapperConcrete
      */
     private $mapper;
+
+    /**
+     * @var MapperConcreteDeprecated
+     */
+    private $mapperDeprecated;
 
     protected $defaultValues = [
         [
@@ -81,16 +88,20 @@ class MapperAbstractTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->dropTables()->createTables()->insertDefaultRows();
+        $this->dropTables()->createTables();
+        $this->insertDefaultRows();
 
         // Remove as pastas criadas
         $this->clearApplicationData();
 
         // Configura o mapper
         $this->mapper = new MapperConcrete($this->tableName, $this->tableKeyName);
+        $this->mapperDeprecated = new MapperConcreteDeprecated($this->tableName, $this->tableKeyName);
+
         $cacheService = new CacheService();
         $cacheService->setCacheDir($this->getDataDir() . '/cache');
         $this->mapper->setCache($cacheService->getFrontend());
+        $this->mapperDeprecated->setCache($cacheService->getFrontend());
 
     }
 
@@ -110,7 +121,7 @@ class MapperAbstractTest extends BaseTestCase
      * Definição de chave invalido
      * @expectedException \InvalidArgumentException
      */
-    public function testKeyNameInvalido()
+    public function testKeyNameInvalido(): void
     {
         $this->mapper->setTableKey(null);
     }
@@ -119,7 +130,7 @@ class MapperAbstractTest extends BaseTestCase
      * Definição de ordem invalido
      * @expectedException \InvalidArgumentException
      */
-    public function testOrderInvalida()
+    public function testOrderInvalida(): void
     {
         $this->mapper->setOrder(null);
     }
@@ -128,7 +139,7 @@ class MapperAbstractTest extends BaseTestCase
      * Definição de ordem invalido
      * @expectedException \InvalidArgumentException
      */
-    public function testfetchRowMultiKeyException()
+    public function testFetchRowMultiKeyException(): void
     {
         // Cria a tabela com chave string
         $this->mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id_int', MapperConcrete::KEY_STRING => 'id_char']);
@@ -138,7 +149,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Definição de chave invalido
      */
-    public function testGettersStters()
+    public function testGettersSetters(): void
     {
         $this->assertEquals('meuid', $this->mapper->setTableKey('meuid')->getTableKey());
         $this->assertEquals('meuid', $this->mapper->setTableKey('meuid')->getTableKey(true));
@@ -149,9 +160,9 @@ class MapperAbstractTest extends BaseTestCase
             $this->mapper->setTableKey(['meuid', 'com array'])->getTableKey(false));
         $this->assertEquals('meuid', $this->mapper->setTableKey(['meuid', 'com array'])->getTableKey(true));
 
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression',
+        $this->assertInstanceOf(Expression::class,
             $this->mapper->setTableKey(new Sql\Expression('chave muito exotica!'))->getTableKey());
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression', $this->mapper->setTableKey([
+        $this->assertInstanceOf(Expression::class, $this->mapper->setTableKey([
             new Sql\Expression('chave muito mais exotica!'),
             'não existo'
         ])->getTableKey(true));
@@ -159,14 +170,14 @@ class MapperAbstractTest extends BaseTestCase
         $this->assertEquals('minhaordem', $this->mapper->setOrder('minhaordem')->getOrder());
         $this->assertEquals(['minhaordem', 'comarray'],
             $this->mapper->setOrder(['minhaordem', 'comarray'])->getOrder());
-        $this->assertInstanceOf('\Zend\Db\Sql\Expression',
+        $this->assertInstanceOf(Expression::class,
             $this->mapper->setOrder(new Sql\Expression('ordem muito exotica!'))->getOrder());
     }
 
     /**
      * Test de criação com a conexão local de testes
      */
-    public function testCreateBase()
+    public function testCreateBase(): void
     {
         $Base = new MapperConcrete($this->tableName, $this->tableKeyName);
         $this->assertInstanceOf(MapperAbstract::class, $Base);
@@ -189,7 +200,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->getOrder()
      */
-    public function testOrder()
+    public function testOrder(): void
     {
         // Verifica a ordem padrão
         $this->assertNull($this->mapper->getOrder());
@@ -212,7 +223,7 @@ class MapperAbstractTest extends BaseTestCase
      *
      * Apenas para ter o coverage completo
      */
-    public function testWhere()
+    public function testWhere(): void
     {
         $this->assertEquals('123456789abcde', $this->mapper->getWhere('123456789abcde'));
     }
@@ -220,7 +231,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests campo deleted
      */
-    public function testDeletedField()
+    public function testDeletedField(): void
     {
         // Verifica se deve remover o registro
         $this->mapper->setUseDeleted(false);
@@ -240,7 +251,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->getSQlString()
      */
-    public function testGetSQlString()
+    public function testGetSQlString(): void
     {
         // Verifica o padrão de não usar o campo deleted e não mostrar os removidos
         $this->mapper->setOrder('id');
@@ -274,17 +285,26 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->testGetSQlSelect()
      */
-    public function testGetSQlSelect()
+    public function testGetSQlSelectWithJoinLeft(): void
     {
         $select = $this->mapper->getTableSelect();
-        $this->assertInstanceOf('\Zend\Db\Sql\Select', $select);
+        $this->assertInstanceOf(Select::class, $select);
         $this->assertEquals($select->getSqlString(), $this->mapper->getTableSelect()->getSqlString());
+        $this->assertEquals('SELECT `album`.* FROM `album`', $select->getSqlString($this->adapter->getPlatform()));
+
+        $this->mapper->setUseJoin(true);
+        $select = $this->mapper->getTableSelect();
+        $this->assertEquals('SELECT `album`.*, `test_table`.`test_column` AS `test_column` FROM `album` LEFT JOIN `test_table` ON `test_condition`', $select->getSqlString($this->adapter->getPlatform()));
+
+        $this->mapperDeprecated->setUseJoin(true);
+        $select = $this->mapperDeprecated->getTableSelect();
+        $this->assertEquals('SELECT `album`.*, `test_table`.`test_column` AS `test_column` FROM `album` LEFT JOIN `test_table` ON `test_condition`', $select->getSqlString($this->adapter->getPlatform()));
     }
 
     /**
      * Tests Base->fetchAll()
      */
-    public function testFetchAll()
+    public function testFetchAll(): void
     {
         $this->assertFalse($this->mapper->isUseHydrateResultSet());
 
@@ -377,7 +397,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->fetchAll()
      */
-    public function testFetchAllHydrateResultSet()
+    public function testFetchAllHydrateResultSet(): void
     {
         $this->mapper->setUseHydrateResultSet(true);
         $this->assertTrue($this->mapper->isUseHydrateResultSet());
@@ -470,7 +490,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->fetchRow()
      */
-    public function testFetchRow()
+    public function testFetchRow(): void
     {
         $this->assertFalse($this->mapper->isUseHydrateResultSet());
 
@@ -496,7 +516,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->fetchRow()
      */
-    public function testFetchRowHydrateResultaSet()
+    public function testFetchRowHydrateResultaSet(): void
     {
         $this->mapper->setUseHydrateResultSet(true);
         $this->assertTrue($this->mapper->isUseHydrateResultSet());
@@ -523,7 +543,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->fetchRow()
      */
-    public function testFetchRowWithIntegerKey()
+    public function testFetchRowWithIntegerKey(): void
     {
         $this->mapper->setTableKey([MapperConcrete::KEY_INTEGER => 'id']);
 
@@ -549,7 +569,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->fetchRow()
      */
-    public function testFetchRowWithStringKey()
+    public function testFetchRowWithStringKey(): void
     {
         $this->dropTables()->createTables(['album_string']);
         $defaultValues = [
@@ -613,7 +633,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Base->fetchRow()
      */
-    public function testFetchRowWithMultipleKey()
+    public function testFetchRowWithMultipleKey(): void
     {
         $this->dropTables()->createTables(['album_array']);
         $defaultValues = [
@@ -684,7 +704,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests Db->insert()
      */
-    public function testInsert()
+    public function testInsert(): void
     {
         // Certifica que a tabela está vazia
         $this->dropTables()->createTables();
@@ -746,14 +766,14 @@ class MapperAbstractTest extends BaseTestCase
             'Verifica se o TERCEIRO registro adicionado corresponde ao original pelo fetchRow()');
 
         // Teste com Zend_Db_Expr
-        $id = $this->mapper->insert(['title' => new \Zend\Db\Sql\Expression('now()')]);
+        $id = $this->mapper->insert(['title' => new Expression('now()')]);
         $this->assertEquals(4, $id);
     }
 
     /**
      * Tests Db->update()
      */
-    public function testUpdate()
+    public function testUpdate(): void
     {
         // Apaga as tabelas
         $this->dropTables()->createTables();
@@ -822,7 +842,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests TableAdapter->delete()
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         // Apaga as tabelas
         $this->dropTables()->createTables();
@@ -905,7 +925,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests TableAdapter->delete()
      */
-    public function testDeleteIntegerKey()
+    public function testDeleteIntegerKey(): void
     {
         $this->dropTables()->createTables();
         $this->mapper->setOrder('id');
@@ -990,7 +1010,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests TableAdapter->delete()
      */
-    public function testDeleteStringKey()
+    public function testDeleteStringKey(): void
     {
 
         // Cria a tabela com chave string
@@ -1088,7 +1108,7 @@ class MapperAbstractTest extends BaseTestCase
      *
      * @expectedException \InvalidArgumentException
      */
-    public function testDeleteInvalidArrayMultiKey()
+    public function testDeleteInvalidArrayMultiKey(): void
     {
         $this->mapper->setTableKey([
             MapperAbstract::KEY_INTEGER => 'id_int',
@@ -1102,7 +1122,7 @@ class MapperAbstractTest extends BaseTestCase
      *
      * @expectedException \LogicException
      */
-    public function testDeleteInvalidArraySingleKey()
+    public function testDeleteInvalidArraySingleKey(): void
     {
         $this->mapper->setTableKey([MapperAbstract::KEY_INTEGER => 'id_int', MapperAbstract::KEY_STRING => 'id_char']);
         $this->mapper->delete(['id_int' => 'A']);
@@ -1112,7 +1132,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests TableAdapter->delete()
      */
-    public function testDeleteArrayKey()
+    public function testDeleteArrayKey(): void
     {
 
         // Cria a tabela com chave string
@@ -1196,7 +1216,7 @@ class MapperAbstractTest extends BaseTestCase
     /**
      * Tests TableAdapter->update()
      */
-    public function testUpdateArrayKey()
+    public function testUpdateArrayKey(): void
     {
         // Cria a tabela com chave string
         $this->mapper->setTableKey([
