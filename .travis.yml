@@ -7,6 +7,9 @@ php:
   - 7.2
   - 7.3
 
+services:
+  - mysql
+
 # optionally specify a list of environments, for example to test different RDBMS
 env:
   - TRAVIS=true EXECUTE_CS_CHECK=true EXECUTE_TEST_COVERALLS=true
