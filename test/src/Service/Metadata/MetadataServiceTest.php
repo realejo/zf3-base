@@ -2,11 +2,13 @@
 
 namespace RealejoTest\Service\Metadata;
 
+use Exception;
 use Realejo\Cache\CacheService;
 use Realejo\Service\Metadata\MetadataMapper;
 use Realejo\Service\Metadata\MetadataService;
 use Realejo\Stdlib\ArrayObject;
 use RealejoTest\BaseTestCase;
+use ReflectionClass;
 use Zend\Db\Sql\Expression;
 
 /**
@@ -127,7 +129,7 @@ class MetadataServiceTest extends BaseTestCase
     /**
      * Tests MetadataService->getSchemaByKeyNames()
      */
-    public function testGetSchemaByKeyNames()
+    public function testGetSchemaByKeyNames(): void
     {
         // Cria o schema exemplo para keyname
         $schemaByKeyName = [];
@@ -142,10 +144,10 @@ class MetadataServiceTest extends BaseTestCase
     /**
      * Tests MetadataService->getCorrectSetKey()
      */
-    public function testGetCorrectSetKey()
+    public function testGetCorrectSetKey(): void
     {
         $service = new MetadataService();
-        $reflection = new \ReflectionClass(get_class($service));
+        $reflection = new ReflectionClass(get_class($service));
         $method = $reflection->getMethod('getCorrectSetKey');
         $method->setAccessible(true);
 
@@ -160,10 +162,10 @@ class MetadataServiceTest extends BaseTestCase
     /**
      * Tests MetadataService->getCorrectSetKey()
      */
-    public function testGetCorrectSetValue()
+    public function testGetCorrectSetValue(): void
     {
         $service = new MetadataService();
-        $reflection = new \ReflectionClass(get_class($service));
+        $reflection = new ReflectionClass(get_class($service));
         $method = $reflection->getMethod('getCorrectSetValue');
         $method->setAccessible(true);
 
@@ -180,7 +182,7 @@ class MetadataServiceTest extends BaseTestCase
         $this->assertEquals('2016-12-10',
             $method->invokeArgs($service, [['type' => MetadataService::DATE], '10/12/2016 14:25:24']));
         $this->assertEquals('0', $method->invokeArgs($service, [['type' => MetadataService::DATE], '0']));
-        $this->assertNull(null, $method->invokeArgs($service, [['type' => MetadataService::DATE], null]));
+        $this->assertNull($method->invokeArgs($service, [['type' => MetadataService::DATE], null]));
 
         $this->assertEquals('value_datetime',
             $method->invokeArgs($service, [['type' => MetadataService::DATETIME], 'value_datetime']));
@@ -206,7 +208,7 @@ class MetadataServiceTest extends BaseTestCase
     /**
      * Tests MetadataService->getMapperSchema()
      */
-    public function testGetMappersSchema()
+    public function testGetMappersSchema(): void
     {
         $service = new MetadataService();
         $cacheService = new CacheService();
@@ -225,7 +227,7 @@ class MetadataServiceTest extends BaseTestCase
         $this->assertEquals('fk_info', $service->getMapperValue()->getTableKey(true));
     }
 
-    public function testCache()
+    public function testCache(): void
     {
         $service = new MetadataService();
         $cacheService = new CacheService();
@@ -287,7 +289,7 @@ class MetadataServiceTest extends BaseTestCase
     /**
      * Tests MetadataService->getSchema()
      */
-    public function testGetSchema()
+    public function testGetSchema(): void
     {
         // Cria o schema associado pelo id
         $schemaById = [];
@@ -311,7 +313,7 @@ class MetadataServiceTest extends BaseTestCase
      * Tests MetadataMapper->getWhere()
      * @depends testGetMappersSchema
      */
-    public function testGetWhere()
+    public function testGetWhere(): void
     {
         $this->assertInternalType('array', $this->metadataService->getWhere([]));
         $this->assertEquals([], $this->metadataService->getWhere([]));
@@ -329,7 +331,7 @@ class MetadataServiceTest extends BaseTestCase
      * Tests MetadataMapper->getWhere()
      * @depends testGetMappersSchema
      */
-    public function testGetWhereBoolean()
+    public function testGetWhereBoolean(): void
     {
         // Cria as tabelas
         $this->createTableSchema();
@@ -429,7 +431,7 @@ class MetadataServiceTest extends BaseTestCase
      * Tests MetadataMapper->getWhere()
      * @depends testGetMappersSchema
      */
-    public function testGetWhereInteger()
+    public function testGetWhereInteger(): void
     {
         // Cria as tabelas
         $this->createTableSchema();
@@ -491,7 +493,7 @@ class MetadataServiceTest extends BaseTestCase
      * Tests MetadataMapper->getWhere()
      * @depends testGetMappersSchema
      */
-    public function testGetWhereString()
+    public function testGetWhereString(): void
     {
         // Cria as tabelas
         $this->createTableSchema();
@@ -575,7 +577,7 @@ class MetadataServiceTest extends BaseTestCase
      * Tests MetadataMapper->getWhere()
      * @depends testGetMappersSchema
      */
-    public function testGetWhereDate()
+    public function testGetWhereDate(): void
     {
         // Cria as tabelas
         $this->createTableSchema();
@@ -672,37 +674,37 @@ class MetadataServiceTest extends BaseTestCase
             $where[0]->getExpression());
     }
 
-    private function getSqlSchemaString($idInfo)
+    private function getSqlSchemaString($idInfo):string
     {
         return "SELECT * FROM metadata_value WHERE metadata_value.fk_info=$idInfo AND tblreference.id_reference=metadata_value.fk_reference";
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Exception
      * @expectedExceptionMessage schemaTable invalid
      */
-    public function testSetSchemaMapper()
+    public function testSetSchemaMapper(): void
     {
         $service = new MetadataService();
-        $service->setMetadataMappers(new \Realejo\Service\Metadata\MetadataMapper('tablename', 'keyname'), null, null);
+        $service->setMetadataMappers(new MetadataMapper('tablename', 'keyname'), null, null);
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Exception
      * @expectedExceptionMessage valueTable invalid
      */
-    public function testSetValuesMapper()
+    public function testSetValuesMapper(): void
     {
         $service = new MetadataService();
-        $service->setMetadataMappers('tableone', new \Realejo\Service\Metadata\MetadataMapper('tablename', 'keyname'),
+        $service->setMetadataMappers('tableone', new MetadataMapper('tablename', 'keyname'),
             null);
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Exception
      * @expectedExceptionMessage mapperForeignKey invalid
      */
-    public function testSetForeignKey()
+    public function testSetForeignKey(): void
     {
         $service = new MetadataService();
         $service->setMetadataMappers('tableone', 'tableone', null);
