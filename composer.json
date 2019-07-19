@@ -27,7 +27,7 @@
     "friendsofphp/php-cs-fixer": "2.*",
     "squizlabs/php_codesniffer": "^2.8 || ^3.0",
     "phpunit/phpunit" : "^6.5 || ^7.0",
-    "zendframework/zend-dom": "~2.6.0"
+    "zendframework/zend-dom": "~2.6.0 || ~2.7.0"
   },
   "autoload" : {
     "psr-4" : {
