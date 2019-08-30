@@ -55,10 +55,10 @@ abstract class ServiceAbstract
     protected $serviceLocator;
 
     /**
-     * Retorna o HTML de um <select> apra usar em formulários
+     * Retorna o HTML de um <select> para usar em formulários
      *
      * @param string $nome Name/ID a ser usado no <select>
-     * @param string $selecionado Valor pré seleiconado
+     * @param string $selecionado Valor pré selecionado
      * @param string $opts Opções adicionais
      *
      * Os valores de option serão os valores dos campos definidos em $htmlSelectOption
@@ -136,14 +136,12 @@ abstract class ServiceAbstract
                 }
 
                 // Verifica se deve usar optgroup e cria o label
-                if ($grouped !== false) {
-                    if ($group !== $row[$grouped]) {
-                        if ($group !== false) {
-                            $options .= '</optgroup>';
-                        }
-                        $options .= '<optgroup label="' . $row[$grouped] . '">';
-                        $group = $row[$grouped];
+                if (($grouped !== false) && $group !== $row[$grouped]) {
+                    if ($group !== false) {
+                        $options .= '</optgroup>';
                     }
+                    $options .= '<optgroup label="' . $row[$grouped] . '">';
+                    $group = $row[$grouped];
                 }
 
                 $options .= "<option value=\"{$row[$key]}\" $data>$option</option>";
@@ -156,7 +154,7 @@ abstract class ServiceAbstract
         }
 
         // Verifica se tem valor padrão
-        if (!is_null($selecionado)) {
+        if ($selecionado !== null) {
             $temp = str_replace(
                 "<option value=\"$selecionado\"",
                 "<option value=\"$selecionado\" selected=\"selected\"",
@@ -397,7 +395,7 @@ abstract class ServiceAbstract
             // Verifica se é uma chave múltipla ou com cast
             if (is_array($this->getMapper()->getTableKey())) {
                 // Verifica se é uma chave simples com cast
-                if (count($this->getMapper()->getTableKey()) != 1) {
+                if (count($this->getMapper()->getTableKey()) !== 1) {
                     throw new \InvalidArgumentException('Não é possível acessar chaves múltiplas informando apenas uma');
                 }
                 $where = [$this->getMapper()->getTableKey(true) => $where];
@@ -458,6 +456,7 @@ abstract class ServiceAbstract
         // Cria a assinatura da consulta
         $cacheKey = 'findAssoc'
             . $this->getUniqueCacheKey()
+            . '_key' . $this->getMapper()->getTableKey(true) . '_'
             . md5($this->getMapper()->getSelect($this->getWhere($where), $order, $count, $offset)->getSqlString(
                 $this->getMapper()->getTableGateway()->getAdapter()->getPlatform()
             ));
@@ -545,7 +544,7 @@ abstract class ServiceAbstract
     /**
      * Inclui um novo registro
      *
-     * @param  array $set Dados do regsitro
+     * @param array $set Dados do registro
      *
      * @return int|array Chave do registro criado
      */
@@ -557,8 +556,8 @@ abstract class ServiceAbstract
     /**
      * Altera um registro
      *
-     * @param  array $set Dados do registro
-     * @param  int|array $key Chave do regsitro a ser alterado
+     * @param array $set Dados do registro
+     * @param int|array $key Chave do registro a ser alterado
      *
      * @return int Quantidade de registro alterados
      */
@@ -622,7 +621,7 @@ abstract class ServiceAbstract
             return null;
         }
 
-        if (!$this->getServiceLocator()->has($class) && $this->getServiceLocator() instanceof ServiceManager) {
+        if ($this->getServiceLocator() instanceof ServiceManager && !$this->getServiceLocator()->has($class)) {
             $newService = new $class();
             if (method_exists($newService, 'setServiceLocator')) {
                 $newService->setServiceLocator($this->getServiceLocator());
