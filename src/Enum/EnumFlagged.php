@@ -32,8 +32,9 @@ abstract class EnumFlagged extends Enum
     /**
      * Return the name os the constant
      *
-     * @param null $value
+     * @param null   $value
      * @param string $join
+     *
      * @return string|array
      */
     public static function getName($value = null, $join = '/')
@@ -65,8 +66,9 @@ abstract class EnumFlagged extends Enum
     /**
      * Descrição dos status
      *
-     * @param null $value
+     * @param null   $value
      * @param string $join
+     *
      * @return string|array|null
      */
     public static function getDescription($value = null, $join = '/')
@@ -98,8 +100,9 @@ abstract class EnumFlagged extends Enum
     /**
      * Return the name os the constant
      *
-     * @param null $value
+     * @param null   $value
      * @param string $join
+     *
      * @return string|array
      */
     public function getValueName($value = null, $join = '/')
@@ -114,8 +117,9 @@ abstract class EnumFlagged extends Enum
     /**
      * Return the name os the constant
      *
-     * @param null $value
+     * @param null   $value
      * @param string $join
+     *
      * @return string|array
      */
     public function getValueDescription($value = null, $join = '/')
@@ -159,5 +163,27 @@ abstract class EnumFlagged extends Enum
         }
 
         return (($this->value & $value) === $value);
+    }
+
+    public function add(int $value): void
+    {
+        if (!static::isValid($value)) {
+            throw new InvalidArgumentException("Value '$value' is not valid.");
+        }
+
+        if (!$this->has($value)) {
+            $this->value += $value;
+        }
+    }
+
+    public function remove(int $value): void
+    {
+        if (!static::isValid($value)) {
+            throw new InvalidArgumentException("Value '$value' is not valid.");
+        }
+
+        if ($this->has($value)) {
+            $this->value -= $value;
+        }
     }
 }

@@ -385,4 +385,93 @@ class EnumFlaggedTest extends TestCase
         $this->assertNotEquals(EnumFlaggedConcrete::READ, $write->getValue());
         $this->assertNotEquals(EnumFlaggedConcrete::WRITE, $read->getValue());
     }
+
+    public function testAddRemove():void
+    {
+        $enum  = new EnumFlaggedConcrete();
+        $this->assertEquals(0, $enum->getValue());
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->add(EnumFlaggedConcrete::READ);
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->add(EnumFlaggedConcrete::WRITE);
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->add(0);
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::READ));
+        $enum->remove(0);
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->remove(EnumFlaggedConcrete::WRITE);
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->add(EnumFlaggedConcrete::EXECUTE);
+        $enum->add(EnumFlaggedConcrete::EXECUTE);
+        $enum->add(EnumFlaggedConcrete::EXECUTE);
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->remove(EnumFlaggedConcrete::READ);
+        $this->assertTrue($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::READ));
+
+        $enum->remove(EnumFlaggedConcrete::EXECUTE);
+        $enum->remove(EnumFlaggedConcrete::EXECUTE);
+        $enum->remove(EnumFlaggedConcrete::EXECUTE);
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::EXECUTE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::WRITE));
+        $this->assertFalse($enum->has(EnumFlaggedConcrete::READ));
+
+        /**
+         * Testes considerando o valor direto
+         */
+        $enum  = new EnumFlaggedConcrete();
+        $enum->add(EnumFlaggedConcrete::EXECUTE);
+        $this->assertEquals(EnumFlaggedConcrete::EXECUTE, $enum->getValue());
+        $enum->add(EnumFlaggedConcrete::EXECUTE);
+        $this->assertEquals(EnumFlaggedConcrete::EXECUTE, $enum->getValue());
+
+        $enum->add(EnumFlaggedConcrete::WRITE);
+        $this->assertEquals(EnumFlaggedConcrete::EXECUTE|EnumFlaggedConcrete::WRITE, $enum->getValue());
+
+        $enum->remove(EnumFlaggedConcrete::EXECUTE);
+        $this->assertEquals(EnumFlaggedConcrete::WRITE, $enum->getValue());
+        $enum->remove(EnumFlaggedConcrete::EXECUTE);
+        $this->assertEquals(EnumFlaggedConcrete::WRITE, $enum->getValue());
+    }
+
+    /**
+     * @expectedExceptionMessage Value '123' is not valid.
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddException():void
+    {
+        $enum  = new EnumFlaggedConcrete();
+        $enum->add(123);
+    }
+
+    /**
+     * @expectedExceptionMessage Value '123' is not valid.
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRemoveException():void
+    {
+        $enum  = new EnumFlaggedConcrete();
+        $enum->remove(123);
+    }
 }
