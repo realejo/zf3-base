@@ -6,9 +6,9 @@ use Realejo\Enum\EnumFlagged;
 
 class EnumFlaggedConcrete extends EnumFlagged
 {
-    const EXECUTE = 1 << 0; // 1
-    const WRITE = 1 << 1; // 2
-    const READ = 1 << 2; // 4
+    public const EXECUTE = 1 << 0; // 1
+    public const WRITE = 1 << 1; // 2
+    public const READ = 1 << 2; // 4
 
     static protected $constDescription = [
         self::EXECUTE => ['x', 'execute'],

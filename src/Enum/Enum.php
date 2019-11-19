@@ -29,6 +29,20 @@ abstract class Enum
 
     protected $value;
 
+    public function __construct($value = null)
+    {
+        $this->setValue($value);
+    }
+
+    public function setValue($value = null): void
+    {
+        if ($value !== null && !static::isValid($value)) {
+            throw new InvalidArgumentException("Value '$value' is not valid.");
+        }
+
+        $this->value = $value;
+    }
+
     /**
      * Return the const values with it's names
      *
@@ -71,7 +85,8 @@ abstract class Enum
      * Return the name os the constant
      *
      * @param null $value
-     * @return string
+     *
+     * @return string|null
      */
     public static function getName($value = null)
     {
@@ -88,6 +103,7 @@ abstract class Enum
      * Return the name os the constant
      *
      * @param null $value
+     *
      * @return string|array
      */
     public function getValueName($value = null)
@@ -96,13 +112,14 @@ abstract class Enum
             $value = $this->value;
         }
 
-        return $this->getName($value);
+        return self::getName($value);
     }
 
     /**
      * Return the name os the constant
      *
      * @param null $value
+     *
      * @return string|array
      */
     public function getValueDescription($value = null)
@@ -111,7 +128,7 @@ abstract class Enum
             $value = $this->value;
         }
 
-        return $this->getDescription($value);
+        return self::getDescription($value);
     }
 
     /**
@@ -136,15 +153,6 @@ abstract class Enum
     {
         $const = static::getNames();
         return in_array($value, array_keys($const), true);
-    }
-
-    public function __construct($value = null)
-    {
-        if ($value !== null && !$this->isValid($value)) {
-            throw new InvalidArgumentException("Value '$value' is not valid.");
-        }
-
-        $this->value = $value;
     }
 
     public function getValue()

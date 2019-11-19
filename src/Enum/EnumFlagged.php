@@ -2,6 +2,8 @@
 
 namespace Realejo\Enum;
 
+use InvalidArgumentException;
+
 /**
  * Enum class
  *
@@ -17,6 +19,16 @@ namespace Realejo\Enum;
  */
 abstract class EnumFlagged extends Enum
 {
+
+    public function setValue($value = null): void
+    {
+        if ($value === '' || $value === null) {
+            $value = 0;
+        }
+
+        parent::setValue($value);
+    }
+
     /**
      * Return the name os the constant
      *
@@ -96,7 +108,7 @@ abstract class EnumFlagged extends Enum
             $value = $this->value;
         }
 
-        return $this->getName($value, $join);
+        return self::getName($value, $join);
     }
 
     /**
@@ -112,15 +124,7 @@ abstract class EnumFlagged extends Enum
             $value = $this->value;
         }
 
-        return $this->getDescription($value, $join);
-    }
-
-    public function __construct($value = 0)
-    {
-        if ($value === '' || $value === null) {
-            $value = 0;
-        }
-        return parent::__construct($value);
+        return self::getDescription($value, $join);
     }
 
     public static function isValid($value): bool
@@ -130,6 +134,7 @@ abstract class EnumFlagged extends Enum
         }
 
         // ZERO is not a const but it's valid because default flagged is ZERO
+        // And it also means 'no flag'
         if ($value === 0) {
             return true;
         }
@@ -138,6 +143,7 @@ abstract class EnumFlagged extends Enum
         if (empty($const)) {
             return false;
         }
+
         $maxFlaggedValue = max($const) * 2 - 1;
         return ($value <= $maxFlaggedValue);
     }
