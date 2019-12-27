@@ -977,7 +977,7 @@ abstract class MapperAbstract
 
     /**
      * @param bool $asObject
-     * @return ArrayObject
+     * @return ArrayObject|string
      */
     public function getHydratorEntity($asObject = true)
     {
@@ -994,11 +994,11 @@ abstract class MapperAbstract
     }
 
     /**
-     * @param ArrayObject $hydratorEntity
+     * @param string $hydratorEntity
      *
      * @return MapperAbstract
      */
-    public function setHydratorEntity(ArrayObject $hydratorEntity)
+    public function setHydratorEntity(string $hydratorEntity)
     {
         $this->hydratorEntity = $hydratorEntity;
 
